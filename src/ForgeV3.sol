@@ -32,16 +32,14 @@ abstract contract ERC20ForgeV3 is BaseForge {
         "ERC20Burn(uint256 uuid, address from, address token, uint256 amount, uint256 nonce, uint256 deadline)"
     );
 
-    function mintERC20(
-        uint256 uuid,
-        address recipient,
-        address token,
-        uint256 amount,
-        uint256 deadline,
-        bytes calldata validatorSig
-    ) external checkDeadline(deadline) {
+    function mintERC20(address recipient, address token, uint256 amount, uint256 deadline, bytes calldata validatorSig)
+        external
+        checkDeadline(deadline)
+    {
+        uint256 nonce = _useNonce(recipient);
+        uint256 uuid = _calcUUID(recipient, nonce);
         bytes32 structHash =
-            keccak256(abi.encode(ERC20_MINT_TYPE_HASH, uuid, recipient, token, amount, _useNonce(recipient), deadline));
+            keccak256(abi.encode(ERC20_MINT_TYPE_HASH, uuid, recipient, token, amount, nonce, deadline));
 
         bytes32 hash = _hashTypedDataV4(structHash);
         _verifyValidatorSignature(hash, validatorSig);
@@ -51,16 +49,16 @@ abstract contract ERC20ForgeV3 is BaseForge {
     }
 
     function transferERC20(
-        uint256 uuid,
         address recipient,
         address token,
         uint256 amount,
         uint256 deadline,
         bytes calldata validatorSig
     ) external checkDeadline(deadline) {
-        bytes32 structHash = keccak256(
-            abi.encode(ERC20_TRANSFER_TYPE_HASH, uuid, recipient, token, amount, _useNonce(recipient), deadline)
-        );
+        uint256 nonce = _useNonce(recipient);
+        uint256 uuid = _calcUUID(recipient, nonce);
+        bytes32 structHash =
+            keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH, uuid, recipient, token, amount, nonce, deadline));
 
         bytes32 hash = _hashTypedDataV4(structHash);
         _verifyValidatorSignature(hash, validatorSig);
@@ -70,16 +68,13 @@ abstract contract ERC20ForgeV3 is BaseForge {
     }
 
     // recipient: msg.sender
-    function burnERC20(
-        uint256 uuid,
-        address from,
-        address token,
-        uint256 amount,
-        uint256 deadline,
-        bytes calldata validatorSig
-    ) external checkDeadline(deadline) {
-        bytes32 structHash =
-            keccak256(abi.encode(ERC20_BURN_TYPE_HASH, uuid, from, token, amount, _useNonce(from), deadline));
+    function burnERC20(address from, address token, uint256 amount, uint256 deadline, bytes calldata validatorSig)
+        external
+        checkDeadline(deadline)
+    {
+        uint256 nonce = _useNonce(from);
+        uint256 uuid = _calcUUID(from, nonce);
+        bytes32 structHash = keccak256(abi.encode(ERC20_BURN_TYPE_HASH, uuid, from, token, amount, nonce, deadline));
 
         bytes32 hash = _hashTypedDataV4(structHash);
         _verifyValidatorSignature(hash, validatorSig);
@@ -106,16 +101,16 @@ abstract contract ERC721ForgeV3 is BaseForge, ERC721HolderUpgradeable {
     );
 
     function mintERC721(
-        uint256 uuid,
         address recipient,
         address token,
         uint256 tokenID,
         uint256 deadline,
         bytes calldata validatorSig
     ) external checkDeadline(deadline) {
-        bytes32 structHash = keccak256(
-            abi.encode(ERC721_MINT_TYPE_HASH, uuid, recipient, token, tokenID, _useNonce(recipient), deadline)
-        );
+        uint256 nonce = _useNonce(recipient);
+        uint256 uuid = _calcUUID(recipient, nonce);
+        bytes32 structHash =
+            keccak256(abi.encode(ERC721_MINT_TYPE_HASH, uuid, recipient, token, tokenID, nonce, deadline));
 
         bytes32 hash = _hashTypedDataV4(structHash);
         _verifyValidatorSignature(hash, validatorSig);
@@ -125,7 +120,6 @@ abstract contract ERC721ForgeV3 is BaseForge, ERC721HolderUpgradeable {
     }
 
     function transferERC721(
-        uint256 uuid,
         address recipient,
         address token,
         uint256 tokenID,
@@ -133,27 +127,27 @@ abstract contract ERC721ForgeV3 is BaseForge, ERC721HolderUpgradeable {
         bytes calldata validatorSig,
         bytes calldata data
     ) external checkDeadline(deadline) {
-        bytes32 structHash = keccak256(
-            abi.encode(ERC721_TRANSFER_TYPE_HASH, uuid, recipient, token, tokenID, _useNonce(recipient), deadline)
-        );
+        uint256 uuid;
+        {
+            uint256 nonce = _useNonce(recipient);
+            uuid = _calcUUID(recipient, nonce);
+            bytes32 structHash =
+                keccak256(abi.encode(ERC721_TRANSFER_TYPE_HASH, uuid, recipient, token, tokenID, nonce, deadline));
 
-        bytes32 hash = _hashTypedDataV4(structHash);
-        _verifyValidatorSignature(hash, validatorSig);
-
+            bytes32 hash = _hashTypedDataV4(structHash);
+            _verifyValidatorSignature(hash, validatorSig);
+        }
         IERC721Forge(token).safeTransferFrom(address(this), recipient, tokenID, data);
         _alertMintToFactory(TokenType.ERC721, uuid, token, abi.encode(recipient, tokenID));
     }
 
-    function burnERC721(
-        uint256 uuid,
-        address from,
-        address token,
-        uint256 tokenID,
-        uint256 deadline,
-        bytes calldata validatorSig
-    ) external checkDeadline(deadline) {
-        bytes32 structHash =
-            keccak256(abi.encode(ERC721_BURN_TYPE_HASH, uuid, from, token, tokenID, _useNonce(from), deadline));
+    function burnERC721(address from, address token, uint256 tokenID, uint256 deadline, bytes calldata validatorSig)
+        external
+        checkDeadline(deadline)
+    {
+        uint256 nonce = _useNonce(from);
+        uint256 uuid = _calcUUID(from, nonce);
+        bytes32 structHash = keccak256(abi.encode(ERC721_BURN_TYPE_HASH, uuid, from, token, tokenID, nonce, deadline));
 
         bytes32 hash = _hashTypedDataV4(structHash);
         _verifyValidatorSignature(hash, validatorSig);
@@ -188,7 +182,6 @@ abstract contract ERC1155ForgeV3 is BaseForge, ERC1155HolderUpgradeable {
     );
 
     function mintERC1155(
-        uint256 uuid,
         address recipient,
         address token,
         uint256 tokenID,
@@ -197,12 +190,11 @@ abstract contract ERC1155ForgeV3 is BaseForge, ERC1155HolderUpgradeable {
         bytes memory validatorSig,
         bytes memory data
     ) external checkDeadline(deadline) {
+        uint256 nonce = _useNonce(recipient);
+        uint256 uuid = _calcUUID(recipient, nonce);
         {
-            bytes32 structHash = keccak256(
-                abi.encode(
-                    ERC1155_MINT_TYPE_HASH, uuid, recipient, token, tokenID, amount, _useNonce(recipient), deadline
-                )
-            );
+            bytes32 structHash =
+                keccak256(abi.encode(ERC1155_MINT_TYPE_HASH, uuid, recipient, token, tokenID, amount, nonce, deadline));
 
             bytes32 hash = _hashTypedDataV4(structHash);
             _verifyValidatorSignature(hash, validatorSig);
@@ -213,7 +205,6 @@ abstract contract ERC1155ForgeV3 is BaseForge, ERC1155HolderUpgradeable {
     }
 
     function transferERC1155(
-        uint256 uuid,
         address recipient,
         address token,
         uint256 tokenID,
@@ -222,11 +213,11 @@ abstract contract ERC1155ForgeV3 is BaseForge, ERC1155HolderUpgradeable {
         bytes memory validatorSig,
         bytes memory data
     ) external checkDeadline(deadline) {
+        uint256 nonce = _useNonce(recipient);
+        uint256 uuid = _calcUUID(recipient, nonce);
         {
             bytes32 structHash = keccak256(
-                abi.encode(
-                    ERC1155_TRANSFER_TYPE_HASH, uuid, recipient, token, tokenID, amount, _useNonce(recipient), deadline
-                )
+                abi.encode(ERC1155_TRANSFER_TYPE_HASH, uuid, recipient, token, tokenID, amount, nonce, deadline)
             );
 
             bytes32 hash = _hashTypedDataV4(structHash);
@@ -240,7 +231,6 @@ abstract contract ERC1155ForgeV3 is BaseForge, ERC1155HolderUpgradeable {
     }
 
     function burnERC1155(
-        uint256 uuid,
         address from,
         address token,
         uint256 tokenID,
@@ -248,18 +238,22 @@ abstract contract ERC1155ForgeV3 is BaseForge, ERC1155HolderUpgradeable {
         uint256 deadline,
         bytes calldata validatorSig
     ) external checkDeadline(deadline) {
-        bytes32 structHash =
-            keccak256(abi.encode(ERC1155_BURN_TYPE_HASH, uuid, from, token, tokenID, amount, _useNonce(from), deadline));
+        uint256 uuid;
+        {
+            uint256 nonce = _useNonce(from);
+            uuid = _calcUUID(from, nonce);
+            bytes32 structHash =
+                keccak256(abi.encode(ERC1155_BURN_TYPE_HASH, uuid, from, token, tokenID, amount, nonce, deadline));
 
-        bytes32 hash = _hashTypedDataV4(structHash);
-        _verifyValidatorSignature(hash, validatorSig);
+            bytes32 hash = _hashTypedDataV4(structHash);
+            _verifyValidatorSignature(hash, validatorSig);
+        }
 
         IERC1155Forge(token).burnFrom(from, tokenID, amount);
         _alertBurnToFactory(TokenType.ERC1155, uuid, token, abi.encode(false, abi.encode(from, tokenID, amount)));
     }
 
     function mintERC1155Batch(
-        uint256 uuid,
         address recipient,
         address token,
         uint256[] memory tokenIDs,
@@ -268,21 +262,22 @@ abstract contract ERC1155ForgeV3 is BaseForge, ERC1155HolderUpgradeable {
         bytes memory validatorSig,
         bytes memory data
     ) external checkDeadline(deadline) {
-        bytes32 structHash = keccak256(
-            abi.encode(
-                ERC1155_BATCH_MINT_TYPE_HASH, uuid, recipient, token, tokenIDs, amounts, _useNonce(recipient), deadline
-            )
-        );
+        uint256 uuid;
+        {
+            uint256 nonce = _useNonce(recipient);
+            uuid = _calcUUID(recipient, nonce);
+            bytes32 structHash = keccak256(
+                abi.encode(ERC1155_BATCH_MINT_TYPE_HASH, uuid, recipient, token, tokenIDs, amounts, nonce, deadline)
+            );
 
-        bytes32 hash = _hashTypedDataV4(structHash);
-        _verifyValidatorSignature(hash, validatorSig);
-
+            bytes32 hash = _hashTypedDataV4(structHash);
+            _verifyValidatorSignature(hash, validatorSig);
+        }
         IERC1155Forge(token).mintBatch(recipient, tokenIDs, amounts, data);
         _alertMintToFactory(TokenType.ERC1155, uuid, token, abi.encode(true, abi.encode(recipient, tokenIDs, amounts)));
     }
 
     function transferERC1155Batch(
-        uint256 uuid,
         address recipient,
         address token,
         uint256[] memory tokenIDs,
@@ -291,22 +286,17 @@ abstract contract ERC1155ForgeV3 is BaseForge, ERC1155HolderUpgradeable {
         bytes memory validatorSig,
         bytes memory data
     ) external checkDeadline(deadline) {
-        bytes32 structHash = keccak256(
-            abi.encode(
-                ERC1155_BATCH_TRANSFER_TYPE_HASH,
-                uuid,
-                recipient,
-                token,
-                tokenIDs,
-                amounts,
-                _useNonce(recipient),
-                deadline
-            )
-        );
+        uint256 uuid;
+        {
+            uint256 nonce = _useNonce(recipient);
+            uuid = _calcUUID(recipient, nonce);
+            bytes32 structHash = keccak256(
+                abi.encode(ERC1155_BATCH_TRANSFER_TYPE_HASH, uuid, recipient, token, tokenIDs, amounts, nonce, deadline)
+            );
 
-        bytes32 hash = _hashTypedDataV4(structHash);
-        _verifyValidatorSignature(hash, validatorSig);
-
+            bytes32 hash = _hashTypedDataV4(structHash);
+            _verifyValidatorSignature(hash, validatorSig);
+        }
         IERC1155Forge(token).safeBatchTransferFrom(address(this), recipient, tokenIDs, amounts, data);
         _alertTransferToFactory(
             TokenType.ERC1155, uuid, token, abi.encode(true, abi.encode(recipient, tokenIDs, amounts))
@@ -314,7 +304,6 @@ abstract contract ERC1155ForgeV3 is BaseForge, ERC1155HolderUpgradeable {
     }
 
     function burnERC1155Batch(
-        uint256 uuid,
         address from,
         address token,
         uint256[] memory tokenIDs,
@@ -322,9 +311,10 @@ abstract contract ERC1155ForgeV3 is BaseForge, ERC1155HolderUpgradeable {
         uint256 deadline,
         bytes memory validatorSig
     ) external checkDeadline(deadline) {
-        bytes32 structHash = keccak256(
-            abi.encode(ERC1155_BATCH_BURN_TYPE_HASH, uuid, from, token, tokenIDs, amounts, _useNonce(from), deadline)
-        );
+        uint256 nonce = _useNonce(from);
+        uint256 uuid = _calcUUID(from, nonce);
+        bytes32 structHash =
+            keccak256(abi.encode(ERC1155_BATCH_BURN_TYPE_HASH, uuid, from, token, tokenIDs, amounts, nonce, deadline));
 
         bytes32 hash = _hashTypedDataV4(structHash);
         _verifyValidatorSignature(hash, validatorSig);

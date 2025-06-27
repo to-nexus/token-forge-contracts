@@ -93,6 +93,10 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
         $._validator = newValidator;
         emit ValidatorUpdated(newValidator);
     }
+
+    function _calcUUID(address user, uint256 nonce) internal view returns (uint256) {
+        return uint256(keccak256(abi.encode(address(this), user, nonce)));
+    }
 }
 
 import {IDiamondCut, LibDiamond} from "diamond-3-hardhat-1.0.0/libraries/LibDiamond.sol";
