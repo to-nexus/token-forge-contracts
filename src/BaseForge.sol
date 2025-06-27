@@ -95,7 +95,7 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
     }
 }
 
-import {IDiamondCut, LibDiamond} from "diamond-3-hardhat-1.0.0/contracts/libraries/LibDiamond.sol";
+import {IDiamondCut, LibDiamond} from "diamond-3-hardhat-1.0.0/libraries/LibDiamond.sol";
 import {IDefaultDiamondCut} from "./interfaces/IDefaultDiamondCut.sol";
 import {IBaseForgeFacet} from "./interfaces/IBaseForgeFacet.sol";
 

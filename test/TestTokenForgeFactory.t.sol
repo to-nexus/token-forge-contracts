@@ -1,20 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Test, console} from "forge-std-1.9.7/src/Test.sol";
-import {Vm} from "forge-std-1.9.7/src/Vm.sol";
+import {Test, console} from "forge-std-1.9.7/Test.sol";
+import {Vm} from "forge-std-1.9.7/Vm.sol";
 
-import {IDiamondCut} from "diamond-3-hardhat-1.0.0/contracts/interfaces/IDiamondCut.sol";
-import {IDiamondLoupe} from "diamond-3-hardhat-1.0.0/contracts/interfaces/IDiamondLoupe.sol";
-import {IERC173} from "diamond-3-hardhat-1.0.0/contracts/interfaces/IERC173.sol";
+import {IDiamondCut} from "diamond-3-hardhat-1.0.0/interfaces/IDiamondCut.sol";
+import {IDiamondLoupe} from "diamond-3-hardhat-1.0.0/interfaces/IDiamondLoupe.sol";
+import {IERC173} from "diamond-3-hardhat-1.0.0/interfaces/IERC173.sol";
 import {ERC1967Proxy} from "@openzeppelin-contracts-5.3.0/proxy/ERC1967/ERC1967Proxy.sol";
 
 import {ForgeProxyCode} from "../src/ForgeProxy.sol";
 import {Diamond3Facet} from "../src/Diamond3Facet.sol";
 import {BaseForge, BaseForgeFacet} from "../src/BaseForge.sol";
-import {ERC20ForgeFacet} from "../src/ERC20Forge.sol";
-import {ERC721ForgeFacet} from "../src/ERC721Forge.sol";
-import {ERC1155ForgeFacet} from "../src/ERC1155Forge.sol";
 import {TokenForgeFactory} from "../src/TokenForgeFactory.sol";
 
 contract TestTokenForgeFactory is Test {
@@ -23,9 +20,6 @@ contract TestTokenForgeFactory is Test {
     ForgeProxyCode public forgeProxyCode;
     Diamond3Facet public diamond3Facet;
     BaseForgeFacet public baseForgeFacet;
-    ERC20ForgeFacet public eRC20ForgeFacet;
-    ERC721ForgeFacet public eRC721ForgeFacet;
-    ERC1155ForgeFacet public eRC1155ForgeFacet;
     TokenForgeFactory public tokenForgeFactory;
 
     function setUp() public {
@@ -35,9 +29,6 @@ contract TestTokenForgeFactory is Test {
         // deploy faucets
         diamond3Facet = new Diamond3Facet();
         baseForgeFacet = new BaseForgeFacet();
-        eRC20ForgeFacet = new ERC20ForgeFacet();
-        eRC721ForgeFacet = new ERC721ForgeFacet();
-        eRC1155ForgeFacet = new ERC1155ForgeFacet();
         // deploy proxy code
         forgeProxyCode = new ForgeProxyCode();
         // deploy factory
@@ -119,7 +110,7 @@ contract TestTokenForgeFactory is Test {
             assertEq(BaseForge(forgeProxy).validator(), validator.addr, "Validator address mismatch");
             assertEq(IERC173(forgeProxy).owner(), serviceOwner, "Service Owner address mismatch");
         }
-        // check facotry data
+        // check factory data
         {
             // allForges
             (string[] memory services, address[] memory forges) = tokenForgeFactory.allForges();

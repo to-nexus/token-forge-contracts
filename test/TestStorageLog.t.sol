@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Test, console} from "forge-std-1.9.7/src/Test.sol";
+import {Test, console} from "forge-std-1.9.7/Test.sol";
 
 contract TestStorageLog is Test {
     function setUp() public {}

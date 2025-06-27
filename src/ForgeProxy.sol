@@ -4,8 +4,8 @@ pragma solidity 0.8.28;
 /**
  * override constructor from diamond-3-hardhat/contracts/Diamond.sol
  */
-import {LibDiamond} from "diamond-3-hardhat-1.0.0/contracts/libraries/LibDiamond.sol";
-import {IDiamondCut} from "diamond-3-hardhat-1.0.0/contracts/interfaces/IDiamondCut.sol";
+import {LibDiamond} from "diamond-3-hardhat-1.0.0/libraries/LibDiamond.sol";
+import {IDiamondCut} from "diamond-3-hardhat-1.0.0/interfaces/IDiamondCut.sol";
 import {IDefaultDiamondCut} from "./interfaces/IDefaultDiamondCut.sol";
 import {IBaseForgeFacet} from "./interfaces/IBaseForgeFacet.sol";
 

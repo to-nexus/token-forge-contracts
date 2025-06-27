@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.28;
 
-import {IDiamondCut} from "diamond-3-hardhat-1.0.0/contracts/interfaces/IDiamondCut.sol";
-import {DiamondCutFacet} from "diamond-3-hardhat-1.0.0/contracts/facets/DiamondCutFacet.sol";
-import {DiamondLoupeFacet} from "diamond-3-hardhat-1.0.0/contracts/facets/DiamondLoupeFacet.sol";
-import {OwnershipFacet} from "diamond-3-hardhat-1.0.0/contracts/facets/OwnershipFacet.sol";
+import {IDiamondCut} from "diamond-3-hardhat-1.0.0/interfaces/IDiamondCut.sol";
+import {DiamondCutFacet} from "diamond-3-hardhat-1.0.0/facets/DiamondCutFacet.sol";
+import {DiamondLoupeFacet} from "diamond-3-hardhat-1.0.0/facets/DiamondLoupeFacet.sol";
+import {OwnershipFacet} from "diamond-3-hardhat-1.0.0/facets/OwnershipFacet.sol";
 
 import {IDefaultDiamondCut} from "./interfaces/IDefaultDiamondCut.sol";
 
