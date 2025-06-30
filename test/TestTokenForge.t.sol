@@ -9,6 +9,7 @@ import {IDiamondLoupe} from "diamond-3-hardhat-1.0.0/interfaces/IDiamondLoupe.so
 import {IERC173} from "diamond-3-hardhat-1.0.0/interfaces/IERC173.sol";
 import {ERC1967Proxy} from "@openzeppelin-contracts-5.3.0/proxy/ERC1967/ERC1967Proxy.sol";
 import {MessageHashUtils} from "@openzeppelin-contracts-5.3.0/utils/cryptography/MessageHashUtils.sol";
+import {ShortString, ShortStrings} from "@openzeppelin-contracts-5.3.0/utils/ShortStrings.sol";
 
 import {ForgeProxyCode} from "../src/ForgeProxy.sol";
 import {Diamond3Facet} from "../src/Diamond3Facet.sol";
@@ -18,6 +19,9 @@ import "../src/ForgeV1.sol";
 import "../src/ForgeV2.sol";
 import "../src/ForgeV3.sol";
 
+import {IERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/IERC20.sol";
+import {IERC721} from "@openzeppelin-contracts-5.3.0/token/ERC721/IERC721.sol";
+import {IERC1155} from "@openzeppelin-contracts-5.3.0/token/ERC1155/IERC1155.sol";
 import {MockERC20} from "./mock/MockERC20.sol";
 import {MockERC721} from "./mock/MockERC721.sol";
 import {MockERC1155} from "./mock/MockERC1155.sol";
@@ -29,6 +33,7 @@ contract TestTokenForgeFactory is Test {
     address public constant SERVICE_OWNER = address(bytes20("SERVICE_OWNER"));
 
     string public constant SERVICE_NAME = "TestService";
+    bytes32 public SERVICE_NAME_B32 = ShortString.unwrap(ShortStrings.toShortString(SERVICE_NAME));
     Vm.Wallet public VALIDATOR = vm.createWallet("Validator");
     Vm.Wallet public ACCOUNT = vm.createWallet("Account");
 
@@ -94,9 +99,15 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
 
         bytes32 structHash =
-            keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, amount, nonce, deadline));
+            keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC20.Transfer(address(0), ACCOUNT.addr, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -131,9 +142,15 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
 
         bytes32 structHash =
-            keccak256(abi.encode(ERC721_MINT_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenID, nonce, deadline));
+            keccak256(abi.encode(ERC721_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC721.Transfer(address(0), ACCOUNT.addr, tokenID);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC721Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -169,11 +186,16 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
         bytes memory data = "Minting ERC1155 token";
 
-        bytes32 structHash = keccak256(
-            abi.encode(ERC1155_MINT_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenID, amount, nonce, deadline)
-        );
+        bytes32 structHash =
+            keccak256(abi.encode(ERC1155_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferSingle(address(FORGE), address(0), ACCOUNT.addr, tokenID, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -214,15 +236,22 @@ contract TestTokenForgeFactory is Test {
         bytes memory data = "Minting ERC1155 token";
 
         bytes32 structHash = keccak256(
-            abi.encode(ERC1155_MINT_BATCH_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
+            abi.encode(ERC1155_MINT_BATCH_TYPE_HASH_V1, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
         );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferBatch(address(FORGE), address(0), ACCOUNT.addr, tokenIDs, amounts);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
+
         // send transaction
         vm.prank(ACCOUNT.addr);
         ForgeV1(FORGE).mintERC1155Batch(token, tokenIDs, amounts, deadline, abi.encodePacked(r, s, v), data);
-
         assertEq(amounts[0], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[0]), "Minted tokenID mismatch");
         assertEq(amounts[1], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[1]), "Minted tokenID mismatch");
     }
@@ -257,9 +286,15 @@ contract TestTokenForgeFactory is Test {
         MockERC20(token).forceMint(FORGE, amount);
 
         bytes32 structHash =
-            keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, amount, nonce, deadline));
+            keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC20.Transfer(address(FORGE), ACCOUNT.addr, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -290,19 +325,25 @@ contract TestTokenForgeFactory is Test {
         vm.label(token, "MockERC721");
 
         // validator signature
-        uint256 uuid = _calcUUID(0);
         uint256 tokenID = 1;
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+        uint256 uuid = _calcUUID(nonce);
         bytes memory data = "Transfer ERC721 token";
 
         // charge token to forge
         MockERC721(token).forceMint(FORGE, tokenID);
 
         bytes32 structHash =
-            keccak256(abi.encode(ERC721_TRANSFER_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenID, nonce, deadline));
+            keccak256(abi.encode(ERC721_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC721.Transfer(address(FORGE), ACCOUNT.addr, tokenID);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC721Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -343,11 +384,16 @@ contract TestTokenForgeFactory is Test {
         // charge token to forge
         MockERC1155(token).forceMint(FORGE, tokenID, amount);
 
-        bytes32 structHash = keccak256(
-            abi.encode(ERC1155_TRANSFER_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenID, amount, nonce, deadline)
-        );
+        bytes32 structHash =
+            keccak256(abi.encode(ERC1155_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferSingle(address(FORGE), address(FORGE), ACCOUNT.addr, tokenID, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -393,12 +439,18 @@ contract TestTokenForgeFactory is Test {
         MockERC1155(token).forceMintBatch(FORGE, tokenIDs, amounts);
 
         bytes32 structHash = keccak256(
-            abi.encode(
-                ERC1155_TRANSFER_BATCH_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline
-            )
+            abi.encode(ERC1155_TRANSFER_BATCH_TYPE_HASH_V1, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
         );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferBatch(address(FORGE), address(FORGE), ACCOUNT.addr, tokenIDs, amounts);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -441,9 +493,15 @@ contract TestTokenForgeFactory is Test {
         MockERC20(token).approve(FORGE, amount);
 
         bytes32 structHash =
-            keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, amount, nonce, deadline));
+            keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -485,9 +543,15 @@ contract TestTokenForgeFactory is Test {
         MockERC721(token).approve(FORGE, tokenID);
 
         bytes32 structHash =
-            keccak256(abi.encode(ERC721_BURN_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenID, nonce, deadline));
+            keccak256(abi.encode(ERC721_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC721.Transfer(ACCOUNT.addr, address(0), tokenID);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC721Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -517,23 +581,28 @@ contract TestTokenForgeFactory is Test {
         vm.label(token, "MockERC1155");
 
         // validator signature
-        uint256 uuid = _calcUUID(0);
         uint256 tokenID = 1;
         uint256 amount = 10 ether;
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+        uint256 uuid = _calcUUID(nonce);
 
-        // charge token to acount
+        // charge token to account
         MockERC1155(token).forceMint(ACCOUNT.addr, tokenID, amount);
         // approve to forge
         vm.prank(ACCOUNT.addr);
         MockERC1155(token).setApprovalForAll(FORGE, true);
 
-        bytes32 structHash = keccak256(
-            abi.encode(ERC1155_BURN_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenID, amount, nonce, deadline)
-        );
+        bytes32 structHash =
+            keccak256(abi.encode(ERC1155_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferSingle(address(FORGE), ACCOUNT.addr, address(0), tokenID, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -579,10 +648,18 @@ contract TestTokenForgeFactory is Test {
         MockERC1155(token).setApprovalForAll(FORGE, true);
 
         bytes32 structHash = keccak256(
-            abi.encode(ERC1155_BURN_BATCH_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
+            abi.encode(ERC1155_BURN_BATCH_TYPE_HASH_V1, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
         );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferBatch(address(FORGE), ACCOUNT.addr, address(0), tokenIDs, amounts);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -629,11 +706,17 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC20_VALIDATOR_MINT_TYPE_HASH_V2, uuid, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC20_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
         }
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC20.Transfer(address(0), ACCOUNT.addr, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -679,11 +762,17 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC721_VALIDATOR_MINT_TYPE_HASH_V2, uuid, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC721_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
         }
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC721.Transfer(address(0), ACCOUNT.addr, tokenID);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC721Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -731,11 +820,17 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_MINT_TYPE_HASH_V2, uuid, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
         }
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferSingle(address(FORGE), address(0), ACCOUNT.addr, tokenID, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -788,11 +883,19 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_MINT_BATCH_TYPE_HASH_V2, uuid, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_MINT_BATCH_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
         }
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferBatch(address(FORGE), address(0), ACCOUNT.addr, tokenIDs, amounts);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -843,11 +946,17 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC20_VALIDATOR_TRANSFER_TYPE_HASH_V2, uuid, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC20_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
         }
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC20.Transfer(address(FORGE), ACCOUNT.addr, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -898,11 +1007,17 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC721_VALIDATOR_TRANSFER_TYPE_HASH_V2, uuid, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC721_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
         }
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC721.Transfer(address(FORGE), ACCOUNT.addr, tokenID);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC721Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -955,11 +1070,17 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_TRANSFER_TYPE_HASH_V2, uuid, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
         }
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferSingle(address(FORGE), address(FORGE), ACCOUNT.addr, tokenID, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -1017,11 +1138,19 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_TRANSFER_BATCH_TYPE_HASH_V2, uuid, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_TRANSFER_BATCH_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
         }
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferBatch(address(FORGE), address(FORGE), ACCOUNT.addr, tokenIDs, amounts);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -1074,11 +1203,17 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH_V2, uuid, ACCOUNT.addr, fromSig));
+                keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, fromSig));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
         }
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -1129,11 +1264,17 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC721_VALIDATOR_BURN_TYPE_HASH_V2, uuid, ACCOUNT.addr, fromSig));
+                keccak256(abi.encode(ERC721_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, fromSig));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
         }
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC721.Transfer(ACCOUNT.addr, address(0), tokenID);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC721Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -1186,11 +1327,17 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_BURN_TYPE_HASH_V2, uuid, ACCOUNT.addr, fromSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, fromSig));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
         }
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferSingle(address(FORGE), ACCOUNT.addr, address(0), tokenID, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -1247,11 +1394,19 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_BURN_BATCH_TYPE_HASH_V2, uuid, ACCOUNT.addr, fromSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_BURN_BATCH_TYPE_HASH_V2, ACCOUNT.addr, fromSig));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
         }
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferBatch(address(FORGE), ACCOUNT.addr, address(0), tokenIDs, amounts);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -1287,9 +1442,15 @@ contract TestTokenForgeFactory is Test {
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
         uint256 uuid = _calcUUID(nonce);
         bytes32 structHash =
-            keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, amount, nonce, deadline));
+            keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC20.Transfer(address(0), ACCOUNT.addr, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, deadline, abi.encodePacked(r, s, v));
@@ -1323,9 +1484,15 @@ contract TestTokenForgeFactory is Test {
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
         uint256 uuid = _calcUUID(nonce);
         bytes32 structHash =
-            keccak256(abi.encode(ERC721_MINT_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenID, nonce, deadline));
+            keccak256(abi.encode(ERC721_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC721.Transfer(address(0), ACCOUNT.addr, tokenID);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC721Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         ForgeV3(FORGE).mintERC721(ACCOUNT.addr, token, tokenID, deadline, abi.encodePacked(r, s, v));
@@ -1361,11 +1528,16 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
         bytes memory data = "Minting ERC1155 token";
 
-        bytes32 structHash = keccak256(
-            abi.encode(ERC1155_MINT_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenID, amount, nonce, deadline)
-        );
+        bytes32 structHash =
+            keccak256(abi.encode(ERC1155_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferSingle(address(FORGE), address(0), ACCOUNT.addr, tokenID, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         ForgeV3(FORGE).mintERC1155(ACCOUNT.addr, token, tokenID, amount, deadline, abi.encodePacked(r, s, v), data);
@@ -1406,16 +1578,23 @@ contract TestTokenForgeFactory is Test {
         bytes memory data = "Minting ERC1155 token";
 
         bytes32 structHash = keccak256(
-            abi.encode(ERC1155_MINT_BATCH_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
+            abi.encode(ERC1155_MINT_BATCH_TYPE_HASH_V1, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
         );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferBatch(address(FORGE), address(0), ACCOUNT.addr, tokenIDs, amounts);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         ForgeV3(FORGE).mintERC1155Batch(
             ACCOUNT.addr, token, tokenIDs, amounts, deadline, abi.encodePacked(r, s, v), data
         );
-
         assertEq(amounts[0], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[0]), "Minted tokenID mismatch");
         assertEq(amounts[1], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[1]), "Minted tokenID mismatch");
     }
@@ -1441,7 +1620,6 @@ contract TestTokenForgeFactory is Test {
         vm.label(token, "MockERC20");
 
         // validator signature
-
         uint256 amount = 100 ether;
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
@@ -1450,9 +1628,15 @@ contract TestTokenForgeFactory is Test {
         MockERC20(token).forceMint(FORGE, amount);
 
         bytes32 structHash =
-            keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, amount, nonce, deadline));
+            keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC20.Transfer(address(FORGE), ACCOUNT.addr, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, deadline, abi.encodePacked(r, s, v));
@@ -1492,9 +1676,15 @@ contract TestTokenForgeFactory is Test {
         MockERC721(token).forceMint(FORGE, tokenID);
 
         bytes32 structHash =
-            keccak256(abi.encode(ERC721_TRANSFER_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenID, nonce, deadline));
+            keccak256(abi.encode(ERC721_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC721.Transfer(address(FORGE), ACCOUNT.addr, tokenID);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC721Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         ForgeV3(FORGE).transferERC721(ACCOUNT.addr, token, tokenID, deadline, abi.encodePacked(r, s, v), data);
@@ -1534,11 +1724,16 @@ contract TestTokenForgeFactory is Test {
         // charge token to forge
         MockERC1155(token).forceMint(FORGE, tokenID, amount);
 
-        bytes32 structHash = keccak256(
-            abi.encode(ERC1155_TRANSFER_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenID, amount, nonce, deadline)
-        );
+        bytes32 structHash =
+            keccak256(abi.encode(ERC1155_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferSingle(address(FORGE), address(FORGE), ACCOUNT.addr, tokenID, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         ForgeV3(FORGE).transferERC1155(ACCOUNT.addr, token, tokenID, amount, deadline, abi.encodePacked(r, s, v), data);
@@ -1583,18 +1778,23 @@ contract TestTokenForgeFactory is Test {
         MockERC1155(token).forceMintBatch(FORGE, tokenIDs, amounts);
 
         bytes32 structHash = keccak256(
-            abi.encode(
-                ERC1155_TRANSFER_BATCH_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline
-            )
+            abi.encode(ERC1155_TRANSFER_BATCH_TYPE_HASH_V1, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
         );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferBatch(address(FORGE), address(FORGE), ACCOUNT.addr, tokenIDs, amounts);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         ForgeV3(FORGE).transferERC1155Batch(
             ACCOUNT.addr, token, tokenIDs, amounts, deadline, abi.encodePacked(r, s, v), data
         );
-
         assertEq(amounts[0], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[0]), "Transfered tokenID mismatch");
         assertEq(amounts[1], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[1]), "Transfered tokenID mismatch");
     }
@@ -1632,9 +1832,15 @@ contract TestTokenForgeFactory is Test {
         MockERC20(token).approve(FORGE, amount);
 
         bytes32 structHash =
-            keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, amount, nonce, deadline));
+            keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         ForgeV3(FORGE).burnERC20(ACCOUNT.addr, token, amount, deadline, abi.encodePacked(r, s, v));
@@ -1675,9 +1881,15 @@ contract TestTokenForgeFactory is Test {
         MockERC721(token).approve(FORGE, tokenID);
 
         bytes32 structHash =
-            keccak256(abi.encode(ERC721_BURN_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenID, nonce, deadline));
+            keccak256(abi.encode(ERC721_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC721.Transfer(ACCOUNT.addr, address(0), tokenID);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC721Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         ForgeV3(FORGE).burnERC721(ACCOUNT.addr, token, tokenID, deadline, abi.encodePacked(r, s, v));
@@ -1718,11 +1930,16 @@ contract TestTokenForgeFactory is Test {
         vm.prank(ACCOUNT.addr);
         MockERC1155(token).setApprovalForAll(FORGE, true);
 
-        bytes32 structHash = keccak256(
-            abi.encode(ERC1155_BURN_TYPE_HASH_V1, uuid, ACCOUNT.addr, token, tokenID, amount, nonce, deadline)
-        );
+        bytes32 structHash =
+            keccak256(abi.encode(ERC1155_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferSingle(address(FORGE), ACCOUNT.addr, address(0), tokenID, amount);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         ForgeV3(FORGE).burnERC1155(ACCOUNT.addr, token, tokenID, amount, deadline, abi.encodePacked(r, s, v));
@@ -1767,14 +1984,21 @@ contract TestTokenForgeFactory is Test {
         MockERC1155(token).setApprovalForAll(FORGE, true);
 
         bytes32 structHash = keccak256(
-            abi.encode(ERC1155_BURN_BATCH_TYPE_HASH_V3, uuid, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
+            abi.encode(ERC1155_BURN_BATCH_TYPE_HASH_V3, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
         );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
+        // expect emit
+        vm.expectEmit();
+        emit IERC1155.TransferBatch(address(FORGE), ACCOUNT.addr, address(0), tokenIDs, amounts);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
+
         // send transaction
         ForgeV3(FORGE).burnERC1155Batch(ACCOUNT.addr, token, tokenIDs, amounts, deadline, abi.encodePacked(r, s, v));
-
         assertEq(0, MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[0]), "Burned tokenID mismatch");
         assertEq(0, MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[1]), "Burned tokenID mismatch");
     }
