@@ -64,6 +64,21 @@ abstract contract ERC20ForgeV1 is BaseForge {
         external
         checkDeadline(deadline)
     {
+        _burnERC20(token, amount, deadline, validatorSig);
+    }
+
+    // recipient: msg.sender
+    function burnERC20Permit(
+        address token,
+        uint256 amount,
+        uint256 deadline,
+        bytes calldata validatorSig,
+        bytes memory permitSig
+    ) external checkDeadline(deadline) erc20Permit(_msgSender(), token, amount, deadline, permitSig) {
+        _burnERC20(token, amount, deadline, validatorSig);
+    }
+
+    function _burnERC20(address token, uint256 amount, uint256 deadline, bytes calldata validatorSig) private {
         address from = _msgSender();
         uint256 nonce = _useNonce(from);
         bytes32 structHash = keccak256(abi.encode(ERC20_BURN_TYPE_HASH, from, token, amount, nonce, deadline));

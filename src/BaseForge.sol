@@ -5,6 +5,7 @@ import {Initializable} from "@openzeppelin-contracts-upgradeable-5.3.0/proxy/uti
 import {ContextUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/ContextUpgradeable.sol";
 import {EIP712Upgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/cryptography/EIP712Upgradeable.sol";
 import {NoncesUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/NoncesUpgradeable.sol";
+import {IERC20Permit} from "@openzeppelin-contracts-5.3.0/token/ERC20/extensions/IERC20Permit.sol";
 import {ECDSA} from "@openzeppelin-contracts-5.3.0/utils/cryptography/ECDSA.sol";
 
 import {TokenType, ITokenForgeFactoryAlert} from "./interfaces/ITokenForgeFactory.sol";
@@ -12,6 +13,7 @@ import {TokenType, ITokenForgeFactoryAlert} from "./interfaces/ITokenForgeFactor
 abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradeable, NoncesUpgradeable {
     error BaseForge__ZeroAddress();
     error BaseForge__ECDSAInvalidValidatorSignature();
+    error BaseForge__ECDSAInvalidPermitSignature();
     error BaseForge__ExpiredSignature(uint256 deadline);
 
     event ValidatorUpdated(address indexed validator);
@@ -34,6 +36,11 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
 
     modifier checkDeadline(uint256 deadline) {
         _verifyDeadline(deadline);
+        _;
+    }
+
+    modifier erc20Permit(address from, address token, uint256 value, uint256 deadline, bytes memory sig) {
+        _erc20Permit(token, from, value, deadline, sig);
         _;
     }
 
@@ -96,6 +103,23 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
 
     function _calcUUID(address user, uint256 nonce) internal view returns (uint256) {
         return uint256(keccak256(abi.encode(address(this), user, nonce)));
+    }
+
+    function _erc20Permit(address token, address from, uint256 value, uint256 deadline, bytes memory sig) private {
+        if (token == address(0)) revert BaseForge__ZeroAddress();
+        if (sig.length != 65) revert BaseForge__ECDSAInvalidPermitSignature();
+
+        bytes32 r;
+        bytes32 s;
+        uint8 v;
+        // ecrecover takes the signature parameters, and the only way to get them
+        // currently is to use assembly.
+        assembly ("memory-safe") {
+            r := mload(add(sig, 0x20))
+            s := mload(add(sig, 0x40))
+            v := byte(0, mload(add(sig, 0x60)))
+        }
+        IERC20Permit(token).permit(from, address(this), value, deadline, v, r, s);
     }
 }
 
