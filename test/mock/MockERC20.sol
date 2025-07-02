@@ -2,12 +2,13 @@
 pragma solidity 0.8.28;
 
 import {ERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/ERC20.sol";
+import {ERC20Permit} from "@openzeppelin-contracts-5.3.0/token/ERC20/extensions/ERC20Permit.sol";
 import {Ownable} from "@openzeppelin-contracts-5.3.0/access/Ownable.sol";
 
-contract MockERC20 is ERC20, Ownable {
+contract MockERC20 is ERC20, ERC20Permit, Ownable {
     address public forge;
 
-    constructor(address _forge) ERC20("MockERC20", "MCK") Ownable(_msgSender()) {
+    constructor(address _forge) ERC20("MockERC20", "MCK") ERC20Permit("MockERC20") Ownable(_msgSender()) {
         forge = _forge;
     }
 
