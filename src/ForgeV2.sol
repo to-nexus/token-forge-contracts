@@ -25,19 +25,19 @@ abstract contract ERC20ForgeV2 is BaseForge {
     error ERC20ForgeV2__InvalidAccountSignature(address account);
 
     bytes32 private constant ERC20_MINT_TYPE_HASH =
-        keccak256("ERC20Mint(address token, uint256 amount, uint256 nonce, uint256 deadline)");
+        keccak256("ERC20Mint(address token,uint256 amount,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC20_VALIDATOR_MINT_TYPE_HASH =
-        keccak256("ValidatorERC20Mint(address recipient, bytes recipientSig)");
+        keccak256("ValidatorERC20Mint(address recipient,bytes recipientSig)");
 
     bytes32 private constant ERC20_TRANSFER_TYPE_HASH =
-        keccak256("ERC20Transfer(address token, uint256 amount, uint256 nonce, uint256 deadline)");
+        keccak256("ERC20Transfer(address token,uint256 amount,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC20_VALIDATOR_TRANSFER_TYPE_HASH =
-        keccak256("ValidatorERC20Transfer(address recipient, bytes recipientSig)");
+        keccak256("ValidatorERC20Transfer(address recipient,bytes recipientSig)");
 
     bytes32 private constant ERC20_BURN_TYPE_HASH =
-        keccak256("ERC20Burn(address token, uint256 amount, uint256 nonce, uint256 deadline)");
+        keccak256("ERC20Burn(address token,uint256 amount,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC20_VALIDATOR_BURN_TYPE_HASH =
-        keccak256("ValidatorERC20Burn(address from, bytes fromSig)");
+        keccak256("ValidatorERC20Burn(address from,bytes fromSig)");
 
     function mintERC20(
         address recipient,
@@ -144,19 +144,19 @@ abstract contract ERC721ForgeV2 is BaseForge, ERC721HolderUpgradeable {
     error ERC721ForgeV2__InvalidAccountSignature(address account);
 
     bytes32 private constant ERC721_MINT_TYPE_HASH =
-        keccak256("ERC721Mint(address token, uint256 tokenID, uint256 nonce, uint256 deadline)");
+        keccak256("ERC721Mint(address token,uint256 tokenID,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC721_VALIDATOR_MINT_TYPE_HASH =
-        keccak256("ValidatorERC721Mint(address recipient, bytes recipientSig)");
+        keccak256("ValidatorERC721Mint(address recipient,bytes recipientSig)");
 
     bytes32 private constant ERC721_TRANSFER_TYPE_HASH =
-        keccak256("ERC721Transfer(address token, uint256 tokenID, uint256 nonce, uint256 deadline)");
+        keccak256("ERC721Transfer(address token,uint256 tokenID,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC721_VALIDATOR_TRANSFER_TYPE_HASH =
-        keccak256("ValidatorERC721Transfer(address recipient, bytes recipientSig)");
+        keccak256("ValidatorERC721Transfer(address recipient,bytes recipientSig)");
 
     bytes32 private constant ERC721_BURN_TYPE_HASH =
-        keccak256("ERC721Burn(address token, uint256 tokenID, uint256 nonce, uint256 deadline)");
+        keccak256("ERC721Burn(address token,uint256 tokenID,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC721_VALIDATOR_BURN_TYPE_HASH =
-        keccak256("ValidatorERC721Burn(address from, bytes fromSig)");
+        keccak256("ValidatorERC721Burn(address from,bytes fromSig)");
 
     function mintERC721(
         address recipient,
@@ -242,33 +242,31 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
     error ERC1155ForgeV2__InvalidAccountSignature(address account);
 
     bytes32 private constant ERC1155_MINT_TYPE_HASH =
-        keccak256("ERC1155Mint(address token, uint256 tokenID, uint256 amount, uint256 nonce, uint256 deadline)");
+        keccak256("ERC1155Mint(address token,uint256 tokenID,uint256 amount,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC1155_VALIDATOR_MINT_TYPE_HASH =
-        keccak256("ValidatorERC1155Mint(address recipient, bytes recipientSig)");
+        keccak256("ValidatorERC1155Mint(address recipient,bytes recipientSig)");
     bytes32 private constant ERC1155_TRANSFER_TYPE_HASH =
-        keccak256("ERC1155Transfer(address token, uint256 tokenID, uint256 amount, uint256 nonce, uint256 deadline)");
+        keccak256("ERC1155Transfer(address token,uint256 tokenID,uint256 amount,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC1155_VALIDATOR_TRANSFER_TYPE_HASH =
-        keccak256("ValidatorERC1155Transfer(address recipient, bytes recipientSig)");
+        keccak256("ValidatorERC1155Transfer(address recipient,bytes recipientSig)");
     bytes32 private constant ERC1155_BURN_TYPE_HASH =
-        keccak256("ERC1155Burn(address token, uint256 tokenID, uint256 amount, uint256 nonce, uint256 deadline)");
+        keccak256("ERC1155Burn(address token,uint256 tokenID,uint256 amount,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC1155_VALIDATOR_BURN_TYPE_HASH =
-        keccak256("ValidatorERC1155Burn(address from, bytes fromSig)");
+        keccak256("ValidatorERC1155Burn(address from,bytes fromSig)");
 
-    bytes32 private constant ERC1155_BATCH_MINT_TYPE_HASH = keccak256(
-        "ERC1155BatchMint(address token, uint256[] tokenIDs, uint256[] amounts, uint256 nonce, uint256 deadline)"
-    );
+    bytes32 private constant ERC1155_BATCH_MINT_TYPE_HASH =
+        keccak256("ERC1155BatchMint(address token,uint256[] tokenIDs,uint256[] amounts,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC1155_VALIDATOR_BATCH_MINT_TYPE_HASH =
-        keccak256("ValidatorERC1155BatchMint(address recipient, bytes recipientSig)");
+        keccak256("ValidatorERC1155BatchMint(address recipient,bytes recipientSig)");
     bytes32 private constant ERC1155_BATCH_TRANSFER_TYPE_HASH = keccak256(
-        "ERC1155BatchTransfer(address token, uint256[] tokenIDs, uint256[] amounts, uint256 nonce, uint256 deadline)"
+        "ERC1155BatchTransfer(address token,uint256[] tokenIDs,uint256[] amounts,uint256 nonce,uint256 deadline)"
     );
     bytes32 private constant ERC1155_VALIDATOR_BATCH_TRANSFER_TYPE_HASH =
-        keccak256("ValidatorERC1155BatchTransfer(address recipient, bytes recipientSig)");
-    bytes32 private constant ERC1155_BATCH_BURN_TYPE_HASH = keccak256(
-        "ERC1155BatchBurn(address token, uint256[] tokenIDs, uint256[] amounts, uint256 nonce, uint256 deadline)"
-    );
+        keccak256("ValidatorERC1155BatchTransfer(address recipient,bytes recipientSig)");
+    bytes32 private constant ERC1155_BATCH_BURN_TYPE_HASH =
+        keccak256("ERC1155BatchBurn(address token,uint256[] tokenIDs,uint256[] amounts,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC1155_VALIDATOR_BATCH_BURN_TYPE_HASH =
-        keccak256("ValidatorERC1155BatchBurn(address from, bytes fromSig)");
+        keccak256("ValidatorERC1155BatchBurn(address from,bytes fromSig)");
 
     function mintERC1155(
         address recipient,

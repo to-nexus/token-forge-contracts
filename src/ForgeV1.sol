@@ -23,11 +23,11 @@ abstract contract ERC20ForgeV1 is BaseForge {
     using SafeERC20 for IERC20;
 
     bytes32 private constant ERC20_MINT_TYPE_HASH =
-        keccak256("ERC20Mint(address recipient, address token, uint256 amount, uint256 nonce, uint256 deadline)");
+        keccak256("ERC20Mint(address recipient,address token,uint256 amount,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC20_TRANSFER_TYPE_HASH =
-        keccak256("ERC20Transfer(address recipient, address token, uint256 amount, uint256 nonce, uint256 deadline)");
+        keccak256("ERC20Transfer(address recipient,address token,uint256 amount,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC20_BURN_TYPE_HASH =
-        keccak256("ERC20Burn(address from, address token, uint256 amount, uint256 nonce, uint256 deadline)");
+        keccak256("ERC20Burn(address from,address token,uint256 amount,uint256 nonce,uint256 deadline)");
 
     function mintERC20(address token, uint256 amount, uint256 deadline, bytes calldata validatorSig)
         external
@@ -98,11 +98,11 @@ abstract contract ERC721ForgeV1 is BaseForge, ERC721HolderUpgradeable {
     error ERC721MintForge__InvalidRecipientSignature(address recipient);
 
     bytes32 private constant ERC721_MINT_TYPE_HASH =
-        keccak256("ERC721Mint(address recipient, address token, uint256 tokenID, uint256 nonce, uint256 deadline)");
+        keccak256("ERC721Mint(address recipient,address token,uint256 tokenID,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC721_TRANSFER_TYPE_HASH =
-        keccak256("ERC721Transfer(address recipient, address token, uint256 tokenID, uint256 nonce, uint256 deadline)");
+        keccak256("ERC721Transfer(address recipient,address token,uint256 tokenID,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC721_BURN_TYPE_HASH =
-        keccak256("ERC721Burn(address from, address token, uint256 tokenID, uint256 nonce, uint256 deadline)");
+        keccak256("ERC721Burn(address from,address token,uint256 tokenID,uint256 nonce,uint256 deadline)");
 
     function mintERC721(address token, uint256 tokenID, uint256 deadline, bytes calldata validatorSig)
         external
@@ -160,23 +160,23 @@ abstract contract ERC1155ForgeV1 is BaseForge, ERC1155HolderUpgradeable {
     using ECDSA for bytes32;
 
     bytes32 private constant ERC1155_MINT_TYPE_HASH = keccak256(
-        "ERC1155Mint(address recipient, address token, uint256 tokenID, uint256 amount, uint256 nonce, uint256 deadline)"
+        "ERC1155Mint(address recipient,address token,uint256 tokenID,uint256 amount,uint256 nonce,uint256 deadline)"
     );
     bytes32 private constant ERC1155_TRANSFER_TYPE_HASH = keccak256(
-        "ERC1155Transfer(address recipient, address token, uint256 tokenID, uint256 amount, uint256 nonce, uint256 deadline)"
+        "ERC1155Transfer(address recipient,address token,uint256 tokenID,uint256 amount,uint256 nonce,uint256 deadline)"
     );
     bytes32 private constant ERC1155_BURN_TYPE_HASH = keccak256(
-        "ERC1155Burn(address from, address token, uint256 tokenID, uint256 amount, uint256 nonce, uint256 deadline)"
+        "ERC1155Burn(address from,address token,uint256 tokenID,uint256 amount,uint256 nonce,uint256 deadline)"
     );
 
     bytes32 private constant ERC1155_BATCH_MINT_TYPE_HASH = keccak256(
-        "ERC1155BatchMint(address recipient, address token, uint256[] tokenIDs, uint256[] amounts, uint256 nonce, uint256 deadline)"
+        "ERC1155BatchMint(address recipient,address token,uint256[] tokenIDs,uint256[] amounts,uint256 nonce,uint256 deadline)"
     );
     bytes32 private constant ERC1155_BATCH_TRANSFER_TYPE_HASH = keccak256(
-        "ERC1155BatchTransfer(address recipient, address token, uint256[] tokenIDs, uint256[] amounts, uint256 nonce, uint256 deadline)"
+        "ERC1155BatchTransfer(address recipient,address token,uint256[] tokenIDs,uint256[] amounts,uint256 nonce,uint256 deadline)"
     );
     bytes32 private constant ERC1155_BATCH_BURN_TYPE_HASH = keccak256(
-        "ERC1155BatchBurn(address from, address token, uint256[] tokenIDs, uint256[] amounts, uint256 nonce, uint256 deadline)"
+        "ERC1155BatchBurn(address from,address token,uint256[] tokenIDs,uint256[] amounts,uint256 nonce,uint256 deadline)"
     );
 
     function mintERC1155(
