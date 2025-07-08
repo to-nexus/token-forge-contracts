@@ -264,7 +264,15 @@ abstract contract ERC1155ForgeV1 is BaseForge, ERC1155HolderUpgradeable {
         uint256 nonce = _useNonce(recipient);
         {
             bytes32 structHash = keccak256(
-                abi.encode(ERC1155_BATCH_MINT_TYPE_HASH, recipient, token, tokenIDs, amounts, nonce, deadline)
+                abi.encode(
+                    ERC1155_BATCH_MINT_TYPE_HASH,
+                    recipient,
+                    token,
+                    keccak256(abi.encodePacked(tokenIDs)),
+                    keccak256(abi.encodePacked(amounts)),
+                    nonce,
+                    deadline
+                )
             );
 
             bytes32 hash = _hashTypedDataV4(structHash);
@@ -291,7 +299,15 @@ abstract contract ERC1155ForgeV1 is BaseForge, ERC1155HolderUpgradeable {
         uint256 nonce = _useNonce(recipient);
         {
             bytes32 structHash = keccak256(
-                abi.encode(ERC1155_BATCH_TRANSFER_TYPE_HASH, recipient, token, tokenIDs, amounts, nonce, deadline)
+                abi.encode(
+                    ERC1155_BATCH_TRANSFER_TYPE_HASH,
+                    recipient,
+                    token,
+                    keccak256(abi.encodePacked(tokenIDs)),
+                    keccak256(abi.encodePacked(amounts)),
+                    nonce,
+                    deadline
+                )
             );
 
             bytes32 hash = _hashTypedDataV4(structHash);
@@ -315,8 +331,17 @@ abstract contract ERC1155ForgeV1 is BaseForge, ERC1155HolderUpgradeable {
     ) external checkDeadline(deadline) {
         address from = _msgSender();
         uint256 nonce = _useNonce(from);
-        bytes32 structHash =
-            keccak256(abi.encode(ERC1155_BATCH_BURN_TYPE_HASH, from, token, tokenIDs, amounts, nonce, deadline));
+        bytes32 structHash = keccak256(
+            abi.encode(
+                ERC1155_BATCH_BURN_TYPE_HASH,
+                from,
+                token,
+                keccak256(abi.encodePacked(tokenIDs)),
+                keccak256(abi.encodePacked(amounts)),
+                nonce,
+                deadline
+            )
+        );
 
         bytes32 hash = _hashTypedDataV4(structHash);
         _verifyValidatorSignature(hash, validatorSig);

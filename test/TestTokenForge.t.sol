@@ -237,7 +237,15 @@ contract TestTokenForgeFactory is Test {
         bytes memory data = "Minting ERC1155 token";
 
         bytes32 structHash = keccak256(
-            abi.encode(ERC1155_MINT_BATCH_TYPE_HASH_V1, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
+            abi.encode(
+                ERC1155_MINT_BATCH_TYPE_HASH_V1,
+                ACCOUNT.addr,
+                token,
+                keccak256(abi.encodePacked(tokenIDs)),
+                keccak256(abi.encodePacked(amounts)),
+                nonce,
+                deadline
+            )
         );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
@@ -440,7 +448,15 @@ contract TestTokenForgeFactory is Test {
         MockERC1155(token).forceMintBatch(FORGE, tokenIDs, amounts);
 
         bytes32 structHash = keccak256(
-            abi.encode(ERC1155_TRANSFER_BATCH_TYPE_HASH_V1, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
+            abi.encode(
+                ERC1155_TRANSFER_BATCH_TYPE_HASH_V1,
+                ACCOUNT.addr,
+                token,
+                keccak256(abi.encodePacked(tokenIDs)),
+                keccak256(abi.encodePacked(amounts)),
+                nonce,
+                deadline
+            )
         );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
@@ -649,7 +665,15 @@ contract TestTokenForgeFactory is Test {
         MockERC1155(token).setApprovalForAll(FORGE, true);
 
         bytes32 structHash = keccak256(
-            abi.encode(ERC1155_BURN_BATCH_TYPE_HASH_V1, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
+            abi.encode(
+                ERC1155_BURN_BATCH_TYPE_HASH_V1,
+                ACCOUNT.addr,
+                token,
+                keccak256(abi.encodePacked(tokenIDs)),
+                keccak256(abi.encodePacked(amounts)),
+                nonce,
+                deadline
+            )
         );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
@@ -707,7 +731,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC20_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC20_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, keccak256(recipientSig)));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -763,7 +787,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC721_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC721_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, keccak256(recipientSig)));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -821,7 +845,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, keccak256(recipientSig)));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -875,8 +899,16 @@ contract TestTokenForgeFactory is Test {
         bytes memory recipientSig;
 
         {
-            bytes32 recipientStructHash =
-                keccak256(abi.encode(ERC1155_MINT_BATCH_TYPE_HASH_V2, token, tokenIDs, amounts, nonce, deadline));
+            bytes32 recipientStructHash = keccak256(
+                abi.encode(
+                    ERC1155_MINT_BATCH_TYPE_HASH_V2,
+                    token,
+                    keccak256(abi.encodePacked(tokenIDs)),
+                    keccak256(abi.encodePacked(amounts)),
+                    nonce,
+                    deadline
+                )
+            );
             bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
             recipientSig = abi.encodePacked(r, s, v);
@@ -884,7 +916,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_MINT_BATCH_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_MINT_BATCH_TYPE_HASH_V2, ACCOUNT.addr, keccak256(recipientSig)));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -947,7 +979,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC20_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC20_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, keccak256(recipientSig)));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -1008,7 +1040,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC721_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC721_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, keccak256(recipientSig)));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -1071,7 +1103,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, keccak256(recipientSig)));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -1130,16 +1162,25 @@ contract TestTokenForgeFactory is Test {
         bytes memory recipientSig;
 
         {
-            bytes32 recipientStructHash =
-                keccak256(abi.encode(ERC1155_TRANSFER_BATCH_TYPE_HASH_V2, token, tokenIDs, amounts, nonce, deadline));
+            bytes32 recipientStructHash = keccak256(
+                abi.encode(
+                    ERC1155_TRANSFER_BATCH_TYPE_HASH_V2,
+                    token,
+                    keccak256(abi.encodePacked(tokenIDs)),
+                    keccak256(abi.encodePacked(amounts)),
+                    nonce,
+                    deadline
+                )
+            );
             bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
             recipientSig = abi.encodePacked(r, s, v);
         }
         bytes memory validatorSig;
         {
-            bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_TRANSFER_BATCH_TYPE_HASH_V2, ACCOUNT.addr, recipientSig));
+            bytes32 validatorStructHash = keccak256(
+                abi.encode(ERC1155_VALIDATOR_TRANSFER_BATCH_TYPE_HASH_V2, ACCOUNT.addr, keccak256(recipientSig))
+            );
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -1204,7 +1245,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, fromSig));
+                keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, keccak256(fromSig)));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -1265,7 +1306,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC721_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, fromSig));
+                keccak256(abi.encode(ERC721_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, keccak256(fromSig)));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -1328,7 +1369,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, fromSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, keccak256(fromSig)));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -1386,8 +1427,16 @@ contract TestTokenForgeFactory is Test {
         bytes memory fromSig;
 
         {
-            bytes32 fromStructHash =
-                keccak256(abi.encode(ERC1155_BURN_BATCH_TYPE_HASH_V2, token, tokenIDs, amounts, nonce, deadline));
+            bytes32 fromStructHash = keccak256(
+                abi.encode(
+                    ERC1155_BURN_BATCH_TYPE_HASH_V2,
+                    token,
+                    keccak256(abi.encodePacked(tokenIDs)),
+                    keccak256(abi.encodePacked(amounts)),
+                    nonce,
+                    deadline
+                )
+            );
             bytes32 fromHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, fromStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, fromHash);
             fromSig = abi.encodePacked(r, s, v);
@@ -1395,7 +1444,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_BURN_BATCH_TYPE_HASH_V2, ACCOUNT.addr, fromSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_BURN_BATCH_TYPE_HASH_V2, ACCOUNT.addr, keccak256(fromSig)));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -1579,7 +1628,15 @@ contract TestTokenForgeFactory is Test {
         bytes memory data = "Minting ERC1155 token";
 
         bytes32 structHash = keccak256(
-            abi.encode(ERC1155_MINT_BATCH_TYPE_HASH_V1, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
+            abi.encode(
+                ERC1155_MINT_BATCH_TYPE_HASH_V1,
+                ACCOUNT.addr,
+                token,
+                keccak256(abi.encodePacked(tokenIDs)),
+                keccak256(abi.encodePacked(amounts)),
+                nonce,
+                deadline
+            )
         );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
@@ -1779,7 +1836,15 @@ contract TestTokenForgeFactory is Test {
         MockERC1155(token).forceMintBatch(FORGE, tokenIDs, amounts);
 
         bytes32 structHash = keccak256(
-            abi.encode(ERC1155_TRANSFER_BATCH_TYPE_HASH_V1, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
+            abi.encode(
+                ERC1155_TRANSFER_BATCH_TYPE_HASH_V1,
+                ACCOUNT.addr,
+                token,
+                keccak256(abi.encodePacked(tokenIDs)),
+                keccak256(abi.encodePacked(amounts)),
+                nonce,
+                deadline
+            )
         );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
@@ -1985,7 +2050,15 @@ contract TestTokenForgeFactory is Test {
         MockERC1155(token).setApprovalForAll(FORGE, true);
 
         bytes32 structHash = keccak256(
-            abi.encode(ERC1155_BURN_BATCH_TYPE_HASH_V3, ACCOUNT.addr, token, tokenIDs, amounts, nonce, deadline)
+            abi.encode(
+                ERC1155_BURN_BATCH_TYPE_HASH_V3,
+                ACCOUNT.addr,
+                token,
+                keccak256(abi.encodePacked(tokenIDs)),
+                keccak256(abi.encodePacked(amounts)),
+                nonce,
+                deadline
+            )
         );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
@@ -2114,7 +2187,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, fromSig));
+                keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, keccak256(fromSig)));
             bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -2217,4 +2290,43 @@ contract TestTokenForgeFactory is Test {
     function _calcUUID(uint256 nonce) internal view returns (uint256) {
         return uint256(keccak256(abi.encode(FORGE, ACCOUNT.addr, nonce)));
     }
+    /*
+    function test_print_struct_hash() external {
+        //        console.logBytes32(ERC20_VALIDATOR_MINT_TYPE_HASH_V2);
+        address token = 0xE7199f0cBd9114A23f6B44cCf20CE09D0D561a96;
+        uint256[] memory tokenIDs = new uint256[](2);
+        tokenIDs[0] = 1;
+        tokenIDs[1] = 2;
+        uint256[] memory amounts = new uint256[](2);
+        amounts[0] = 1;
+        amounts[1] = 2;
+
+        uint256 nonce = 11;
+        uint256 deadline = 1751943489;
+        {
+            bytes32 domainSeparator = keccak256(
+                abi.encode(
+                    keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"),
+                    keccak256(bytes("MockService")),
+                    keccak256(bytes("1")),
+                    612044,
+                    0xa55D9fFf44bF394bDB42b0A20D7Fcb2090e424d2
+                )
+            );
+            bytes32 recipientStructHash = keccak256(
+                abi.encode(
+                    ERC1155_MINT_BATCH_TYPE_HASH_V2,
+                    token,
+                    keccak256(abi.encodePacked(tokenIDs)), // <- 여기가 핵심
+                    keccak256(abi.encodePacked(amounts)), // <- 여기도
+                    nonce,
+                    deadline
+                )
+            );
+            bytes32 recipientHash = MessageHashUtils.toTypedDataHash(domainSeparator, recipientStructHash);
+            console.logBytes32(keccak256(abi.encodePacked(tokenIDs)));
+            console.logBytes(abi.encodePacked(tokenIDs));
+        }
+    }
+    */
 }

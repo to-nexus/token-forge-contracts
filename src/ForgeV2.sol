@@ -55,7 +55,8 @@ abstract contract ERC20ForgeV2 is BaseForge {
             if (recipientSigner != recipient) revert ERC20ForgeV2__InvalidAccountSignature(recipient);
         }
         {
-            bytes32 validatorStructHash = keccak256(abi.encode(ERC20_VALIDATOR_MINT_TYPE_HASH, recipient, recipientSig));
+            bytes32 validatorStructHash =
+                keccak256(abi.encode(ERC20_VALIDATOR_MINT_TYPE_HASH, recipient, keccak256(recipientSig)));
             bytes32 validatorHash = _hashTypedDataV4(validatorStructHash);
             _verifyValidatorSignature(validatorHash, validatorSig);
         }
@@ -81,7 +82,7 @@ abstract contract ERC20ForgeV2 is BaseForge {
         }
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC20_VALIDATOR_TRANSFER_TYPE_HASH, recipient, recipientSig));
+                keccak256(abi.encode(ERC20_VALIDATOR_TRANSFER_TYPE_HASH, recipient, keccak256(recipientSig)));
             bytes32 validatorHash = _hashTypedDataV4(validatorStructHash);
             _verifyValidatorSignature(validatorHash, validatorSig);
         }
@@ -128,7 +129,8 @@ abstract contract ERC20ForgeV2 is BaseForge {
             if (fromSigner != from) revert ERC20ForgeV2__InvalidAccountSignature(from);
         }
         {
-            bytes32 validatorStructHash = keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH, from, fromSig));
+            bytes32 validatorStructHash =
+                keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH, from, keccak256(fromSig)));
             bytes32 validatorHash = _hashTypedDataV4(validatorStructHash);
             _verifyValidatorSignature(validatorHash, validatorSig);
         }
@@ -175,7 +177,7 @@ abstract contract ERC721ForgeV2 is BaseForge, ERC721HolderUpgradeable {
         }
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC721_VALIDATOR_MINT_TYPE_HASH, recipient, recipientSig));
+                keccak256(abi.encode(ERC721_VALIDATOR_MINT_TYPE_HASH, recipient, keccak256(recipientSig)));
             bytes32 validatorHash = _hashTypedDataV4(validatorStructHash);
             _verifyValidatorSignature(validatorHash, validatorSig);
         }
@@ -202,7 +204,7 @@ abstract contract ERC721ForgeV2 is BaseForge, ERC721HolderUpgradeable {
         }
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC721_VALIDATOR_TRANSFER_TYPE_HASH, recipient, recipientSig));
+                keccak256(abi.encode(ERC721_VALIDATOR_TRANSFER_TYPE_HASH, recipient, keccak256(recipientSig)));
             bytes32 validatorHash = _hashTypedDataV4(validatorStructHash);
             _verifyValidatorSignature(validatorHash, validatorSig);
         }
@@ -226,7 +228,8 @@ abstract contract ERC721ForgeV2 is BaseForge, ERC721HolderUpgradeable {
             if (fromSigner != from) revert ERC721ForgeV2__InvalidAccountSignature(from);
         }
         {
-            bytes32 validatorStructHash = keccak256(abi.encode(ERC721_VALIDATOR_BURN_TYPE_HASH, from, fromSig));
+            bytes32 validatorStructHash =
+                keccak256(abi.encode(ERC721_VALIDATOR_BURN_TYPE_HASH, from, keccak256(fromSig)));
             bytes32 validatorHash = _hashTypedDataV4(validatorStructHash);
             _verifyValidatorSignature(validatorHash, validatorSig);
         }
@@ -288,7 +291,7 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
         }
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_MINT_TYPE_HASH, recipient, recipientSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_MINT_TYPE_HASH, recipient, keccak256(recipientSig)));
             bytes32 validatorHash = _hashTypedDataV4(validatorStructHash);
             _verifyValidatorSignature(validatorHash, validatorSig);
         }
@@ -321,7 +324,7 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
         }
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_TRANSFER_TYPE_HASH, recipient, recipientSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_TRANSFER_TYPE_HASH, recipient, keccak256(recipientSig)));
             bytes32 validatorHash = _hashTypedDataV4(validatorStructHash);
             _verifyValidatorSignature(validatorHash, validatorSig);
         }
@@ -352,7 +355,8 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
             if (fromSigner != from) revert ERC1155ForgeV2__InvalidAccountSignature(from);
         }
         {
-            bytes32 validatorStructHash = keccak256(abi.encode(ERC1155_VALIDATOR_BURN_TYPE_HASH, from, fromSig));
+            bytes32 validatorStructHash =
+                keccak256(abi.encode(ERC1155_VALIDATOR_BURN_TYPE_HASH, from, keccak256(fromSig)));
             bytes32 validatorHash = _hashTypedDataV4(validatorStructHash);
             _verifyValidatorSignature(validatorHash, validatorSig);
         }
@@ -374,15 +378,23 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
     ) external checkDeadline(deadline) {
         uint256 nonce = _useNonce(recipient);
         {
-            bytes32 recipientStructHash =
-                keccak256(abi.encode(ERC1155_BATCH_MINT_TYPE_HASH, token, tokenIDs, amounts, nonce, deadline));
+            bytes32 recipientStructHash = keccak256(
+                abi.encode(
+                    ERC1155_BATCH_MINT_TYPE_HASH,
+                    token,
+                    keccak256(abi.encodePacked(tokenIDs)),
+                    keccak256(abi.encodePacked(amounts)),
+                    nonce,
+                    deadline
+                )
+            );
             bytes32 recipientHash = _hashTypedDataV4(recipientStructHash);
             address recipientSigner = ECDSA.recover(recipientHash, recipientSig);
             if (recipientSigner != recipient) revert ERC1155ForgeV2__InvalidAccountSignature(recipient);
         }
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_BATCH_MINT_TYPE_HASH, recipient, recipientSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_BATCH_MINT_TYPE_HASH, recipient, keccak256(recipientSig)));
             bytes32 validatorHash = _hashTypedDataV4(validatorStructHash);
             _verifyValidatorSignature(validatorHash, validatorSig);
         }
@@ -407,15 +419,23 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
     ) external checkDeadline(deadline) {
         uint256 nonce = _useNonce(recipient);
         {
-            bytes32 recipientStructHash =
-                keccak256(abi.encode(ERC1155_BATCH_TRANSFER_TYPE_HASH, token, tokenIDs, amounts, nonce, deadline));
+            bytes32 recipientStructHash = keccak256(
+                abi.encode(
+                    ERC1155_BATCH_TRANSFER_TYPE_HASH,
+                    token,
+                    keccak256(abi.encodePacked(tokenIDs)),
+                    keccak256(abi.encodePacked(amounts)),
+                    nonce,
+                    deadline
+                )
+            );
             bytes32 recipientHash = _hashTypedDataV4(recipientStructHash);
             address recipientSigner = ECDSA.recover(recipientHash, recipientSig);
             if (recipientSigner != recipient) revert ERC1155ForgeV2__InvalidAccountSignature(recipient);
         }
         {
             bytes32 validatorStructHash =
-                keccak256(abi.encode(ERC1155_VALIDATOR_BATCH_TRANSFER_TYPE_HASH, recipient, recipientSig));
+                keccak256(abi.encode(ERC1155_VALIDATOR_BATCH_TRANSFER_TYPE_HASH, recipient, keccak256(recipientSig)));
             bytes32 validatorHash = _hashTypedDataV4(validatorStructHash);
             _verifyValidatorSignature(validatorHash, validatorSig);
         }
@@ -439,14 +459,23 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
     ) external checkDeadline(deadline) {
         uint256 nonce = _useNonce(from);
         {
-            bytes32 fromStructHash =
-                keccak256(abi.encode(ERC1155_BATCH_BURN_TYPE_HASH, token, tokenIDs, amounts, nonce, deadline));
+            bytes32 fromStructHash = keccak256(
+                abi.encode(
+                    ERC1155_BATCH_BURN_TYPE_HASH,
+                    token,
+                    keccak256(abi.encodePacked(tokenIDs)),
+                    keccak256(abi.encodePacked(amounts)),
+                    nonce,
+                    deadline
+                )
+            );
             bytes32 fromHash = _hashTypedDataV4(fromStructHash);
             address fromSigner = ECDSA.recover(fromHash, fromSig);
             if (fromSigner != from) revert ERC1155ForgeV2__InvalidAccountSignature(from);
         }
         {
-            bytes32 validatorStructHash = keccak256(abi.encode(ERC1155_VALIDATOR_BATCH_BURN_TYPE_HASH, from, fromSig));
+            bytes32 validatorStructHash =
+                keccak256(abi.encode(ERC1155_VALIDATOR_BATCH_BURN_TYPE_HASH, from, keccak256(fromSig)));
             bytes32 validatorHash = _hashTypedDataV4(validatorStructHash);
             _verifyValidatorSignature(validatorHash, validatorSig);
         }
