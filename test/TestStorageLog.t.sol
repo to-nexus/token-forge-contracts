@@ -6,13 +6,24 @@ import {Test, console} from "forge-std-1.9.7/Test.sol";
 contract TestStorageLog is Test {
     function setUp() public {}
 
-    function testLog() external pure {
+    function test_storage_forge_factory() external pure {
         bytes32 location;
         // ForgeFactory.sol
         {
             location =
                 keccak256(abi.encode(uint256(keccak256("cross.storage.ForgeFactory")) - 1)) & ~bytes32(uint256(0xff));
-            console.log("\nTokenForgeFactory");
+            console.log("\nForgeFactory");
+            console.logBytes32(location);
+        }
+    }
+
+    function test_storage_base_forge() external pure {
+        bytes32 location;
+        // ForgeFactory.sol
+        {
+            location =
+                keccak256(abi.encode(uint256(keccak256("cross.storage.BaseForge")) - 1)) & ~bytes32(uint256(0xff));
+            console.log("\nBaseForge");
             console.logBytes32(location);
         }
     }

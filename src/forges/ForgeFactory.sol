@@ -76,7 +76,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     bytes32 private constant MANAGER_ROLE = keccak256("MANAGER");
 
     /// @custom:storage-location erc7201:cross.storage.ForgeFactory
-    struct TokenForgeFactoryStorage {
+    struct ForgeFactoryStorage {
         ForgeProxyCode _forgeProxyCode;
         address _diamondImpl;
         address _baseImpl;
@@ -86,12 +86,12 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     }
 
     // keccak256(abi.encode(uint256(keccak256("cross.storage.ForgeFactory")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant TOKEN_FORGE_FACTORY_STORAGE_LOCATION =
+    bytes32 private constant FORGE_FACTORY_STORAGE_LOCATION =
         0x47ead7afa197188cefdcc034aa6d34d17eb7c3c606ba94c96925ee5f9b99fd00;
 
-    function _getTokenForgeFactoryStorage() private pure returns (TokenForgeFactoryStorage storage $) {
+    function _getForgeFactoryStorage() private pure returns (ForgeFactoryStorage storage $) {
         assembly {
-            $.slot := TOKEN_FORGE_FACTORY_STORAGE_LOCATION
+            $.slot := FORGE_FACTORY_STORAGE_LOCATION
         }
     }
 
@@ -127,7 +127,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
             revert TokenForgeFactory__InvalidData("baseImpl facet");
         }
 
-        TokenForgeFactoryStorage storage $ = _getTokenForgeFactoryStorage();
+        ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
         $._forgeProxyCode = _forgeProxyCode;
         $._diamondImpl = _diamondImpl;
         $._baseImpl = _baseImpl;
@@ -142,7 +142,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     ////////////////////
 
     function allForges() external view returns (string[] memory, address[] memory) {
-        TokenForgeFactoryStorage storage $ = _getTokenForgeFactoryStorage();
+        ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
 
         uint256 length = $._serviceToForge.length();
         string[] memory services = new string[](length);
@@ -158,7 +158,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     }
 
     function isRunningForge(address forge) external view returns (string memory service, bool running) {
-        TokenForgeFactoryStorage storage $ = _getTokenForgeFactoryStorage();
+        ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
         bytes32 service32 = $._forgeToService[forge];
         if (service32 != bytes32(0)) {
             service = ShortStrings.toString(ShortString.wrap(service32));
@@ -169,18 +169,18 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     function forgeByService(string memory service) external view returns (address forge, bool running) {
         bytes32 _service = ShortString.unwrap(ShortStrings.toShortString(service));
 
-        TokenForgeFactoryStorage storage $ = _getTokenForgeFactoryStorage();
+        ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
         bool ok;
         (ok, forge) = $._serviceToForge.tryGet(_service);
         if (ok) running = $._isRunning[_service];
     }
 
     function lengthAllForges() external view returns (uint256) {
-        return _getTokenForgeFactoryStorage()._serviceToForge.length();
+        return _getForgeFactoryStorage()._serviceToForge.length();
     }
 
     function forgeByIndex(uint256 index) external view returns (string memory service, address forge, bool running) {
-        TokenForgeFactoryStorage storage $ = _getTokenForgeFactoryStorage();
+        ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
         bytes32 _service;
         (_service, forge) = $._serviceToForge.at(index);
         service = ShortStrings.toString(ShortString.wrap(_service));
@@ -192,7 +192,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     /////////////////////
 
     function alertMint(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external {
-        bytes32 service = _checkRunningService(_getTokenForgeFactoryStorage(), msg.sender);
+        bytes32 service = _checkRunningService(_getForgeFactoryStorage(), msg.sender);
         if (tokenType == TokenType.ERC20) {
             (address to, uint256 amount) = abi.decode(data, (address, uint256));
             emit ERC20Minted(service, uuid, to, token, amount);
@@ -220,7 +220,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     }
 
     function alertTransfer(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external {
-        bytes32 service = _checkRunningService(_getTokenForgeFactoryStorage(), msg.sender);
+        bytes32 service = _checkRunningService(_getForgeFactoryStorage(), msg.sender);
         if (tokenType == TokenType.ERC20) {
             (address to, uint256 amount) = abi.decode(data, (address, uint256));
             emit ERC20Transferred(service, uuid, to, token, amount);
@@ -248,7 +248,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     }
 
     function alertBurn(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external {
-        bytes32 service = _checkRunningService(_getTokenForgeFactoryStorage(), msg.sender);
+        bytes32 service = _checkRunningService(_getForgeFactoryStorage(), msg.sender);
         if (tokenType == TokenType.ERC20) {
             (address from, uint256 amount) = abi.decode(data, (address, uint256));
             emit ERC20Burned(service, uuid, from, token, amount);
@@ -275,7 +275,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
         }
     }
 
-    function _checkRunningService(TokenForgeFactoryStorage storage $, address forge) private view returns (bytes32) {
+    function _checkRunningService(ForgeFactoryStorage storage $, address forge) private view returns (bytes32) {
         bytes32 service = $._forgeToService[forge];
         if (service == bytes32(0)) {
             revert TokenForgeFactory__CallerIsNotForge(forge);
@@ -302,7 +302,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
 
         bytes32 _service = ShortString.unwrap(ShortStrings.toShortString(service));
 
-        TokenForgeFactoryStorage storage $ = _getTokenForgeFactoryStorage();
+        ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
         if ($._serviceToForge.contains(_service)) revert TokenForgeFactory__AlreadyUsedService(_service);
 
         // deploy forge proxy
@@ -324,7 +324,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
 
     function removeService(string memory service) external onlyRole(MANAGER_ROLE) {
         bytes32 _service = ShortString.unwrap(ShortStrings.toShortString(service));
-        TokenForgeFactoryStorage storage $ = _getTokenForgeFactoryStorage();
+        ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
 
         // check if service exists
         (bool ok, address forge) = $._serviceToForge.tryGet(_service);
@@ -340,7 +340,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     function pauseService(string memory service, bool paused) external onlyRole(MANAGER_ROLE) {
         bytes32 _service = ShortString.unwrap(ShortStrings.toShortString(service));
 
-        TokenForgeFactoryStorage storage $ = _getTokenForgeFactoryStorage();
+        ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
         if (!$._serviceToForge.contains(_service)) revert TokenForgeFactory__ServiceNotFound(_service);
         if ($._isRunning[_service] == paused) {
             if (paused) delete $._isRunning[_service];
