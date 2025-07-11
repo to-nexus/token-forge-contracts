@@ -9,10 +9,10 @@ import {IDiamondLoupe} from "diamond-3-hardhat-1.0.0/interfaces/IDiamondLoupe.so
 import {IERC173} from "diamond-3-hardhat-1.0.0/interfaces/IERC173.sol";
 import {ERC1967Proxy} from "@openzeppelin-contracts-5.3.0/proxy/ERC1967/ERC1967Proxy.sol";
 
-import {ForgeProxyCode} from "../src/ForgeProxy.sol";
-import {Diamond3Facet} from "../src/Diamond3Facet.sol";
-import {BaseForge, BaseForgeFacet} from "../src/BaseForge.sol";
-import {TokenForgeFactory} from "../src/TokenForgeFactory.sol";
+import {ForgeProxyCode} from "../src/forges/ForgeProxy.sol";
+import {Diamond3Facet} from "../src/forges/Diamond3Facet.sol";
+import {BaseForge, BaseForgeFacet} from "../src/forges/BaseForge.sol";
+import {ForgeFactory} from "../src/forges/ForgeFactory.sol";
 
 contract TestTokenForgeFactory is Test {
     address public constant OWNER = address(bytes20("OWNER"));
@@ -20,7 +20,7 @@ contract TestTokenForgeFactory is Test {
     ForgeProxyCode public forgeProxyCode;
     Diamond3Facet public diamond3Facet;
     BaseForgeFacet public baseForgeFacet;
-    TokenForgeFactory public tokenForgeFactory;
+    ForgeFactory public tokenForgeFactory;
 
     function setUp() public {
         vm.label(OWNER, "owner");
@@ -32,15 +32,15 @@ contract TestTokenForgeFactory is Test {
         // deploy proxy code
         forgeProxyCode = new ForgeProxyCode();
         // deploy factory
-        TokenForgeFactory tokenForgeFactoryImpl = new TokenForgeFactory();
+        ForgeFactory tokenForgeFactoryImpl = new ForgeFactory();
         ERC1967Proxy tokenForgeFactoryProxy = new ERC1967Proxy(
             address(tokenForgeFactoryImpl),
             abi.encodeCall(
-                TokenForgeFactory.initialize,
+                ForgeFactory.initialize,
                 (OWNER, address(forgeProxyCode), address(diamond3Facet), address(baseForgeFacet))
             )
         );
-        tokenForgeFactory = TokenForgeFactory(address(tokenForgeFactoryProxy));
+        tokenForgeFactory = ForgeFactory(address(tokenForgeFactoryProxy));
         vm.stopPrank();
     }
 

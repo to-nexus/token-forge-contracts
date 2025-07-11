@@ -7,7 +7,7 @@ enum TokenType {
     ERC1155
 }
 
-interface ITokenForgeFactoryAlert {
+interface IForgeFactoryAlert {
     function alertMint(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external;
     function alertTransfer(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external;
     function alertBurn(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external;

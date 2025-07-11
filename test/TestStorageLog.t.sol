@@ -8,10 +8,10 @@ contract TestStorageLog is Test {
 
     function testLog() external pure {
         bytes32 location;
-        // TokenForgeFactory
+        // ForgeFactory.sol
         {
-            location = keccak256(abi.encode(uint256(keccak256("cross.storage.TokenForgeFactory")) - 1))
-                & ~bytes32(uint256(0xff));
+            location =
+                keccak256(abi.encode(uint256(keccak256("cross.storage.ForgeFactory")) - 1)) & ~bytes32(uint256(0xff));
             console.log("\nTokenForgeFactory");
             console.logBytes32(location);
         }

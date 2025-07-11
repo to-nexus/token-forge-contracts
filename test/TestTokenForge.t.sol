@@ -11,13 +11,13 @@ import {ERC1967Proxy} from "@openzeppelin-contracts-5.3.0/proxy/ERC1967/ERC1967P
 import {MessageHashUtils} from "@openzeppelin-contracts-5.3.0/utils/cryptography/MessageHashUtils.sol";
 import {ShortString, ShortStrings} from "@openzeppelin-contracts-5.3.0/utils/ShortStrings.sol";
 
-import {ForgeProxyCode} from "../src/ForgeProxy.sol";
-import {Diamond3Facet} from "../src/Diamond3Facet.sol";
-import {TokenForgeFactory} from "../src/TokenForgeFactory.sol";
-import "../src/BaseForge.sol";
-import "../src/ForgeV1.sol";
-import "../src/ForgeV2.sol";
-import "../src/ForgeV3.sol";
+import {ForgeProxyCode} from "../src/forges/ForgeProxy.sol";
+import {Diamond3Facet} from "../src/forges/Diamond3Facet.sol";
+import {ForgeFactory} from "../src/forges/ForgeFactory.sol";
+import "../src/forges/BaseForge.sol";
+import "../src/forges/ForgeV1.sol";
+import "../src/forges/ForgeV2.sol";
+import "../src/forges/ForgeV3.sol";
 
 import {IERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/IERC20.sol";
 import {IERC20Permit} from "@openzeppelin-contracts-5.3.0/token/ERC20/extensions/IERC20Permit.sol";
@@ -44,7 +44,7 @@ contract TestTokenForgeFactory is Test {
     ForgeV1 public forgeV1;
     ForgeV2 public forgeV2;
     ForgeV3 public forgeV3;
-    TokenForgeFactory public tokenForgeFactory;
+    ForgeFactory public tokenForgeFactory;
     address public FORGE;
 
     function setUp() public {
@@ -60,15 +60,15 @@ contract TestTokenForgeFactory is Test {
         // deploy proxy code
         forgeProxyCode = new ForgeProxyCode();
         // deploy factory
-        TokenForgeFactory tokenForgeFactoryImpl = new TokenForgeFactory();
+        ForgeFactory tokenForgeFactoryImpl = new ForgeFactory();
         ERC1967Proxy tokenForgeFactoryProxy = new ERC1967Proxy(
             address(tokenForgeFactoryImpl),
             abi.encodeCall(
-                TokenForgeFactory.initialize,
+                ForgeFactory.initialize,
                 (OWNER, address(forgeProxyCode), address(diamond3Facet), address(baseForgeFacet))
             )
         );
-        tokenForgeFactory = TokenForgeFactory(address(tokenForgeFactoryProxy));
+        tokenForgeFactory = ForgeFactory(address(tokenForgeFactoryProxy));
 
         vm.stopPrank();
     }
@@ -108,7 +108,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC20.Transfer(address(0), ACCOUNT.addr, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+        emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -151,7 +151,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC721.Transfer(address(0), ACCOUNT.addr, tokenID);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC721Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
+        emit ForgeFactory.ERC721Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -196,7 +196,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), address(0), ACCOUNT.addr, tokenID, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
+        emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -254,9 +254,9 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), address(0), ACCOUNT.addr, tokenIDs, amounts);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
+        emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -303,7 +303,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC20.Transfer(address(FORGE), ACCOUNT.addr, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+        emit ForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -352,7 +352,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC721.Transfer(address(FORGE), ACCOUNT.addr, tokenID);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC721Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
+        emit ForgeFactory.ERC721Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -402,7 +402,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), address(FORGE), ACCOUNT.addr, tokenID, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
+        emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -465,9 +465,9 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), address(FORGE), ACCOUNT.addr, tokenIDs, amounts);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
+        emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -518,7 +518,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+        emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -568,7 +568,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC721.Transfer(ACCOUNT.addr, address(0), tokenID);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC721Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
+        emit ForgeFactory.ERC721Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -619,7 +619,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), ACCOUNT.addr, address(0), tokenID, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
+        emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -682,9 +682,9 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), ACCOUNT.addr, address(0), tokenIDs, amounts);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
+        emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -741,7 +741,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC20.Transfer(address(0), ACCOUNT.addr, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+        emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -797,7 +797,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC721.Transfer(address(0), ACCOUNT.addr, tokenID);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC721Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
+        emit ForgeFactory.ERC721Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -855,7 +855,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), address(0), ACCOUNT.addr, tokenID, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
+        emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -926,9 +926,9 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), address(0), ACCOUNT.addr, tokenIDs, amounts);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
+        emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -989,7 +989,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC20.Transfer(address(FORGE), ACCOUNT.addr, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+        emit ForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -1050,7 +1050,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC721.Transfer(address(FORGE), ACCOUNT.addr, tokenID);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC721Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
+        emit ForgeFactory.ERC721Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -1113,7 +1113,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), address(FORGE), ACCOUNT.addr, tokenID, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
+        emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -1190,9 +1190,9 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), address(FORGE), ACCOUNT.addr, tokenIDs, amounts);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
+        emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -1255,7 +1255,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+        emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -1316,7 +1316,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC721.Transfer(ACCOUNT.addr, address(0), tokenID);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC721Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
+        emit ForgeFactory.ERC721Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -1379,7 +1379,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), ACCOUNT.addr, address(0), tokenID, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
+        emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -1454,9 +1454,9 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), ACCOUNT.addr, address(0), tokenIDs, amounts);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
+        emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -1500,7 +1500,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC20.Transfer(address(0), ACCOUNT.addr, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+        emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, deadline, abi.encodePacked(r, s, v));
@@ -1542,7 +1542,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC721.Transfer(address(0), ACCOUNT.addr, tokenID);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC721Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
+        emit ForgeFactory.ERC721Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         ForgeV3(FORGE).mintERC721(ACCOUNT.addr, token, tokenID, deadline, abi.encodePacked(r, s, v));
@@ -1587,7 +1587,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), address(0), ACCOUNT.addr, tokenID, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
+        emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         ForgeV3(FORGE).mintERC1155(ACCOUNT.addr, token, tokenID, amount, deadline, abi.encodePacked(r, s, v), data);
@@ -1645,9 +1645,9 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), address(0), ACCOUNT.addr, tokenIDs, amounts);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
+        emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         ForgeV3(FORGE).mintERC1155Batch(
@@ -1694,7 +1694,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC20.Transfer(address(FORGE), ACCOUNT.addr, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+        emit ForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, deadline, abi.encodePacked(r, s, v));
@@ -1742,7 +1742,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC721.Transfer(address(FORGE), ACCOUNT.addr, tokenID);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC721Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
+        emit ForgeFactory.ERC721Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         ForgeV3(FORGE).transferERC721(ACCOUNT.addr, token, tokenID, deadline, abi.encodePacked(r, s, v), data);
@@ -1791,7 +1791,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), address(FORGE), ACCOUNT.addr, tokenID, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
+        emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         ForgeV3(FORGE).transferERC1155(ACCOUNT.addr, token, tokenID, amount, deadline, abi.encodePacked(r, s, v), data);
@@ -1853,9 +1853,9 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), address(FORGE), ACCOUNT.addr, tokenIDs, amounts);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
+        emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         ForgeV3(FORGE).transferERC1155Batch(
@@ -1906,7 +1906,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+        emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         ForgeV3(FORGE).burnERC20(ACCOUNT.addr, token, amount, deadline, abi.encodePacked(r, s, v));
@@ -1955,7 +1955,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC721.Transfer(ACCOUNT.addr, address(0), tokenID);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC721Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
+        emit ForgeFactory.ERC721Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
         ForgeV3(FORGE).burnERC721(ACCOUNT.addr, token, tokenID, deadline, abi.encodePacked(r, s, v));
@@ -2005,7 +2005,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), ACCOUNT.addr, address(0), tokenID, amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
+        emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
         ForgeV3(FORGE).burnERC1155(ACCOUNT.addr, token, tokenID, amount, deadline, abi.encodePacked(r, s, v));
@@ -2067,9 +2067,9 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), ACCOUNT.addr, address(0), tokenIDs, amounts);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
+        emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
+        emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
         ForgeV3(FORGE).burnERC1155Batch(ACCOUNT.addr, token, tokenIDs, amounts, deadline, abi.encodePacked(r, s, v));
@@ -2137,7 +2137,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit(true, true, true, true, token);
         emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+        emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -2212,7 +2212,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit(true, true, true, true, token);
         emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+        emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         vm.prank(ACCOUNT.addr);
@@ -2280,7 +2280,7 @@ contract TestTokenForgeFactory is Test {
         vm.expectEmit(true, true, true, true, token);
         emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
         vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
-        emit TokenForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+        emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
         ForgeV3(FORGE).burnERC20Permit(ACCOUNT.addr, token, amount, deadline, validatorSig, permitSig);

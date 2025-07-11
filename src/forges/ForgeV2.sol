@@ -11,10 +11,10 @@ import {ERC1155HolderUpgradeable} from
 import {ECDSA} from "@openzeppelin-contracts-5.3.0/utils/cryptography/ECDSA.sol";
 import {SafeERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/utils/SafeERC20.sol";
 
-import {IERC20, IERC20Forge} from "./interfaces/IERC20Forge.sol";
-import {IERC721Forge} from "./interfaces/IERC721Forge.sol";
-import {IERC1155Forge} from "./interfaces/IERC1155Forge.sol";
-import {TokenType, ITokenForgeFactoryAlert} from "./interfaces/ITokenForgeFactory.sol";
+import {IERC20, IERC20Forge} from "../interfaces/IERC20Forge.sol";
+import {IERC721Forge} from "../interfaces/IERC721Forge.sol";
+import {IERC1155Forge} from "../interfaces/IERC1155Forge.sol";
+import {TokenType, IForgeFactoryAlert} from "../interfaces/IForgeFactory.sol";
 import {BaseForge} from "./BaseForge.sol";
 
 abstract contract ERC20ForgeV2 is BaseForge {

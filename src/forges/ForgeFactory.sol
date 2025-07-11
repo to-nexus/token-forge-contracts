@@ -11,11 +11,11 @@ import {ShortString, ShortStrings} from "@openzeppelin-contracts-5.3.0/utils/Sho
 import {EnumerableMap} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableMap.sol";
 import {Create2} from "@openzeppelin-contracts-5.3.0/utils/Create2.sol";
 
-import {TokenType, ITokenForgeFactoryAlert} from "./interfaces/ITokenForgeFactory.sol";
-import {IDefaultDiamondCut} from "./interfaces/IDefaultDiamondCut.sol";
+import {TokenType, IForgeFactoryAlert} from "../interfaces/IForgeFactory.sol";
+import {IDefaultDiamondCut} from "../interfaces/IDefaultDiamondCut.sol";
 import {ForgeProxyCode} from "./ForgeProxy.sol";
 
-contract TokenForgeFactory is ITokenForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgradeable {
+contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgradeable {
     using ECDSA for bytes32;
     using EnumerableMap for EnumerableMap.Bytes32ToAddressMap;
 
@@ -75,7 +75,7 @@ contract TokenForgeFactory is ITokenForgeFactoryAlert, AccessControlUpgradeable,
 
     bytes32 private constant MANAGER_ROLE = keccak256("MANAGER");
 
-    /// @custom:storage-location erc7201:cross.storage.TokenForgeFactory
+    /// @custom:storage-location erc7201:cross.storage.ForgeFactory
     struct TokenForgeFactoryStorage {
         ForgeProxyCode _forgeProxyCode;
         address _diamondImpl;
@@ -85,9 +85,9 @@ contract TokenForgeFactory is ITokenForgeFactoryAlert, AccessControlUpgradeable,
         mapping(bytes32 service => bool) _isRunning;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("cross.storage.TokenForgeFactory")) - 1)) & ~bytes32(uint256(0xff))
+    // keccak256(abi.encode(uint256(keccak256("cross.storage.ForgeFactory")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant TOKEN_FORGE_FACTORY_STORAGE_LOCATION =
-        0x5ac6ce4fd3cf7358c9a2cbdc90756f82e10994295c639f27faf15b59f70a0600;
+        0x47ead7afa197188cefdcc034aa6d34d17eb7c3c606ba94c96925ee5f9b99fd00;
 
     function _getTokenForgeFactoryStorage() private pure returns (TokenForgeFactoryStorage storage $) {
         assembly {
