@@ -17,7 +17,8 @@ abstract contract ERC1155Base is
     OwnableUpgradeable,
     UUPSUpgradeable
 {
-    error ERC1155Preset__NullInput(bytes32 field);
+    error ERC1155Base__NullInput(bytes32 field);
+    error ERC1155Base__OnlyForge(address caller);
 
     /// @custom:storage-location erc7201:cross.storage.forge.erc1155
     struct ERC1155BaseStorage {
@@ -34,6 +35,11 @@ abstract contract ERC1155Base is
         }
     }
 
+    modifier onlyForge() {
+        if (_msgSender() != _getERC1155PresetStorage().forge) revert ERC1155Base__OnlyForge(_msgSender());
+        _;
+    }
+
     function initialize(address owner, address forge, string calldata baseTokenURI) external initializer {
         __ERC1155Preset_init(forge, baseTokenURI);
 
@@ -43,9 +49,36 @@ abstract contract ERC1155Base is
     }
 
     function __ERC1155Preset_init(address forge, string calldata baseTokenURI) internal virtual onlyInitializing {
-        if (forge == address(0)) revert ERC1155Preset__NullInput("forge");
-        if (bytes(baseTokenURI).length == 0) revert ERC1155Preset__NullInput("baseTokenURI");
+        if (forge == address(0)) revert ERC1155Base__NullInput("forge");
+        if (bytes(baseTokenURI).length == 0) revert ERC1155Base__NullInput("baseTokenURI");
         _getERC1155PresetStorage().forge = forge;
+    }
+
+    function mint(address to, uint256 tokenID, uint256 amount, bytes calldata data) external onlyForge {
+        _mint(to, tokenID, amount, data);
+    }
+
+    function mintBatch(address to, uint256[] memory tokenIDs, uint256[] memory amounts, bytes calldata data)
+        external
+        onlyForge
+    {
+        _mintBatch(to, tokenIDs, amounts, data);
+    }
+
+    function burnFrom(address from, uint256 tokenID, uint256 amount) external {
+        if (from != _msgSender() && !isApprovedForAll(from, _msgSender())) {
+            revert ERC1155MissingApprovalForAll(_msgSender(), from);
+        }
+
+        _burn(from, tokenID, amount);
+    }
+
+    function burnFromBatch(address from, uint256[] memory tokenIDs, uint256[] memory amounts) external {
+        if (from != _msgSender() && !isApprovedForAll(from, _msgSender())) {
+            revert ERC1155MissingApprovalForAll(_msgSender(), from);
+        }
+
+        _burnBatch(from, tokenIDs, amounts);
     }
 
     function supportsInterface(bytes4 interfaceId)

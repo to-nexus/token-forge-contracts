@@ -23,6 +23,8 @@ import {IERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/IERC20.sol";
 import {IERC20Permit} from "@openzeppelin-contracts-5.3.0/token/ERC20/extensions/IERC20Permit.sol";
 import {IERC721} from "@openzeppelin-contracts-5.3.0/token/ERC721/IERC721.sol";
 import {IERC1155} from "@openzeppelin-contracts-5.3.0/token/ERC1155/IERC1155.sol";
+
+import {TokenFactory} from "../src/tokens/TokenFactory.sol";
 import {MockERC20} from "./mock/MockERC20.sol";
 import {MockERC721} from "./mock/MockERC721.sol";
 import {MockERC1155} from "./mock/MockERC1155.sol";
@@ -44,8 +46,13 @@ contract TestTokenForgeFactory is Test {
     ForgeV1 public forgeV1;
     ForgeV2 public forgeV2;
     ForgeV3 public forgeV3;
-    ForgeFactory public tokenForgeFactory;
+    ForgeFactory public forgeFactory;
     address public FORGE;
+
+    TokenFactory public tokenFactory;
+    address public mockERC20Impl;
+    address public mockERC721Impl;
+    address public mockERC1155Impl;
 
     function setUp() public {
         vm.label(OWNER, "owner");
@@ -68,9 +75,46 @@ contract TestTokenForgeFactory is Test {
                 (OWNER, address(forgeProxyCode), address(diamond3Facet), address(baseForgeFacet))
             )
         );
-        tokenForgeFactory = ForgeFactory(address(tokenForgeFactoryProxy));
+        forgeFactory = ForgeFactory(address(tokenForgeFactoryProxy));
+        {
+            mockERC20Impl = address(new MockERC20());
+            mockERC721Impl = address(new MockERC721());
+            mockERC1155Impl = address(new MockERC1155());
+            address[] memory erc20Impls = new address[](1);
+            erc20Impls[0] = mockERC20Impl;
+            address[] memory erc721Impls = new address[](1);
+            erc721Impls[0] = mockERC721Impl;
+            address[] memory erc1155Impls = new address[](1);
+            erc1155Impls[0] = mockERC1155Impl;
+            address tokenFactoryImpl = address(new TokenFactory());
+            address tokenFactoryProxy = address(
+                new ERC1967Proxy(
+                    tokenFactoryImpl,
+                    abi.encodeCall(
+                        TokenFactory.initialize, (OWNER, address(forgeFactory), erc20Impls, erc721Impls, erc1155Impls)
+                    )
+                )
+            );
+            tokenFactory = TokenFactory(tokenFactoryProxy);
+        }
 
         vm.stopPrank();
+    }
+
+    function _deployERC20() internal returns (address) {
+        vm.prank(OWNER);
+        return tokenFactory.deployERC20(OWNER, SERVICE_NAME, "MockERC20", "M20", 18, 0, mockERC20Impl);
+    }
+
+    function _deployERC721() internal returns (address) {
+        vm.prank(OWNER);
+        return
+            tokenFactory.deployERC721(OWNER, SERVICE_NAME, "MockERC721", "M721", "https://xxx.yyy.zzz", mockERC721Impl);
+    }
+
+    function _deployERC1155() internal returns (address) {
+        vm.prank(OWNER);
+        return tokenFactory.deployERC1155(OWNER, SERVICE_NAME, "https://xxx.yyy.zzz", mockERC1155Impl);
     }
 
     function test_mint_erc20_v1() external {
@@ -85,12 +129,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc20
-        address token = address(new MockERC20(FORGE));
+        address token = _deployERC20();
         vm.label(token, "MockERC20");
 
         // validator signature
@@ -107,7 +151,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC20.Transfer(address(0), ACCOUNT.addr, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
@@ -128,12 +172,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc721
-        address token = address(new MockERC721(FORGE));
+        address token = _deployERC721();
         vm.label(token, "MockERC721");
 
         // validator signature
@@ -150,7 +194,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC721.Transfer(address(0), ACCOUNT.addr, tokenID);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC721Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
@@ -171,12 +215,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -195,7 +239,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), address(0), ACCOUNT.addr, tokenID, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
@@ -216,12 +260,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -253,9 +297,9 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), address(0), ACCOUNT.addr, tokenIDs, amounts);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
@@ -277,12 +321,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc20
-        address token = address(new MockERC20(FORGE));
+        address token = _deployERC20();
         vm.label(token, "MockERC20");
 
         // validator signature
@@ -292,6 +336,7 @@ contract TestTokenForgeFactory is Test {
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
 
         // charge token to forge
+        vm.prank(OWNER);
         MockERC20(token).forceMint(FORGE, amount);
 
         bytes32 structHash =
@@ -302,7 +347,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC20.Transfer(address(FORGE), ACCOUNT.addr, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
@@ -325,12 +370,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc721
-        address token = address(new MockERC721(FORGE));
+        address token = _deployERC721();
         vm.label(token, "MockERC721");
 
         // validator signature
@@ -341,6 +386,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory data = "Transfer ERC721 token";
 
         // charge token to forge
+        vm.prank(OWNER);
         MockERC721(token).forceMint(FORGE, tokenID);
 
         bytes32 structHash =
@@ -351,7 +397,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC721.Transfer(address(FORGE), ACCOUNT.addr, tokenID);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC721Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
@@ -374,12 +420,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -391,6 +437,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory data = "Transfer ERC1155 token";
 
         // charge token to forge
+        vm.prank(OWNER);
         MockERC1155(token).forceMint(FORGE, tokenID, amount);
 
         bytes32 structHash =
@@ -401,7 +448,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), address(FORGE), ACCOUNT.addr, tokenID, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
@@ -424,12 +471,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -445,6 +492,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory data = "Transfer ERC1155 token";
 
         // charge token to forge
+        vm.prank(OWNER);
         MockERC1155(token).forceMintBatch(FORGE, tokenIDs, amounts);
 
         bytes32 structHash = keccak256(
@@ -464,9 +512,9 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), address(FORGE), ACCOUNT.addr, tokenIDs, amounts);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
@@ -489,12 +537,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc20
-        address token = address(new MockERC20(FORGE));
+        address token = _deployERC20();
         vm.label(token, "MockERC20");
 
         // validator signature
@@ -504,6 +552,7 @@ contract TestTokenForgeFactory is Test {
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
 
         // charge token to account
+        vm.prank(OWNER);
         MockERC20(token).forceMint(ACCOUNT.addr, amount);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -517,7 +566,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
@@ -539,12 +588,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc721
-        address token = address(new MockERC721(FORGE));
+        address token = _deployERC721();
         vm.label(token, "MockERC721");
 
         // validator signature
@@ -554,6 +603,7 @@ contract TestTokenForgeFactory is Test {
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
 
         // charge token to account
+        vm.prank(OWNER);
         MockERC721(token).forceMint(ACCOUNT.addr, tokenID);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -567,7 +617,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC721.Transfer(ACCOUNT.addr, address(0), tokenID);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC721Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
@@ -589,12 +639,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -605,6 +655,7 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
 
         // charge token to account
+        vm.prank(OWNER);
         MockERC1155(token).forceMint(ACCOUNT.addr, tokenID, amount);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -618,7 +669,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), ACCOUNT.addr, address(0), tokenID, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
@@ -639,12 +690,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -659,6 +710,7 @@ contract TestTokenForgeFactory is Test {
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
 
         // charge token to account
+        vm.prank(OWNER);
         MockERC1155(token).forceMintBatch(ACCOUNT.addr, tokenIDs, amounts);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -681,9 +733,9 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), ACCOUNT.addr, address(0), tokenIDs, amounts);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
@@ -706,12 +758,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc20
-        address token = address(new MockERC20(FORGE));
+        address token = _deployERC20();
         vm.label(token, "MockERC20");
 
         // validator signature
@@ -740,7 +792,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC20.Transfer(address(0), ACCOUNT.addr, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
@@ -761,12 +813,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc721
-        address token = address(new MockERC721(FORGE));
+        address token = _deployERC721();
         vm.label(token, "MockERC721");
 
         // validator signature
@@ -796,7 +848,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC721.Transfer(address(0), ACCOUNT.addr, tokenID);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC721Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
@@ -817,12 +869,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -854,7 +906,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), address(0), ACCOUNT.addr, tokenID, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
@@ -875,12 +927,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -925,9 +977,9 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), address(0), ACCOUNT.addr, tokenIDs, amounts);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
@@ -951,12 +1003,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc20
-        address token = address(new MockERC20(FORGE));
+        address token = _deployERC20();
         vm.label(token, "MockERC20");
 
         // validator signature
@@ -965,6 +1017,7 @@ contract TestTokenForgeFactory is Test {
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
 
+        vm.prank(OWNER);
         MockERC20(token).forceMint(FORGE, amount);
 
         bytes memory recipientSig;
@@ -988,7 +1041,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC20.Transfer(address(FORGE), ACCOUNT.addr, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
@@ -1010,12 +1063,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc721
-        address token = address(new MockERC721(FORGE));
+        address token = _deployERC721();
         vm.label(token, "MockERC721");
 
         // validator signature
@@ -1026,6 +1079,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory data = "Transfer ERC721 token";
 
         // charge token to forge
+        vm.prank(OWNER);
         MockERC721(token).forceMint(FORGE, tokenID);
 
         bytes memory recipientSig;
@@ -1049,7 +1103,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC721.Transfer(address(FORGE), ACCOUNT.addr, tokenID);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC721Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
@@ -1072,12 +1126,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -1089,6 +1143,7 @@ contract TestTokenForgeFactory is Test {
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
 
         // charge token to forge
+        vm.prank(OWNER);
         MockERC1155(token).forceMint(FORGE, tokenID, amount);
 
         bytes memory recipientSig;
@@ -1112,7 +1167,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), address(FORGE), ACCOUNT.addr, tokenID, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
@@ -1135,12 +1190,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -1157,6 +1212,7 @@ contract TestTokenForgeFactory is Test {
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
 
         // charge token to forge
+        vm.prank(OWNER);
         MockERC1155(token).forceMintBatch(FORGE, tokenIDs, amounts);
 
         bytes memory recipientSig;
@@ -1189,9 +1245,9 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), address(FORGE), ACCOUNT.addr, tokenIDs, amounts);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
@@ -1215,12 +1271,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc20
-        address token = address(new MockERC20(FORGE));
+        address token = _deployERC20();
         vm.label(token, "MockERC20");
 
         // validator signature
@@ -1230,6 +1286,7 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
 
         // charge token to account
+        vm.prank(OWNER);
         MockERC20(token).forceMint(ACCOUNT.addr, amount);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -1254,7 +1311,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
@@ -1275,12 +1332,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc721
-        address token = address(new MockERC721(FORGE));
+        address token = _deployERC721();
         vm.label(token, "MockERC721");
 
         // validator signature
@@ -1290,6 +1347,7 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
 
         // charge token to account
+        vm.prank(OWNER);
         MockERC721(token).forceMint(ACCOUNT.addr, tokenID);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -1315,7 +1373,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC721.Transfer(ACCOUNT.addr, address(0), tokenID);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC721Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
@@ -1337,12 +1395,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -1353,6 +1411,7 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
 
         // charge token to account
+        vm.prank(OWNER);
         MockERC1155(token).forceMint(ACCOUNT.addr, tokenID, amount);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -1378,7 +1437,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), ACCOUNT.addr, address(0), tokenID, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
@@ -1399,12 +1458,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -1419,6 +1478,7 @@ contract TestTokenForgeFactory is Test {
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
         uint256 uuid = _calcUUID(nonce);
         // charge token to account
+        vm.prank(OWNER);
         MockERC1155(token).forceMintBatch(ACCOUNT.addr, tokenIDs, amounts);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -1453,9 +1513,9 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), ACCOUNT.addr, address(0), tokenIDs, amounts);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
@@ -1477,12 +1537,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc20
-        address token = address(new MockERC20(FORGE));
+        address token = _deployERC20();
         vm.label(token, "MockERC20");
 
         // validator signature
@@ -1499,7 +1559,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC20.Transfer(address(0), ACCOUNT.addr, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
@@ -1519,12 +1579,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc721
-        address token = address(new MockERC721(FORGE));
+        address token = _deployERC721();
         vm.label(token, "MockERC721");
 
         // validator signature
@@ -1541,7 +1601,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC721.Transfer(address(0), ACCOUNT.addr, tokenID);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC721Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
@@ -1561,12 +1621,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -1586,7 +1646,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), address(0), ACCOUNT.addr, tokenID, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
@@ -1606,12 +1666,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -1644,9 +1704,9 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), address(0), ACCOUNT.addr, tokenIDs, amounts);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
@@ -1669,12 +1729,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc20
-        address token = address(new MockERC20(FORGE));
+        address token = _deployERC20();
         vm.label(token, "MockERC20");
 
         // validator signature
@@ -1683,6 +1743,7 @@ contract TestTokenForgeFactory is Test {
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
         uint256 uuid = _calcUUID(nonce);
         // charge token to forge
+        vm.prank(OWNER);
         MockERC20(token).forceMint(FORGE, amount);
 
         bytes32 structHash =
@@ -1693,7 +1754,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC20.Transfer(address(FORGE), ACCOUNT.addr, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
@@ -1715,12 +1776,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc721
-        address token = address(new MockERC721(FORGE));
+        address token = _deployERC721();
         vm.label(token, "MockERC721");
 
         // validator signature
@@ -1731,6 +1792,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory data = "Transfer ERC721 token";
 
         // charge token to forge
+        vm.prank(OWNER);
         MockERC721(token).forceMint(FORGE, tokenID);
 
         bytes32 structHash =
@@ -1741,7 +1803,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC721.Transfer(address(FORGE), ACCOUNT.addr, tokenID);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC721Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
@@ -1763,12 +1825,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -1780,6 +1842,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory data = "Transfer ERC1155 token";
 
         // charge token to forge
+        vm.prank(OWNER);
         MockERC1155(token).forceMint(FORGE, tokenID, amount);
 
         bytes32 structHash =
@@ -1790,7 +1853,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), address(FORGE), ACCOUNT.addr, tokenID, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
@@ -1812,12 +1875,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -1833,6 +1896,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory data = "Transfer ERC1155 token";
 
         // charge token to forge
+        vm.prank(OWNER);
         MockERC1155(token).forceMintBatch(FORGE, tokenIDs, amounts);
 
         bytes32 structHash = keccak256(
@@ -1852,9 +1916,9 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), address(FORGE), ACCOUNT.addr, tokenIDs, amounts);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
@@ -1877,12 +1941,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc20
-        address token = address(new MockERC20(FORGE));
+        address token = _deployERC20();
         vm.label(token, "MockERC20");
 
         // validator signature
@@ -1892,6 +1956,7 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
 
         // charge token to account
+        vm.prank(OWNER);
         MockERC20(token).forceMint(ACCOUNT.addr, amount);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -1905,7 +1970,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
@@ -1926,12 +1991,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc721
-        address token = address(new MockERC721(FORGE));
+        address token = _deployERC721();
         vm.label(token, "MockERC721");
 
         // validator signature
@@ -1941,6 +2006,7 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
 
         // charge token to account
+        vm.prank(OWNER);
         MockERC721(token).forceMint(ACCOUNT.addr, tokenID);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -1954,7 +2020,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC721.Transfer(ACCOUNT.addr, address(0), tokenID);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC721Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
@@ -1975,12 +2041,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -1991,6 +2057,7 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
 
         // charge token to acount
+        vm.prank(OWNER);
         MockERC1155(token).forceMint(ACCOUNT.addr, tokenID, amount);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -2004,7 +2071,7 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferSingle(address(FORGE), ACCOUNT.addr, address(0), tokenID, amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
@@ -2024,12 +2091,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc1155
-        address token = address(new MockERC1155(FORGE));
+        address token = _deployERC1155();
         vm.label(token, "MockERC1155");
 
         // validator signature
@@ -2044,6 +2111,7 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
 
         // charge token to account
+        vm.prank(OWNER);
         MockERC1155(token).forceMintBatch(ACCOUNT.addr, tokenIDs, amounts);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -2066,9 +2134,9 @@ contract TestTokenForgeFactory is Test {
         // expect emit
         vm.expectEmit();
         emit IERC1155.TransferBatch(address(FORGE), ACCOUNT.addr, address(0), tokenIDs, amounts);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[0], amounts[0]);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC1155Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
@@ -2089,12 +2157,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc20
-        address token = address(new MockERC20(FORGE));
+        address token = _deployERC20();
         vm.label(token, "MockERC20");
 
         // validator signature
@@ -2104,6 +2172,7 @@ contract TestTokenForgeFactory is Test {
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
 
         // charge token to account
+        vm.prank(OWNER);
         MockERC20(token).forceMint(ACCOUNT.addr, amount);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -2136,7 +2205,7 @@ contract TestTokenForgeFactory is Test {
         emit IERC20.Approval(ACCOUNT.addr, address(FORGE), amount);
         vm.expectEmit(true, true, true, true, token);
         emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
@@ -2157,12 +2226,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc20
-        address token = address(new MockERC20(FORGE));
+        address token = _deployERC20();
         vm.label(token, "MockERC20");
 
         // validator signature
@@ -2172,6 +2241,7 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
 
         // charge token to account
+        vm.prank(OWNER);
         MockERC20(token).forceMint(ACCOUNT.addr, amount);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -2211,7 +2281,7 @@ contract TestTokenForgeFactory is Test {
         emit IERC20.Approval(ACCOUNT.addr, address(FORGE), amount);
         vm.expectEmit(true, true, true, true, token);
         emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
@@ -2232,12 +2302,12 @@ contract TestTokenForgeFactory is Test {
         });
         // deploy forge
         vm.prank(OWNER);
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
         vm.label(FORGE, "Forge");
         bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
 
         // deploy mock erc20
-        address token = address(new MockERC20(FORGE));
+        address token = _deployERC20();
         vm.label(token, "MockERC20");
 
         // validator signature
@@ -2247,6 +2317,7 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
 
         // charge token to account
+        vm.prank(OWNER);
         MockERC20(token).forceMint(ACCOUNT.addr, amount);
         // approve to forge
         vm.prank(ACCOUNT.addr);
@@ -2279,7 +2350,7 @@ contract TestTokenForgeFactory is Test {
         emit IERC20.Approval(ACCOUNT.addr, address(FORGE), amount);
         vm.expectEmit(true, true, true, true, token);
         emit IERC20.Transfer(ACCOUNT.addr, address(0), amount);
-        vm.expectEmit(true, true, true, true, address(tokenForgeFactory));
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
         emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction

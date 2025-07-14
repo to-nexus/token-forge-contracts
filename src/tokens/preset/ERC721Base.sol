@@ -20,8 +20,8 @@ abstract contract ERC721Base is
     OwnableUpgradeable,
     UUPSUpgradeable
 {
-    error ERC721Preset__NullInput(bytes32 field);
-    error ERC721Preset__InvalidInitialSupply(uint256 initialSupply);
+    error ERC721Base__NullInput(bytes32 field);
+    error ERC721Base__OnlyForge(address caller);
 
     /// @custom:storage-location erc7201:cross.storage.forge.erc721
     struct ERC721PresetStorage {
@@ -37,6 +37,11 @@ abstract contract ERC721Base is
         assembly {
             $.slot := ERC721PresetStorageLocation
         }
+    }
+
+    modifier onlyForge() {
+        if (_msgSender() != _getERC721PresetStorage().forge) revert ERC721Base__OnlyForge(_msgSender());
+        _;
     }
 
     function initialize(
@@ -60,12 +65,21 @@ abstract contract ERC721Base is
         string calldata symbol,
         string calldata baseTokenURI
     ) internal virtual onlyInitializing {
-        if (bytes(name).length == 0) revert ERC721Preset__NullInput("name");
-        if (bytes(symbol).length == 0) revert ERC721Preset__NullInput("symbol");
-        if (bytes(baseTokenURI).length == 0) revert ERC721Preset__NullInput("symbol");
-        ERC721PresetStorage storage _$ = _getERC721PresetStorage();
-        _$.baseURI = baseTokenURI;
-        _$.forge = forge;
+        if (bytes(name).length == 0) revert ERC721Base__NullInput("name");
+        if (bytes(symbol).length == 0) revert ERC721Base__NullInput("symbol");
+        if (bytes(baseTokenURI).length == 0) revert ERC721Base__NullInput("symbol");
+        ERC721PresetStorage storage $ = _getERC721PresetStorage();
+        $.baseURI = baseTokenURI;
+        $.forge = forge;
+    }
+
+    function mint(address to, uint256 tokenID) external onlyForge {
+        _mint(to, tokenID);
+    }
+
+    function burnFrom(address from, uint256 tokenID) external {
+        _checkAuthorized(from, _msgSender(), tokenID);
+        _burn(tokenID);
     }
 
     function _baseURI() internal view override returns (string memory) {

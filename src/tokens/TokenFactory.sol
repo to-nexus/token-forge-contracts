@@ -68,15 +68,15 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
         if (forgeFactory == address(0)) revert TokenFactory__ZeroAddress("forgeFactory");
 
         _setRoleAdmin(MANAGER_ROLE, DEFAULT_ADMIN_ROLE);
-        _grantRole(DEFAULT_ADMIN_ROLE, owner);
+        _grantRole(MANAGER_ROLE, owner);
         _grantRole(DEFAULT_ADMIN_ROLE, owner);
 
         TokenFactoryStorage storage $ = _getTokenFactoryStorage();
         $.forgeFactory = IForgeFactoryForgeByService(forgeFactory);
 
-        _setERC20Impls($, erc20Impls, true);
-        _setERC721Impls($, erc721Impls, true);
-        _setERC1155Impls($, erc1155Impls, true);
+        _setImpls(TokenType.ERC20, type(IERC20Forge).interfaceId, $.erc20Impls, erc20Impls, true);
+        _setImpls(TokenType.ERC721, type(IERC721Forge).interfaceId, $.erc721Impls, erc721Impls, true);
+        _setImpls(TokenType.ERC1155, type(IERC1155Forge).interfaceId, $.erc1155Impls, erc1155Impls, true);
     }
 
     function getServiceTokens(string calldata service, TokenType tokenType) external view returns (address[] memory) {
@@ -108,11 +108,11 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
         uint256 initialSupply,
         address logic
     ) external onlyRole(MANAGER_ROLE) returns (address token) {
-        TokenFactoryStorage storage _$ = _getTokenFactoryStorage();
+        TokenFactoryStorage storage $ = _getTokenFactoryStorage();
         {
-            (address forge, bool running) = _$.forgeFactory.forgeByService(service);
+            (address forge, bool running) = $.forgeFactory.forgeByService(service);
             if (forge == address(0) || !running) revert TokenFactory__InvalidService(service);
-            if (_$.erc20Impls.contains(logic)) {
+            if (!$.erc20Impls.contains(logic)) {
                 revert TokenFactory__InvalidLogic(TokenType.ERC20, logic);
             }
             token = address(
@@ -124,7 +124,7 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
         bytes32 service32 = ShortString.unwrap(ShortStrings.toShortString(service));
         if (token == address(0)) revert TokenFactory__DeployFailed(TokenType.ERC20, service32, logic);
 
-        _$.registeredTokens[service32][TokenType.ERC20].add(token);
+        $.registeredTokens[service32][TokenType.ERC20].add(token);
         emit TokenDeployed(service32, owner, TokenType.ERC20, token, logic);
     }
 
@@ -136,11 +136,11 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
         string calldata baseTokenURI,
         address logic
     ) external onlyRole(MANAGER_ROLE) returns (address token) {
-        TokenFactoryStorage storage _$ = _getTokenFactoryStorage();
+        TokenFactoryStorage storage $ = _getTokenFactoryStorage();
         {
-            (address forge, bool running) = _$.forgeFactory.forgeByService(service);
+            (address forge, bool running) = $.forgeFactory.forgeByService(service);
             if (forge == address(0) || !running) revert TokenFactory__InvalidService(service);
-            if (_$.erc721Impls.contains(logic)) {
+            if (!$.erc721Impls.contains(logic)) {
                 revert TokenFactory__InvalidLogic(TokenType.ERC721, logic);
             }
             token = address(
@@ -152,7 +152,7 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
         bytes32 service32 = ShortString.unwrap(ShortStrings.toShortString(service));
         if (token == address(0)) revert TokenFactory__DeployFailed(TokenType.ERC721, service32, logic);
 
-        _$.registeredTokens[service32][TokenType.ERC721].add(token);
+        $.registeredTokens[service32][TokenType.ERC721].add(token);
         emit TokenDeployed(service32, owner, TokenType.ERC721, token, logic);
     }
 
@@ -161,11 +161,11 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
         onlyRole(MANAGER_ROLE)
         returns (address token)
     {
-        TokenFactoryStorage storage _$ = _getTokenFactoryStorage();
+        TokenFactoryStorage storage $ = _getTokenFactoryStorage();
         {
-            (address forge, bool running) = _$.forgeFactory.forgeByService(service);
+            (address forge, bool running) = $.forgeFactory.forgeByService(service);
             if (forge == address(0) || !running) revert TokenFactory__InvalidService(service);
-            if (_$.erc1155Impls.contains(logic)) {
+            if (!$.erc1155Impls.contains(logic)) {
                 revert TokenFactory__InvalidLogic(TokenType.ERC1155, logic);
             }
             token = address(new ERC1967Proxy(logic, abi.encodeCall(IERC1155Forge.initialize, (owner, forge, uri))));
@@ -173,7 +173,7 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
         bytes32 service32 = ShortString.unwrap(ShortStrings.toShortString(service));
         if (token == address(0)) revert TokenFactory__DeployFailed(TokenType.ERC1155, service32, logic);
 
-        _$.registeredTokens[service32][TokenType.ERC1155].add(token);
+        $.registeredTokens[service32][TokenType.ERC1155].add(token);
         emit TokenDeployed(service32, owner, TokenType.ERC1155, token, logic);
     }
 
@@ -181,84 +181,45 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
         external
         onlyRole(MANAGER_ROLE)
     {
+        EnumerableSet.AddressSet storage _impls;
+        bytes4 interfaceId;
         if (tokenType == TokenType.ERC20) {
-            _setERC20Impls(_getTokenFactoryStorage(), logicAddress, add);
+            (_impls, interfaceId) = (_getTokenFactoryStorage().erc20Impls, type(IERC20Forge).interfaceId);
         } else if (tokenType == TokenType.ERC721) {
-            _setERC721Impls(_getTokenFactoryStorage(), logicAddress, add);
+            (_impls, interfaceId) = (_getTokenFactoryStorage().erc721Impls, type(IERC721Forge).interfaceId);
         } else {
-            _setERC1155Impls(_getTokenFactoryStorage(), logicAddress, add);
+            (_impls, interfaceId) = (_getTokenFactoryStorage().erc1155Impls, type(IERC1155Forge).interfaceId);
         }
+        _setImpls(tokenType, interfaceId, _impls, logicAddress, add);
     }
 
-    function _setERC20Impls(TokenFactoryStorage storage $, address[] calldata erc20Impls, bool add) private {
-        EnumerableSet.AddressSet storage _erc20Impls = $.erc20Impls;
-        uint256 length = erc20Impls.length;
+    function _setImpls(
+        TokenType tokeType,
+        bytes4 interfaceId,
+        EnumerableSet.AddressSet storage _impls,
+        address[] calldata impls,
+        bool add
+    ) private {
+        uint256 length = impls.length;
         unchecked {
             if (add) {
                 for (uint256 i = 0; i < length; ++i) {
-                    address erc20Impl = erc20Impls[i];
-                    if (!IERC165(erc20Impl).supportsInterface(type(IERC20Forge).interfaceId)) {
-                        revert TokenFactory__InvalidLogic(TokenType.ERC20, erc20Impl);
+                    address impl = impls[i];
+                    if (impl == address(0)) {
+                        revert TokenFactory__ZeroAddress("impls");
                     }
-                    if (erc20Impl != address(0) && _erc20Impls.add(erc20Impl)) {
-                        emit PresetLogicSet(TokenType.ERC20, erc20Impl);
+                    if (!IERC165(impl).supportsInterface(interfaceId)) {
+                        revert TokenFactory__InvalidLogic(tokeType, impl);
+                    }
+                    if (_impls.add(impl)) {
+                        emit PresetLogicSet(tokeType, impl);
                     }
                 }
             } else {
                 for (uint256 i = 0; i < length; ++i) {
-                    address erc20Impl = erc20Impls[i];
-                    if (_erc20Impls.remove(erc20Impl)) {
-                        emit PresetLogicRemoved(TokenType.ERC20, erc20Impl);
-                    }
-                }
-            }
-        }
-    }
-
-    function _setERC721Impls(TokenFactoryStorage storage $, address[] calldata erc721Impls, bool add) private {
-        EnumerableSet.AddressSet storage _erc721Impls = $.erc721Impls;
-        uint256 length = erc721Impls.length;
-        unchecked {
-            if (add) {
-                for (uint256 i = 0; i < length; ++i) {
-                    address erc721Impl = erc721Impls[i];
-                    if (!IERC165(erc721Impl).supportsInterface(type(IERC721Forge).interfaceId)) {
-                        revert TokenFactory__InvalidLogic(TokenType.ERC721, erc721Impl);
-                    }
-                    if (erc721Impl != address(0) && _erc721Impls.add(erc721Impl)) {
-                        emit PresetLogicSet(TokenType.ERC721, erc721Impl);
-                    }
-                }
-            } else {
-                for (uint256 i = 0; i < length; ++i) {
-                    address erc721Impl = erc721Impls[i];
-                    if (_erc721Impls.remove(erc721Impl)) {
-                        emit PresetLogicRemoved(TokenType.ERC721, erc721Impl);
-                    }
-                }
-            }
-        }
-    }
-
-    function _setERC1155Impls(TokenFactoryStorage storage $, address[] calldata erc1155Impls, bool add) private {
-        EnumerableSet.AddressSet storage _erc1155Impls = $.erc1155Impls;
-        uint256 length = erc1155Impls.length;
-        unchecked {
-            if (add) {
-                for (uint256 i = 0; i < length; ++i) {
-                    address erc1155Impl = erc1155Impls[i];
-                    if (!IERC165(erc1155Impl).supportsInterface(type(IERC1155Forge).interfaceId)) {
-                        revert TokenFactory__InvalidLogic(TokenType.ERC1155, erc1155Impl);
-                    }
-                    if (erc1155Impl != address(0) && _erc1155Impls.add(erc1155Impl)) {
-                        emit PresetLogicSet(TokenType.ERC1155, erc1155Impl);
-                    }
-                }
-            } else {
-                for (uint256 i = 0; i < length; ++i) {
-                    address erc1155Impl = erc1155Impls[i];
-                    if (_erc1155Impls.remove(erc1155Impl)) {
-                        emit PresetLogicRemoved(TokenType.ERC1155, erc1155Impl);
+                    address impl = impls[i];
+                    if (_impls.remove(impl)) {
+                        emit PresetLogicRemoved(tokeType, impl);
                     }
                 }
             }
