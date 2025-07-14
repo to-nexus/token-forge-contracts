@@ -101,10 +101,10 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     {
         __AccessControl_init();
         __UUPSUpgradeable_init();
-        __TokenForgeFactory_init(_owner, ForgeProxyCode(_forgeProxyCode), _diamondImpl, _baseImpl);
+        __ForgeFactory_init(_owner, ForgeProxyCode(_forgeProxyCode), _diamondImpl, _baseImpl);
     }
 
-    function __TokenForgeFactory_init(
+    function __ForgeFactory_init(
         address _owner,
         ForgeProxyCode _forgeProxyCode,
         address _diamondImpl,
