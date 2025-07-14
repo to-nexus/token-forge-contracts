@@ -10,8 +10,8 @@ contract TestStorageLog is Test {
         bytes32 location;
         // ForgeFactory.sol
         {
-            location =
-                keccak256(abi.encode(uint256(keccak256("cross.storage.ForgeFactory")) - 1)) & ~bytes32(uint256(0xff));
+            location = keccak256(abi.encode(uint256(keccak256("cross.storage.forge.ForgeFactory")) - 1))
+                & ~bytes32(uint256(0xff));
             console.log("\nForgeFactory");
             console.logBytes32(location);
         }
@@ -19,11 +19,50 @@ contract TestStorageLog is Test {
 
     function test_storage_base_forge() external pure {
         bytes32 location;
-        // ForgeFactory.sol
+        {
+            location = keccak256(abi.encode(uint256(keccak256("erc7201:cross.storage.forge.BaseForge")) - 1))
+                & ~bytes32(uint256(0xff));
+            console.log("\nBaseForge");
+            console.logBytes32(location);
+        }
+    }
+
+    function test_storage_token_factory() external pure {
+        bytes32 location;
+        {
+            location = keccak256(abi.encode(uint256(keccak256("cross.storage.forge.TokenFactory")) - 1))
+                & ~bytes32(uint256(0xff));
+            console.log("\nTokenFactory");
+            console.logBytes32(location);
+        }
+    }
+
+    function test_storage_token_erc20() external pure {
+        bytes32 location;
         {
             location =
-                keccak256(abi.encode(uint256(keccak256("cross.storage.BaseForge")) - 1)) & ~bytes32(uint256(0xff));
-            console.log("\nBaseForge");
+                keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20")) - 1)) & ~bytes32(uint256(0xff));
+            console.log("\nERC20Base");
+            console.logBytes32(location);
+        }
+    }
+
+    function test_storage_token_erc721() external pure {
+        bytes32 location;
+        {
+            location =
+                keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc721")) - 1)) & ~bytes32(uint256(0xff));
+            console.log("\nERC721Base");
+            console.logBytes32(location);
+        }
+    }
+
+    function test_storage_token_erc1155() external pure {
+        bytes32 location;
+        {
+            location =
+                keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc1155")) - 1)) & ~bytes32(uint256(0xff));
+            console.log("\nERC1155Base");
             console.logBytes32(location);
         }
     }

@@ -26,7 +26,7 @@ abstract contract ERC1155Base is
 
     // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc1155")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant ERC1155BaseStorageLocation =
-        0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00;
+        0xa4673bb384131e0f99d53662bec7c02c60fe363c5b3f49f47bfea0107c7ded00;
 
     function _getERC1155PresetStorage() private pure returns (ERC1155BaseStorage storage $) {
         assembly {

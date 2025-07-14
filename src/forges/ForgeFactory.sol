@@ -87,7 +87,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
 
     // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.ForgeFactory")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant FORGE_FACTORY_STORAGE_LOCATION =
-        0x47ead7afa197188cefdcc034aa6d34d17eb7c3c606ba94c96925ee5f9b99fd00;
+        0x11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e00;
 
     function _getForgeFactoryStorage() private pure returns (ForgeFactoryStorage storage $) {
         assembly {

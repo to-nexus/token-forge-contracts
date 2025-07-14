@@ -20,7 +20,7 @@ abstract contract ERC20Base is IERC20Forge, ERC165Upgradeable, ERC20Upgradeable,
 
     // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant ERC20BaseStorageLocation =
-        0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00;
+        0x5336721aabdf58b9f67dce2b9c89749de013c2e87912f00ce8440ff438c6c800;
 
     function _getERC20PresetStorage() private pure returns (ERC20BaseStorage storage $) {
         assembly {

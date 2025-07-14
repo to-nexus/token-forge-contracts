@@ -37,7 +37,7 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
 
     // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.TokenFactory")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant TOKEN_FACTORY_STORAGE_LOCATION =
-        0x47ead7afa197188cefdcc034aa6d34d17eb7c3c606ba94c96925ee5f9b99fd00;
+        0xd9ce7ba49891d0b3422c928b675902668a780038fd864217ee35722e549a9f00;
 
     function _getTokenFactoryStorage() private pure returns (TokenFactoryStorage storage $) {
         assembly {

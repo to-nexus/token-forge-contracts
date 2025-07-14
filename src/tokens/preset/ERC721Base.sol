@@ -31,7 +31,7 @@ abstract contract ERC721Base is
 
     // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc721")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant ERC721PresetStorageLocation =
-        0x52c63247e1f47db19d5ce0460030c497f067ca4cebf71ba98eeadabe20bace00;
+        0xae399aba48b00e5fadd22cfd23d29924573cb21a1b3727798605d103f2a75a00;
 
     function _getERC721PresetStorage() private pure returns (ERC721PresetStorage storage $) {
         assembly {

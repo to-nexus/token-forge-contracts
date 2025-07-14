@@ -26,7 +26,7 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
 
     // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.BaseForge")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant BASE_FORGE_STORAGE_LOCATION =
-        0x2bceef4468671a8ef280e9e6f32be0e3f08c175d14c5dd11c601b87929129000;
+        0x30dd639bea4303e0511339dd4e7bcd7a8759c5bbf20d8c42af05f18fcc153000;
 
     function _getBaseForgeStorage() private pure returns (BaseForgeStorage storage $) {
         assembly {
