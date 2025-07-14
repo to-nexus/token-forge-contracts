@@ -18,13 +18,13 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
 
     event ValidatorUpdated(address indexed validator);
 
-    /// @custom:storage-location erc7201:cross.storage.BaseForge
+    /// @custom:storage-location erc7201:cross.storage.forge.BaseForge
     struct BaseForgeStorage {
         address _factory;
         address _validator;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("cross.storage.BaseForge")) - 1)) & ~bytes32(uint256(0xff))
+    // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.BaseForge")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant BASE_FORGE_STORAGE_LOCATION =
         0x2bceef4468671a8ef280e9e6f32be0e3f08c175d14c5dd11c601b87929129000;
 

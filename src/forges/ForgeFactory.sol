@@ -75,7 +75,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
 
     bytes32 private constant MANAGER_ROLE = keccak256("MANAGER");
 
-    /// @custom:storage-location erc7201:cross.storage.ForgeFactory
+    /// @custom:storage-location erc7201:cross.storage.forge.ForgeFactory
     struct ForgeFactoryStorage {
         ForgeProxyCode _forgeProxyCode;
         address _diamondImpl;
@@ -85,7 +85,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
         mapping(bytes32 service => bool) _isRunning;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("cross.storage.ForgeFactory")) - 1)) & ~bytes32(uint256(0xff))
+    // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.ForgeFactory")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant FORGE_FACTORY_STORAGE_LOCATION =
         0x47ead7afa197188cefdcc034aa6d34d17eb7c3c606ba94c96925ee5f9b99fd00;
 
