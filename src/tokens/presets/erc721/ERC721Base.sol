@@ -51,7 +51,7 @@ abstract contract ERC721Base is
         string calldata symbol,
         string calldata baseTokenURI
     ) external initializer {
-        __ERC721Preset_init(forge, name, symbol, baseTokenURI);
+        __ERC721Base_init(forge, name, symbol, baseTokenURI);
 
         __ERC721_init(name, symbol);
         __ERC721Holder_init();
@@ -59,7 +59,7 @@ abstract contract ERC721Base is
         __Ownable_init(owner);
     }
 
-    function __ERC721Preset_init(
+    function __ERC721Base_init(
         address forge,
         string calldata name,
         string calldata symbol,

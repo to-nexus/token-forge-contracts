@@ -29,29 +29,29 @@ abstract contract ERC1155Base is
     bytes32 private constant ERC1155BaseStorageLocation =
         0xa4673bb384131e0f99d53662bec7c02c60fe363c5b3f49f47bfea0107c7ded00;
 
-    function _getERC1155PresetStorage() private pure returns (ERC1155BaseStorage storage $) {
+    function _getERC1155BaseStorage() private pure returns (ERC1155BaseStorage storage $) {
         assembly {
             $.slot := ERC1155BaseStorageLocation
         }
     }
 
     modifier onlyForge() {
-        if (_msgSender() != _getERC1155PresetStorage().forge) revert ERC1155Base__OnlyForge(_msgSender());
+        if (_msgSender() != _getERC1155BaseStorage().forge) revert ERC1155Base__OnlyForge(_msgSender());
         _;
     }
 
     function initialize(address owner, address forge, string calldata baseTokenURI) external initializer {
-        __ERC1155Preset_init(forge, baseTokenURI);
+        __ERC1155Base_init(forge, baseTokenURI);
 
         __ERC1155_init(baseTokenURI);
         __ERC1155Holder_init();
         __Ownable_init(owner);
     }
 
-    function __ERC1155Preset_init(address forge, string calldata baseTokenURI) internal virtual onlyInitializing {
+    function __ERC1155Base_init(address forge, string calldata baseTokenURI) internal virtual onlyInitializing {
         if (forge == address(0)) revert ERC1155Base__NullInput("forge");
         if (bytes(baseTokenURI).length == 0) revert ERC1155Base__NullInput("baseTokenURI");
-        _getERC1155PresetStorage().forge = forge;
+        _getERC1155BaseStorage().forge = forge;
     }
 
     function mint(address to, uint256 tokenID, uint256 amount, bytes calldata data) external onlyForge {

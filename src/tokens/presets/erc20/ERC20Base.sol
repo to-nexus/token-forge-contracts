@@ -50,14 +50,14 @@ abstract contract ERC20Base is
         uint8 _decimals,
         uint256 _initialSupply
     ) external initializer {
-        __ERC20Preset_init(_owner, _forge, _name, _symbol, _decimals, _initialSupply);
+        __ERC20Base_init(_owner, _forge, _name, _symbol, _decimals, _initialSupply);
 
         __ERC20_init(_name, _symbol);
         __ERC20Permit_init(_name);
         __Ownable_init(_owner);
     }
 
-    function __ERC20Preset_init(
+    function __ERC20Base_init(
         address _owner,
         address _forge,
         string memory _name,
