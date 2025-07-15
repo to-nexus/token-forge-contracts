@@ -20,8 +20,8 @@ contract TestStorageLog is Test {
     function test_storage_base_forge() external pure {
         bytes32 location;
         {
-            location = keccak256(abi.encode(uint256(keccak256("erc7201:cross.storage.forge.BaseForge")) - 1))
-                & ~bytes32(uint256(0xff));
+            location =
+                keccak256(abi.encode(uint256(keccak256("cross.storage.forge.BaseForge")) - 1)) & ~bytes32(uint256(0xff));
             console.log("\nBaseForge");
             console.logBytes32(location);
         }
