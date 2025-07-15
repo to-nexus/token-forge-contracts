@@ -10,18 +10,20 @@ import {IERC173} from "diamond-3-hardhat-1.0.0/interfaces/IERC173.sol";
 import {ERC1967Proxy} from "@openzeppelin-contracts-5.3.0/proxy/ERC1967/ERC1967Proxy.sol";
 import {MessageHashUtils} from "@openzeppelin-contracts-5.3.0/utils/cryptography/MessageHashUtils.sol";
 
-import {ForgeProxyCode} from "../src/ForgeProxy.sol";
-import {Diamond3Facet} from "../src/Diamond3Facet.sol";
-import {TokenForgeFactory} from "../src/TokenForgeFactory.sol";
-import "../src/BaseForge.sol";
-import "../src/ForgeV1.sol";
-import "../src/ForgeV2.sol";
+import {ForgeProxyCode} from "../src/forges/ForgeProxy.sol";
+import {Diamond3Facet} from "../src/forges/Diamond3Facet.sol";
+import {ForgeFactory} from "../src/forges/ForgeFactory.sol";
+import "../src/forges/BaseForge.sol";
+import "../src/forges/ForgeV1.sol";
+import "../src/forges/ForgeV2.sol";
+import "../src/forges/ForgeV3.sol";
 
+import {TokenFactory} from "../src/tokens/TokenFactory.sol";
 import {MockERC20} from "./mock/MockERC20.sol";
 import {MockERC721} from "./mock/MockERC721.sol";
 import {MockERC1155} from "./mock/MockERC1155.sol";
 
-import "./TestTokenForge.t.sol";
+import "./mock/StructHash.sol";
 
 contract TestException is Test {
     address public constant OWNER = address(bytes20("OWNER"));
@@ -37,10 +39,14 @@ contract TestException is Test {
     ForgeV1 public forgeV1;
     ForgeV2 public forgeV2;
     ForgeV3 public forgeV3;
-    TokenForgeFactory public tokenForgeFactory;
+    ForgeFactory public forgeFactory;
     address public FORGE;
     bytes32 public DOMAIN_SEPARATOR;
 
+    TokenFactory public tokenFactory;
+    address public mockERC20Impl;
+    address public mockERC721Impl;
+    address public mockERC1155Impl;
     MockERC20 public mockERC20;
     MockERC721 public mockERC721;
     MockERC1155 public mockERC1155;
@@ -61,11 +67,11 @@ contract TestException is Test {
         // deploy proxy code
         forgeProxyCode = new ForgeProxyCode();
         // deploy factory
-        TokenForgeFactory tokenForgeFactoryImpl = new TokenForgeFactory();
-        ERC1967Proxy tokenForgeFactoryProxy = new ERC1967Proxy(
-            address(tokenForgeFactoryImpl),
+        ForgeFactory forgeFactoryImpl = new ForgeFactory();
+        ERC1967Proxy forgeFactoryProxy = new ERC1967Proxy(
+            address(forgeFactoryImpl),
             abi.encodeCall(
-                TokenForgeFactory.initialize,
+                ForgeFactory.initialize,
                 (OWNER, address(forgeProxyCode), address(diamond3Facet), address(baseForgeFacet))
             )
         );
@@ -144,15 +150,39 @@ contract TestException is Test {
             });
         }
 
-        tokenForgeFactory = TokenForgeFactory(address(tokenForgeFactoryProxy));
-        FORGE = tokenForgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        forgeFactory = ForgeFactory(address(forgeFactoryProxy));
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
+
+        {
+            mockERC20Impl = address(new MockERC20());
+            mockERC721Impl = address(new MockERC721());
+            mockERC1155Impl = address(new MockERC1155());
+            address[] memory erc20Impls = new address[](1);
+            erc20Impls[0] = mockERC20Impl;
+            address[] memory erc721Impls = new address[](1);
+            erc721Impls[0] = mockERC721Impl;
+            address[] memory erc1155Impls = new address[](1);
+            erc1155Impls[0] = mockERC1155Impl;
+            address tokenFactoryImpl = address(new TokenFactory());
+            address tokenFactoryProxy = address(
+                new ERC1967Proxy(
+                    tokenFactoryImpl,
+                    abi.encodeCall(
+                        TokenFactory.initialize, (OWNER, address(forgeFactory), erc20Impls, erc721Impls, erc1155Impls)
+                    )
+                )
+            );
+            tokenFactory = TokenFactory(tokenFactoryProxy);
+        }
+        mockERC20 = MockERC20(tokenFactory.deployERC20(OWNER, SERVICE_NAME, "MockERC20", "M20", 18, 0, mockERC20Impl));
+        mockERC721 = MockERC721(
+            tokenFactory.deployERC721(OWNER, SERVICE_NAME, "MockERC721", "M721", "https://xxx.yyy.zzz/", mockERC721Impl)
+        );
+        mockERC1155 =
+            MockERC1155(tokenFactory.deployERC1155(OWNER, SERVICE_NAME, "https://xxx.yyy.zzz/", mockERC1155Impl));
 
         vm.stopPrank();
-        mockERC20 = new MockERC20(FORGE);
-        mockERC721 = new MockERC721(FORGE);
-        mockERC1155 = new MockERC1155(FORGE);
-
-        DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
     }
 
     function test_v1_sender_is_not_msgsender() external {

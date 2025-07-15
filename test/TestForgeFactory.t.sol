@@ -9,18 +9,18 @@ import {IDiamondLoupe} from "diamond-3-hardhat-1.0.0/interfaces/IDiamondLoupe.so
 import {IERC173} from "diamond-3-hardhat-1.0.0/interfaces/IERC173.sol";
 import {ERC1967Proxy} from "@openzeppelin-contracts-5.3.0/proxy/ERC1967/ERC1967Proxy.sol";
 
-import {ForgeProxyCode} from "../src/ForgeProxy.sol";
-import {Diamond3Facet} from "../src/Diamond3Facet.sol";
-import {BaseForge, BaseForgeFacet} from "../src/BaseForge.sol";
-import {TokenForgeFactory} from "../src/TokenForgeFactory.sol";
+import {ForgeProxyCode} from "../src/forges/ForgeProxy.sol";
+import {Diamond3Facet} from "../src/forges/Diamond3Facet.sol";
+import {BaseForge, BaseForgeFacet} from "../src/forges/BaseForge.sol";
+import {ForgeFactory} from "../src/forges/ForgeFactory.sol";
 
-contract TestTokenForgeFactory is Test {
+contract TestForgeFactory is Test {
     address public constant OWNER = address(bytes20("OWNER"));
 
     ForgeProxyCode public forgeProxyCode;
     Diamond3Facet public diamond3Facet;
     BaseForgeFacet public baseForgeFacet;
-    TokenForgeFactory public tokenForgeFactory;
+    ForgeFactory public forgeFactory;
 
     function setUp() public {
         vm.label(OWNER, "owner");
@@ -32,15 +32,15 @@ contract TestTokenForgeFactory is Test {
         // deploy proxy code
         forgeProxyCode = new ForgeProxyCode();
         // deploy factory
-        TokenForgeFactory tokenForgeFactoryImpl = new TokenForgeFactory();
+        ForgeFactory tokenForgeFactoryImpl = new ForgeFactory();
         ERC1967Proxy tokenForgeFactoryProxy = new ERC1967Proxy(
             address(tokenForgeFactoryImpl),
             abi.encodeCall(
-                TokenForgeFactory.initialize,
+                ForgeFactory.initialize,
                 (OWNER, address(forgeProxyCode), address(diamond3Facet), address(baseForgeFacet))
             )
         );
-        tokenForgeFactory = TokenForgeFactory(address(tokenForgeFactoryProxy));
+        forgeFactory = ForgeFactory(address(tokenForgeFactoryProxy));
         vm.stopPrank();
     }
 
@@ -60,7 +60,7 @@ contract TestTokenForgeFactory is Test {
         Vm.Wallet memory validator = vm.createWallet(service);
         IDiamondCut.FacetCut[] memory addCuts;
         vm.prank(OWNER);
-        address forgeProxy = tokenForgeFactory.addService(serviceOwner, validator.addr, service, addCuts);
+        address forgeProxy = forgeFactory.addService(serviceOwner, validator.addr, service, addCuts);
         assertNotEq(forgeProxy, address(0), "ForgeProxy address should not be zero");
         // check domain separator
         {
@@ -113,24 +113,24 @@ contract TestTokenForgeFactory is Test {
         // check factory data
         {
             // allForges
-            (string[] memory services, address[] memory forges) = tokenForgeFactory.allForges();
+            (string[] memory services, address[] memory forges) = forgeFactory.allForges();
             assertEq(services.length, 1, "Expected 1 service in the factory");
             assertEq(services.length, forges.length, "Services and forges length mismatch");
             assertEq(services[0], service, "Service name mismatch");
             assertEq(forges[0], forgeProxy, "Forge address mismatch");
 
             // lengthAllForges
-            uint256 lengthAllForges = tokenForgeFactory.lengthAllForges();
+            uint256 lengthAllForges = forgeFactory.lengthAllForges();
             assertEq(lengthAllForges, 1, "Expected 1 forge in the factory");
 
             // forgeByIndex
-            (string memory serviceName, address forge, bool running) = tokenForgeFactory.forgeByIndex(0);
+            (string memory serviceName, address forge, bool running) = forgeFactory.forgeByIndex(0);
             assertEq(service, serviceName, "Service name mismatch by index");
             assertEq(forgeProxy, forge, "Service name mismatch by index");
             assertTrue(running, "Service should be running");
 
             // forgeByService
-            (forge, running) = tokenForgeFactory.forgeByService(service);
+            (forge, running) = forgeFactory.forgeByService(service);
             assertEq(forgeProxy, forge, "Forge address mismatch by service");
             assertTrue(running, "Service should be running");
         }
@@ -167,8 +167,8 @@ contract TestTokenForgeFactory is Test {
         // pause service
         {
             vm.prank(OWNER);
-            tokenForgeFactory.pauseService(service, true);
-            (address forge, bool running) = tokenForgeFactory.forgeByService(service);
+            forgeFactory.pauseService(service, true);
+            (address forge, bool running) = forgeFactory.forgeByService(service);
             assertEq(forge, forgeProxy, "Forge address should not change after pause");
             assertFalse(running, "Service should not be running after pause");
 
@@ -179,8 +179,8 @@ contract TestTokenForgeFactory is Test {
         // resume service
         {
             vm.prank(OWNER);
-            tokenForgeFactory.pauseService(service, false);
-            (address forge, bool running) = tokenForgeFactory.forgeByService(service);
+            forgeFactory.pauseService(service, false);
+            (address forge, bool running) = forgeFactory.forgeByService(service);
             assertEq(forge, forgeProxy, "Forge address should not change after resume");
             assertTrue(running, "Service should be running after resume");
 
@@ -191,13 +191,13 @@ contract TestTokenForgeFactory is Test {
         // check facets in the forge proxy
         {
             vm.prank(OWNER);
-            tokenForgeFactory.removeService(service);
+            forgeFactory.removeService(service);
             // allForges
-            (string[] memory services, address[] memory forges) = tokenForgeFactory.allForges();
+            (string[] memory services, address[] memory forges) = forgeFactory.allForges();
             assertEq(services.length, 0, "Expected 0 services in the factory after removal");
             assertEq(services.length, forges.length, "Services and forges length mismatch after removal");
             // lengthAllForges
-            uint256 lengthAllForges = tokenForgeFactory.lengthAllForges();
+            uint256 lengthAllForges = forgeFactory.lengthAllForges();
             assertEq(lengthAllForges, 0, "Expected 0 forges in the factory after removal");
             // forgeByIndex out of bounds
             // (string memory serviceName, address forge, bool running) = tokenForgeFactory.forgeByIndex(0);
@@ -205,7 +205,7 @@ contract TestTokenForgeFactory is Test {
             // assertEq(forge, address(0), "Forge address should be zero after removal");
             // assertFalse(running, "Service should not be running after removal");
             // forgeByService
-            (address forge, bool running) = tokenForgeFactory.forgeByService(service);
+            (address forge, bool running) = forgeFactory.forgeByService(service);
             assertEq(forge, address(0), "Forge address should be zero after removal");
             assertFalse(running, "Service should not be running after removal");
         }
@@ -222,9 +222,9 @@ contract TestTokenForgeFactory is Test {
 
         IDiamondCut.FacetCut[] memory addCuts;
         vm.prank(OWNER);
-        address forgeProxy1 = tokenForgeFactory.addService(serviceOwner1, validator1.addr, service1, addCuts);
+        address forgeProxy1 = forgeFactory.addService(serviceOwner1, validator1.addr, service1, addCuts);
         vm.prank(OWNER);
-        address forgeProxy2 = tokenForgeFactory.addService(serviceOwner2, validator2.addr, service2, addCuts);
+        address forgeProxy2 = forgeFactory.addService(serviceOwner2, validator2.addr, service2, addCuts);
         assertNotEq(forgeProxy1, forgeProxy2, "Forge proxies should be different");
         assertNotEq(
             BaseForge(forgeProxy1).DOMAIN_SEPARATOR(),

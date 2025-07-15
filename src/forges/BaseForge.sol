@@ -8,7 +8,7 @@ import {NoncesUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils
 import {IERC20Permit} from "@openzeppelin-contracts-5.3.0/token/ERC20/extensions/IERC20Permit.sol";
 import {ECDSA} from "@openzeppelin-contracts-5.3.0/utils/cryptography/ECDSA.sol";
 
-import {TokenType, ITokenForgeFactoryAlert} from "./interfaces/ITokenForgeFactory.sol";
+import {TokenType, IForgeFactoryAlert} from "../interfaces/IForgeFactory.sol";
 
 abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradeable, NoncesUpgradeable {
     error BaseForge__ZeroAddress();
@@ -18,19 +18,19 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
 
     event ValidatorUpdated(address indexed validator);
 
-    /// @custom:storage-location erc7201:cross.storage.BaseForge
+    /// @custom:storage-location erc7201:cross.storage.forge.BaseForge
     struct BaseForgeStorage {
         address _factory;
         address _validator;
     }
 
-    // keccak256(abi.encode(uint256(keccak256("cross.storage.BaseForge")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant TOKEN_FORGE_FACTORY_STORAGE_LOCATION =
-        0x5ac6ce4fd3cf7358c9a2cbdc90756f82e10994295c639f27faf15b59f70a0600;
+    // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.BaseForge")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant BASE_FORGE_STORAGE_LOCATION =
+        0x2c5210729a867e7ab740fad20902d38fd0116d2f4c79ff3d49f62658db3eca00;
 
     function _getBaseForgeStorage() private pure returns (BaseForgeStorage storage $) {
         assembly {
-            $.slot := TOKEN_FORGE_FACTORY_STORAGE_LOCATION
+            $.slot := BASE_FORGE_STORAGE_LOCATION
         }
     }
 
@@ -79,17 +79,17 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
     }
 
     function _alertMintToFactory(TokenType tokenType, uint256 uuid, address token, bytes memory data) internal {
-        ITokenForgeFactoryAlert factory = ITokenForgeFactoryAlert(_getBaseForgeStorage()._factory);
+        IForgeFactoryAlert factory = IForgeFactoryAlert(_getBaseForgeStorage()._factory);
         factory.alertMint(tokenType, uuid, token, data);
     }
 
     function _alertTransferToFactory(TokenType tokenType, uint256 uuid, address token, bytes memory data) internal {
-        ITokenForgeFactoryAlert factory = ITokenForgeFactoryAlert(_getBaseForgeStorage()._factory);
+        IForgeFactoryAlert factory = IForgeFactoryAlert(_getBaseForgeStorage()._factory);
         factory.alertTransfer(tokenType, uuid, token, data);
     }
 
     function _alertBurnToFactory(TokenType tokenType, uint256 uuid, address token, bytes memory data) internal {
-        ITokenForgeFactoryAlert factory = ITokenForgeFactoryAlert(_getBaseForgeStorage()._factory);
+        IForgeFactoryAlert factory = IForgeFactoryAlert(_getBaseForgeStorage()._factory);
         factory.alertBurn(tokenType, uuid, token, data);
     }
 
@@ -124,8 +124,8 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
 }
 
 import {IDiamondCut, LibDiamond} from "diamond-3-hardhat-1.0.0/libraries/LibDiamond.sol";
-import {IDefaultDiamondCut} from "./interfaces/IDefaultDiamondCut.sol";
-import {IBaseForgeFacet} from "./interfaces/IBaseForgeFacet.sol";
+import {IDefaultDiamondCut} from "../interfaces/IDefaultDiamondCut.sol";
+import {IBaseForgeFacet} from "../interfaces/IBaseForgeFacet.sol";
 
 contract BaseForgeFacet is IDefaultDiamondCut, IBaseForgeFacet, BaseForge {
     bytes4[] public BASEFORGE_FACET_FUNCTIONS;

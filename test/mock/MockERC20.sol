@@ -1,29 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.28;
 
-import {ERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/ERC20.sol";
-import {ERC20Permit} from "@openzeppelin-contracts-5.3.0/token/ERC20/extensions/ERC20Permit.sol";
-import {Ownable} from "@openzeppelin-contracts-5.3.0/access/Ownable.sol";
+import {ERC20Base} from "../../src/tokens/presets/erc20/ERC20Base.sol";
 
-contract MockERC20 is ERC20, ERC20Permit, Ownable {
-    address public forge;
-
-    constructor(address _forge) ERC20("MockERC20", "MCK") ERC20Permit("MockERC20") Ownable(_msgSender()) {
-        forge = _forge;
-    }
-
+contract MockERC20 is ERC20Base {
     function forceMint(address to, uint256 amount) external onlyOwner {
         _mint(to, amount);
-    }
-
-    function mint(address to, uint256 amount) external {
-        require(_msgSender() == forge, "MockERC20: only forge can mint");
-        _mint(to, amount);
-    }
-
-    function burnFrom(address from, uint256 amount) external {
-        require(_msgSender() == forge, "MockERC20: only forge can burn");
-        _spendAllowance(from, _msgSender(), amount);
-        _burn(from, amount);
     }
 }

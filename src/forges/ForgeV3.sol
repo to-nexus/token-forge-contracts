@@ -9,12 +9,14 @@ import {ERC1155HolderUpgradeable} from
     "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
 
 import {ECDSA} from "@openzeppelin-contracts-5.3.0/utils/cryptography/ECDSA.sol";
-import {SafeERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/utils/SafeERC20.sol";
+import {IERC20, SafeERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/utils/SafeERC20.sol";
+import {IERC721} from "@openzeppelin-contracts-5.3.0/token/ERC721/IERC721.sol";
+import {IERC1155} from "@openzeppelin-contracts-5.3.0/token/ERC1155/IERC1155.sol";
 
-import {IERC20, IERC20Forge} from "./interfaces/IERC20Forge.sol";
-import {IERC721Forge} from "./interfaces/IERC721Forge.sol";
-import {IERC1155Forge} from "./interfaces/IERC1155Forge.sol";
-import {TokenType, ITokenForgeFactoryAlert} from "./interfaces/ITokenForgeFactory.sol";
+import {IERC20Forge} from "../interfaces/IERC20Forge.sol";
+import {IERC721Forge} from "../interfaces/IERC721Forge.sol";
+import {IERC1155Forge} from "../interfaces/IERC1155Forge.sol";
+import {TokenType, IForgeFactoryAlert} from "../interfaces/IForgeFactory.sol";
 import {BaseForge} from "./BaseForge.sol";
 
 abstract contract ERC20ForgeV3 is BaseForge {
@@ -137,7 +139,7 @@ abstract contract ERC721ForgeV3 is BaseForge, ERC721HolderUpgradeable {
         bytes32 hash = _hashTypedDataV4(structHash);
         _verifyValidatorSignature(hash, validatorSig);
 
-        IERC721Forge(token).safeTransferFrom(address(this), recipient, tokenID, data);
+        IERC721(token).safeTransferFrom(address(this), recipient, tokenID, data);
         _alertTransferToFactory(TokenType.ERC721, _calcUUID(recipient, nonce), token, abi.encode(recipient, tokenID));
     }
 
@@ -225,7 +227,7 @@ abstract contract ERC1155ForgeV3 is BaseForge, ERC1155HolderUpgradeable {
             _verifyValidatorSignature(hash, validatorSig);
         }
 
-        IERC1155Forge(token).safeTransferFrom(address(this), recipient, tokenID, amount, data);
+        IERC1155(token).safeTransferFrom(address(this), recipient, tokenID, amount, data);
         _alertTransferToFactory(
             TokenType.ERC1155,
             _calcUUID(recipient, nonce),
@@ -314,7 +316,7 @@ abstract contract ERC1155ForgeV3 is BaseForge, ERC1155HolderUpgradeable {
         bytes32 hash = _hashTypedDataV4(structHash);
         _verifyValidatorSignature(hash, validatorSig);
 
-        IERC1155Forge(token).safeBatchTransferFrom(address(this), recipient, tokenIDs, amounts, data);
+        IERC1155(token).safeBatchTransferFrom(address(this), recipient, tokenIDs, amounts, data);
         _alertTransferToFactory(
             TokenType.ERC1155,
             _calcUUID(recipient, nonce),
