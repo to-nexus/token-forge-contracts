@@ -72,7 +72,7 @@ abstract contract ERC20Base is
         $.decimals = _decimals;
         $.forge = _forge;
         if (_initialSupply != 0) {
-            _mint(_owner, _initialSupply * (10 ** uint256(_decimals)));
+            _mint(_owner, _initialSupply);
         }
     }
 
