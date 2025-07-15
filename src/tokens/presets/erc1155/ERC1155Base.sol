@@ -7,7 +7,7 @@ import {ERC165Upgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils
 import {ERC1155Upgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC1155/ERC1155Upgradeable.sol";
 import {ERC1155HolderUpgradeable} from
     "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
-import {IERC1155Forge} from "../../interfaces/IERC1155Forge.sol";
+import {IERC1155Forge} from "../../../interfaces/IERC1155Forge.sol";
 
 abstract contract ERC1155Base is
     IERC1155Forge,

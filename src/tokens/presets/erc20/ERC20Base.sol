@@ -7,7 +7,7 @@ import {ERC20Upgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/token/
 import {ERC20PermitUpgradeable} from
     "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import {ERC165Upgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/introspection/ERC165Upgradeable.sol";
-import {IERC20Forge} from "../../interfaces/IERC20Forge.sol";
+import {IERC20Forge} from "../../../interfaces/IERC20Forge.sol";
 
 abstract contract ERC20Base is
     IERC20Forge,

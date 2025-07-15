@@ -9,7 +9,7 @@ import {ERC721HolderUpgradeable} from
     "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC721/utils/ERC721HolderUpgradeable.sol";
 import {ERC721URIStorageUpgradeable} from
     "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
-import {IERC721Forge} from "../../interfaces/IERC721Forge.sol";
+import {IERC721Forge} from "../../../interfaces/IERC721Forge.sol";
 
 abstract contract ERC721Base is
     IERC721Forge,

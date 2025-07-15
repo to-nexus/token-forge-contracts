@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.28;
 
-import {ERC1155Base} from "../../src/tokens/preset/ERC1155Base.sol";
+import {ERC1155Base} from "../../src/tokens/presets/erc1155/ERC1155Base.sol";
 
 contract MockERC1155 is ERC1155Base {
     function forceMint(address to, uint256 tokenID, uint256 amount) external onlyOwner {
