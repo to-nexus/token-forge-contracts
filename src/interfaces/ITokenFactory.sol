@@ -24,10 +24,11 @@ interface ITokenFactory {
     function deployERC20(
         address owner,
         string calldata service,
-        string calldata name,
-        string calldata symbol,
+        string memory name,
+        string memory symbol,
         uint8 decimals,
         uint256 initialSupply,
+        bytes memory data,
         address logic
     ) external returns (address tokenAddress);
 
@@ -44,9 +45,10 @@ interface ITokenFactory {
     function deployERC721(
         address owner,
         string calldata service,
-        string calldata name,
-        string calldata symbol,
-        string calldata baseTokenURI,
+        string memory name,
+        string memory symbol,
+        string memory baseTokenURI,
+        bytes memory data,
         address logic
     ) external returns (address tokenAddress);
 
@@ -58,7 +60,7 @@ interface ITokenFactory {
      * @param logic 사용할 로직 컨트랙트 주소 (optional, 0이면 기본 프리셋 사용)
      * @return tokenAddress 배포된 토큰 프록시 주소
      */
-    function deployERC1155(address owner, string calldata service, string calldata uri, address logic)
+    function deployERC1155(address owner, string calldata service, string memory uri, bytes memory data, address logic)
         external
         returns (address tokenAddress);
     //

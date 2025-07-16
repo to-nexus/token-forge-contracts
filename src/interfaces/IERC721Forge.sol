@@ -7,7 +7,8 @@ interface IERC721Forge {
         address forge,
         string calldata name,
         string calldata symbol,
-        string calldata baseTokenURI
+        string calldata baseTokenURI,
+        bytes calldata data
     ) external;
 
     function mint(address to, uint256 tokenID) external;

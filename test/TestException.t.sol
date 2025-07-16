@@ -175,12 +175,15 @@ contract TestException is Test {
             );
             tokenFactory = TokenFactory(tokenFactoryProxy);
         }
-        mockERC20 = MockERC20(tokenFactory.deployERC20(OWNER, SERVICE_NAME, "MockERC20", "M20", 18, 0, mockERC20Impl));
+        mockERC20 =
+            MockERC20(tokenFactory.deployERC20(OWNER, SERVICE_NAME, "MockERC20", "M20", 18, 0, "", mockERC20Impl));
         mockERC721 = MockERC721(
-            tokenFactory.deployERC721(OWNER, SERVICE_NAME, "MockERC721", "M721", "https://xxx.yyy.zzz/", mockERC721Impl)
+            tokenFactory.deployERC721(
+                OWNER, SERVICE_NAME, "MockERC721", "M721", "https://xxx.yyy.zzz/", "", mockERC721Impl
+            )
         );
         mockERC1155 =
-            MockERC1155(tokenFactory.deployERC1155(OWNER, SERVICE_NAME, "https://xxx.yyy.zzz/", mockERC1155Impl));
+            MockERC1155(tokenFactory.deployERC1155(OWNER, SERVICE_NAME, "https://xxx.yyy.zzz/", "", mockERC1155Impl));
 
         vm.stopPrank();
     }

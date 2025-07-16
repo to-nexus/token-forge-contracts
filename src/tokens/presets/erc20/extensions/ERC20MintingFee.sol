@@ -27,6 +27,18 @@ abstract contract ERC20MintingFee is ERC20Base {
         }
     }
 
+    function __ERC20MintingFee_init(address feeRecipient, uint256 feeBPS) internal onlyInitializing {
+        if (feeRecipient == address(0)) revert ERC20MintingFee__InvalidFeeRecipient(feeRecipient);
+        if (feeBPS > 10000) revert ERC20MintingFee__InvalidFeeBPS(feeBPS);
+
+        ERC20MintingFeeStorage storage $ = _getERC20MintingFeeStorage();
+        $.feeRecipient = feeRecipient;
+        $.feeBPS = uint96(feeBPS);
+
+        emit FeeRecipientUpdated(address(0), feeRecipient);
+        emit FeeBPSUpdated(0, feeBPS);
+    }
+
     function mint(address to, uint256 amount) public virtual override {
         ERC20MintingFeeStorage storage $ = _getERC20MintingFeeStorage();
         if ($.feeBPS == 0) {

@@ -103,18 +103,19 @@ contract TestTokenForgeFactory is Test {
 
     function _deployERC20() internal returns (address) {
         vm.prank(OWNER);
-        return tokenFactory.deployERC20(OWNER, SERVICE_NAME, "MockERC20", "M20", 18, 0, mockERC20Impl);
+        return tokenFactory.deployERC20(OWNER, SERVICE_NAME, "MockERC20", "M20", 18, 0, "", mockERC20Impl);
     }
 
     function _deployERC721() internal returns (address) {
         vm.prank(OWNER);
-        return
-            tokenFactory.deployERC721(OWNER, SERVICE_NAME, "MockERC721", "M721", "https://xxx.yyy.zzz", mockERC721Impl);
+        return tokenFactory.deployERC721(
+            OWNER, SERVICE_NAME, "MockERC721", "M721", "https://xxx.yyy.zzz", "", mockERC721Impl
+        );
     }
 
     function _deployERC1155() internal returns (address) {
         vm.prank(OWNER);
-        return tokenFactory.deployERC1155(OWNER, SERVICE_NAME, "https://xxx.yyy.zzz", mockERC1155Impl);
+        return tokenFactory.deployERC1155(OWNER, SERVICE_NAME, "https://xxx.yyy.zzz", "", mockERC1155Impl);
     }
 
     function test_mint_erc20_v1() external {

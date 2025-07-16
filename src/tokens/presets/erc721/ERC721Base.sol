@@ -47,11 +47,12 @@ abstract contract ERC721Base is
     function initialize(
         address owner,
         address forge,
-        string calldata name,
-        string calldata symbol,
-        string calldata baseTokenURI
+        string memory name,
+        string memory symbol,
+        string memory baseTokenURI,
+        bytes memory data
     ) external initializer {
-        __ERC721Base_init(forge, name, symbol, baseTokenURI);
+        __ERC721Base_init(forge, name, symbol, baseTokenURI, data);
 
         __ERC721_init(name, symbol);
         __ERC721Holder_init();
@@ -61,9 +62,10 @@ abstract contract ERC721Base is
 
     function __ERC721Base_init(
         address forge,
-        string calldata name,
-        string calldata symbol,
-        string calldata baseTokenURI
+        string memory name,
+        string memory symbol,
+        string memory baseTokenURI,
+        bytes memory data
     ) internal virtual onlyInitializing {
         if (bytes(name).length == 0) revert ERC721Base__NullInput("name");
         if (bytes(symbol).length == 0) revert ERC721Base__NullInput("symbol");
