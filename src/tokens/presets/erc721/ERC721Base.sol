@@ -50,9 +50,19 @@ abstract contract ERC721Base is
         string memory name,
         string memory symbol,
         string memory baseTokenURI,
-        bytes memory data
-    ) external initializer {
-        __ERC721Base_init(forge, name, symbol, baseTokenURI, data);
+        bytes memory
+    ) external virtual initializer {
+        __ERC721Base_init(owner, forge, name, symbol, baseTokenURI);
+    }
+
+    function __ERC721Base_init(
+        address owner,
+        address forge,
+        string memory name,
+        string memory symbol,
+        string memory baseTokenURI
+    ) internal onlyInitializing {
+        __ERC721Base_init_unchained(forge, name, symbol, baseTokenURI);
 
         __ERC721_init(name, symbol);
         __ERC721Holder_init();
@@ -60,13 +70,12 @@ abstract contract ERC721Base is
         __Ownable_init(owner);
     }
 
-    function __ERC721Base_init(
+    function __ERC721Base_init_unchained(
         address forge,
         string memory name,
         string memory symbol,
-        string memory baseTokenURI,
-        bytes memory data
-    ) internal virtual onlyInitializing {
+        string memory baseTokenURI
+    ) private onlyInitializing {
         if (bytes(name).length == 0) revert ERC721Base__NullInput("name");
         if (bytes(symbol).length == 0) revert ERC721Base__NullInput("symbol");
         if (bytes(baseTokenURI).length == 0) revert ERC721Base__NullInput("symbol");
