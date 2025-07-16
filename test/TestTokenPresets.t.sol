@@ -24,6 +24,7 @@ import {ITokenFactory, TokenFactory} from "../src/tokens/TokenFactory.sol";
 import "./mock/StructHash.sol";
 
 import {ERC20Mintable} from "../src/tokens/presets/erc20/ERC20Mintable.sol";
+import {ERC20MintFee} from "../src/tokens/presets/erc20/ERC20MintFee.sol";
 import {ERC20Fixed} from "../src/tokens/presets/erc20/ERC20Fixed.sol";
 
 contract TestTokenPresets is Test {
@@ -264,6 +265,123 @@ contract TestTokenPresets is Test {
         vm.prank(ACCOUNT.addr);
         erc20.burnFrom(ACCOUNT.addr, amount);
         assertEq(erc20.balanceOf(ACCOUNT.addr), amount * 2, "Burned amount mismatch");
+    }
+
+    function test_erc20_mint_fee() external {
+        ERC20MintFee logic = new ERC20MintFee();
+        address[] memory erc20Impls = new address[](1);
+        erc20Impls[0] = address(logic);
+        vm.prank(OWNER);
+        tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC20, erc20Impls, true);
+        vm.prank(OWNER);
+        ERC20MintFee erc20 = ERC20MintFee(
+            tokenFactory.deployERC20(SERVICE_OWNER, SERVICE_NAME, "ERC20Mintable", "ERC20M", 18, 0, address(logic))
+        );
+        assertEq(erc20.balanceOf(SERVICE_OWNER), 0, "Initial supply should be 0");
+
+        // set fee recipient and fee BPS
+        vm.prank(SERVICE_OWNER);
+        erc20.setMintingFeeRecipient(SERVICE_OWNER);
+        vm.prank(SERVICE_OWNER);
+        erc20.setMintingFeeBPS(100); // 1% fee
+
+        // check minting
+        uint256 amount = 100 ether;
+        uint256 expectFeeAmount = (amount * 100) / 10000; // 1% fee
+        uint256 expectAccountAmount = amount - expectFeeAmount; // 1% fee
+        uint256 deadline = block.timestamp + 30; // 30 seconds deadline
+        uint256 nonce;
+        {
+            // v1
+            // validator signature
+            nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+            uint256 uuid = _calcUUID(nonce);
+
+            bytes32 structHash =
+                keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, address(erc20), amount, nonce, deadline));
+            bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+            (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+            // expect emit
+            vm.expectEmit();
+            emit IERC20.Transfer(address(0), SERVICE_OWNER, expectFeeAmount);
+            vm.expectEmit();
+            emit IERC20.Transfer(address(0), ACCOUNT.addr, expectAccountAmount);
+            vm.expectEmit(true, true, true, true, address(forgeFactory));
+            emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, address(erc20), amount);
+
+            // send transaction
+            vm.prank(ACCOUNT.addr);
+            ForgeV1(FORGE).mintERC20(address(erc20), amount, deadline, abi.encodePacked(r, s, v));
+            assertEq(expectAccountAmount, erc20.balanceOf(ACCOUNT.addr), "Minted amount mismatch");
+            assertEq(expectFeeAmount, erc20.balanceOf(SERVICE_OWNER), "Minting fee amount mismatch");
+        }
+        {
+            // v2
+            nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+            uint256 uuid = _calcUUID(nonce);
+
+            bytes memory recipientSig;
+
+            {
+                bytes32 recipientStructHash =
+                    keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V2, address(erc20), amount, nonce, deadline));
+                bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
+                recipientSig = abi.encodePacked(r, s, v);
+            }
+            bytes memory validatorSig;
+            {
+                bytes32 validatorStructHash =
+                    keccak256(abi.encode(ERC20_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, keccak256(recipientSig)));
+                bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
+                validatorSig = abi.encodePacked(r, s, v);
+            }
+
+            // expect emit
+            vm.expectEmit();
+            emit IERC20.Transfer(address(0), SERVICE_OWNER, expectFeeAmount);
+            vm.expectEmit();
+            emit IERC20.Transfer(address(0), ACCOUNT.addr, expectAccountAmount);
+            vm.expectEmit(true, true, true, true, address(forgeFactory));
+            emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, address(erc20), amount);
+
+            // send transaction
+            ForgeV2(FORGE).mintERC20(ACCOUNT.addr, address(erc20), amount, deadline, recipientSig, validatorSig);
+            assertEq(expectAccountAmount * 2, erc20.balanceOf(ACCOUNT.addr), "Minted amount mismatch");
+            assertEq(expectFeeAmount * 2, erc20.balanceOf(SERVICE_OWNER), "Minting fee amount mismatch");
+        }
+        {
+            // v3
+            nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+            uint256 uuid = _calcUUID(nonce);
+            bytes32 structHash =
+                keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, address(erc20), amount, nonce, deadline));
+            bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+            (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+            // expect emit
+            vm.expectEmit();
+            emit IERC20.Transfer(address(0), SERVICE_OWNER, expectFeeAmount);
+            vm.expectEmit();
+            emit IERC20.Transfer(address(0), ACCOUNT.addr, expectAccountAmount);
+            vm.expectEmit(true, true, true, true, address(forgeFactory));
+            emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, address(erc20), amount);
+
+            // send transaction
+            ForgeV3(FORGE).mintERC20(ACCOUNT.addr, address(erc20), amount, deadline, abi.encodePacked(r, s, v));
+            assertEq(expectAccountAmount * 3, erc20.balanceOf(ACCOUNT.addr), "Minted amount mismatch");
+            assertEq(expectFeeAmount * 3, erc20.balanceOf(SERVICE_OWNER), "Minting fee amount mismatch");
+        }
+
+        // check burn able
+        vm.prank(ACCOUNT.addr);
+        // require approve self
+        erc20.approve(ACCOUNT.addr, amount);
+        vm.prank(ACCOUNT.addr);
+        erc20.burnFrom(ACCOUNT.addr, amount);
+        assertEq(erc20.balanceOf(ACCOUNT.addr), (expectAccountAmount * 3) - amount, "Burned amount mismatch");
     }
 
     function test_erc20_fixed() external {
