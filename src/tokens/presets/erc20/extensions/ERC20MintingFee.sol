@@ -5,7 +5,6 @@ import {ERC20Base} from "../ERC20Base.sol";
 
 abstract contract ERC20MintingFee is ERC20Base {
     error ERC20MintingFee__InvalidFeeBPS(uint256 feeBPS);
-    error ERC20MintingFee__InvalidFeeRecipient(address recipient);
 
     event FeeRecipientUpdated(address indexed oldRecipient, address indexed newRecipient);
     event FeeBPSUpdated(uint256 oldBPS, uint256 newBPS);
@@ -28,7 +27,7 @@ abstract contract ERC20MintingFee is ERC20Base {
     }
 
     function __ERC20MintingFee_init(address feeRecipient, uint256 feeBPS) internal onlyInitializing {
-        if (feeRecipient == address(0)) revert ERC20MintingFee__InvalidFeeRecipient(feeRecipient);
+        if (feeRecipient == address(0)) revert ERC20Base__NullInput("feeRecipient");
         if (feeBPS > 10000) revert ERC20MintingFee__InvalidFeeBPS(feeBPS);
 
         ERC20MintingFeeStorage storage $ = _getERC20MintingFeeStorage();
@@ -71,7 +70,7 @@ abstract contract ERC20MintingFee is ERC20Base {
     }
 
     function setMintingFeeRecipient(address _feeRecipient) external onlyOwner {
-        if (_feeRecipient == address(0)) revert ERC20MintingFee__InvalidFeeRecipient(_feeRecipient);
+        if (_feeRecipient == address(0)) revert ERC20Base__NullInput("feeRecipient");
 
         ERC20MintingFeeStorage storage $ = _getERC20MintingFeeStorage();
         emit FeeRecipientUpdated($.feeRecipient, _feeRecipient);

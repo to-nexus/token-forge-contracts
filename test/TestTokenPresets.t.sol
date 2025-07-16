@@ -275,15 +275,18 @@ contract TestTokenPresets is Test {
         tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC20, erc20Impls, true);
         vm.prank(OWNER);
         ERC20MintFee erc20 = ERC20MintFee(
-            tokenFactory.deployERC20(SERVICE_OWNER, SERVICE_NAME, "ERC20Mintable", "ERC20M", 18, 0, "", address(logic))
+            tokenFactory.deployERC20(
+                SERVICE_OWNER,
+                SERVICE_NAME,
+                "ERC20Mintable",
+                "ERC20M",
+                18,
+                0,
+                abi.encode(SERVICE_OWNER, 100),
+                address(logic)
+            )
         );
         assertEq(erc20.balanceOf(SERVICE_OWNER), 0, "Initial supply should be 0");
-
-        // set fee recipient and fee BPS
-        vm.prank(SERVICE_OWNER);
-        erc20.setMintingFeeRecipient(SERVICE_OWNER);
-        vm.prank(SERVICE_OWNER);
-        erc20.setMintingFeeBPS(100); // 1% fee
 
         // check minting
         uint256 amount = 100 ether;
