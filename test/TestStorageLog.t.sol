@@ -66,4 +66,14 @@ contract TestStorageLog is Test {
             console.logBytes32(location);
         }
     }
+
+    function test_storage_token_erc20_mintingfee() external pure {
+        bytes32 location;
+        {
+            location = keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20.mintingfee")) - 1))
+                & ~bytes32(uint256(0xff));
+            console.log("\nERC20MintingFee");
+            console.logBytes32(location);
+        }
+    }
 }
