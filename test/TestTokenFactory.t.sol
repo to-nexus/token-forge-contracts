@@ -321,19 +321,19 @@ contract TestTokenFactory is Test {
         assertEq(0, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC1155).length);
 
         vm.prank(OWNER);
-        tokenFactory.deployERC20(OWNER, SERVICE_NAME, "TestToken", "TTK", 18, 0, mockERC20Impl);
+        tokenFactory.deployERC20(OWNER, SERVICE_NAME, "TestToken", "TTK", 18, 0, "", mockERC20Impl);
         assertEq(1, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC20).length);
         assertEq(0, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC721).length);
         assertEq(0, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC1155).length);
 
         vm.prank(OWNER);
-        tokenFactory.deployERC721(OWNER, SERVICE_NAME, "TestNFT", "TNFT", "https://xxx.yyy.zzz/", mockERC721Impl);
+        tokenFactory.deployERC721(OWNER, SERVICE_NAME, "TestNFT", "TNFT", "https://xxx.yyy.zzz/", "", mockERC721Impl);
         assertEq(1, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC20).length);
         assertEq(1, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC721).length);
         assertEq(0, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC1155).length);
 
         vm.prank(OWNER);
-        tokenFactory.deployERC1155(OWNER, SERVICE_NAME, "https://xxx.yyy.zzz/", mockERC1155Impl);
+        tokenFactory.deployERC1155(OWNER, SERVICE_NAME, "https://xxx.yyy.zzz/", "", mockERC1155Impl);
         assertEq(1, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC20).length);
         assertEq(1, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC721).length);
         assertEq(1, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC1155).length);
@@ -355,13 +355,15 @@ contract TestTokenFactory is Test {
 
         vm.startPrank(OWNER);
         vm.expectRevert(abi.encodeWithSignature("TokenFactory__InvalidService(string)", invalidServiceName));
-        tokenFactory.deployERC20(OWNER, invalidServiceName, "TestToken", "TTK", 18, 0, mockERC20Impl);
+        tokenFactory.deployERC20(OWNER, invalidServiceName, "TestToken", "TTK", 18, 0, "", mockERC20Impl);
 
         vm.expectRevert(abi.encodeWithSignature("TokenFactory__InvalidService(string)", invalidServiceName));
-        tokenFactory.deployERC721(OWNER, invalidServiceName, "TestNFT", "TNFT", "https://xxx.yyy.zzz/", mockERC721Impl);
+        tokenFactory.deployERC721(
+            OWNER, invalidServiceName, "TestNFT", "TNFT", "https://xxx.yyy.zzz/", "", mockERC721Impl
+        );
 
         vm.expectRevert(abi.encodeWithSignature("TokenFactory__InvalidService(string)", invalidServiceName));
-        tokenFactory.deployERC1155(OWNER, invalidServiceName, "https://xxx.yyy.zzz/", mockERC1155Impl);
+        tokenFactory.deployERC1155(OWNER, invalidServiceName, "https://xxx.yyy.zzz/", "", mockERC1155Impl);
         vm.stopPrank();
     }
 }

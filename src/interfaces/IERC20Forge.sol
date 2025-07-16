@@ -8,7 +8,8 @@ interface IERC20Forge {
         string calldata name,
         string calldata symbol,
         uint8 decimals,
-        uint256 initialSupply
+        uint256 initialSupply,
+        bytes calldata data
     ) external;
 
     function mint(address to, uint256 amount) external;

@@ -48,9 +48,10 @@ abstract contract ERC20Base is
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
-        uint256 _initialSupply
+        uint256 _initialSupply,
+        bytes memory _data
     ) external initializer {
-        __ERC20Base_init(_owner, _forge, _name, _symbol, _decimals, _initialSupply);
+        __ERC20Base_init(_owner, _forge, _name, _symbol, _decimals, _initialSupply, _data);
 
         __ERC20_init(_name, _symbol);
         __ERC20Permit_init(_name);
@@ -63,7 +64,8 @@ abstract contract ERC20Base is
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
-        uint256 _initialSupply
+        uint256 _initialSupply,
+        bytes memory
     ) internal virtual onlyInitializing {
         // owner 는 __Ownable_init() 에서 address(0) 을 확인함
         if (bytes(_name).length == 0) revert ERC20Base__NullInput("name");

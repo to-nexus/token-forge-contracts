@@ -175,7 +175,7 @@ contract TestTokenPresets is Test {
         tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC20, erc20Impls, true);
         vm.prank(OWNER);
         ERC20Mintable erc20 = ERC20Mintable(
-            tokenFactory.deployERC20(SERVICE_OWNER, SERVICE_NAME, "ERC20Mintable", "ERC20M", 18, 0, address(logic))
+            tokenFactory.deployERC20(SERVICE_OWNER, SERVICE_NAME, "ERC20Mintable", "ERC20M", 18, 0, "", address(logic))
         );
         assertEq(erc20.balanceOf(SERVICE_OWNER), 0, "Initial supply should be 0");
 
@@ -275,7 +275,7 @@ contract TestTokenPresets is Test {
         tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC20, erc20Impls, true);
         vm.prank(OWNER);
         ERC20MintFee erc20 = ERC20MintFee(
-            tokenFactory.deployERC20(SERVICE_OWNER, SERVICE_NAME, "ERC20Mintable", "ERC20M", 18, 0, address(logic))
+            tokenFactory.deployERC20(SERVICE_OWNER, SERVICE_NAME, "ERC20Mintable", "ERC20M", 18, 0, "", address(logic))
         );
         assertEq(erc20.balanceOf(SERVICE_OWNER), 0, "Initial supply should be 0");
 
@@ -396,12 +396,14 @@ contract TestTokenPresets is Test {
         vm.expectRevert(abi.encodeWithSignature("ERC20Base__NullInput(bytes32)", bytes32("initialSupply")));
         vm.prank(OWNER);
         ERC20Fixed erc20 = ERC20Fixed(
-            tokenFactory.deployERC20(SERVICE_OWNER, SERVICE_NAME, "ERC20Fixed", "ERC20F", 18, 0, address(logic))
+            tokenFactory.deployERC20(SERVICE_OWNER, SERVICE_NAME, "ERC20Fixed", "ERC20F", 18, 0, "", address(logic))
         );
 
         vm.prank(OWNER);
         erc20 = ERC20Fixed(
-            tokenFactory.deployERC20(SERVICE_OWNER, SERVICE_NAME, "ERC20Fixed", "ERC20F", 18, 1000e18, address(logic))
+            tokenFactory.deployERC20(
+                SERVICE_OWNER, SERVICE_NAME, "ERC20Fixed", "ERC20F", 18, 1000e18, "", address(logic)
+            )
         );
         assertEq(erc20.balanceOf(SERVICE_OWNER), 1000e18, "Initial supply should be 1000e18");
 

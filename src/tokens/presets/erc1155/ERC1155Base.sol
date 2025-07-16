@@ -40,15 +40,22 @@ abstract contract ERC1155Base is
         _;
     }
 
-    function initialize(address owner, address forge, string calldata baseTokenURI) external initializer {
-        __ERC1155Base_init(forge, baseTokenURI);
+    function initialize(address owner, address forge, string memory baseTokenURI, bytes memory data)
+        external
+        initializer
+    {
+        __ERC1155Base_init(forge, baseTokenURI, data);
 
         __ERC1155_init(baseTokenURI);
         __ERC1155Holder_init();
         __Ownable_init(owner);
     }
 
-    function __ERC1155Base_init(address forge, string calldata baseTokenURI) internal virtual onlyInitializing {
+    function __ERC1155Base_init(address forge, string memory baseTokenURI, bytes memory data)
+        internal
+        virtual
+        onlyInitializing
+    {
         if (forge == address(0)) revert ERC1155Base__NullInput("forge");
         if (bytes(baseTokenURI).length == 0) revert ERC1155Base__NullInput("baseTokenURI");
         _getERC1155BaseStorage().forge = forge;
