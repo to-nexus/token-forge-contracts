@@ -24,7 +24,7 @@ import {ITokenFactory, TokenFactory} from "../src/tokens/TokenFactory.sol";
 import "./mock/StructHash.sol";
 
 import {ERC20Mintable} from "../src/tokens/presets/erc20/ERC20Mintable.sol";
-import {ERC20MintFee} from "../src/tokens/presets/erc20/ERC20MintFee.sol";
+import {ERC20MintingFee} from "../src/tokens/presets/erc20/ERC20MintingFee.sol";
 import {ERC20Fixed} from "../src/tokens/presets/erc20/ERC20Fixed.sol";
 
 contract TestTokenPresets is Test {
@@ -268,13 +268,13 @@ contract TestTokenPresets is Test {
     }
 
     function test_erc20_mint_fee() external {
-        ERC20MintFee logic = new ERC20MintFee();
+        ERC20MintingFee logic = new ERC20MintingFee();
         address[] memory erc20Impls = new address[](1);
         erc20Impls[0] = address(logic);
         vm.prank(OWNER);
         tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC20, erc20Impls, true);
         vm.prank(OWNER);
-        ERC20MintFee erc20 = ERC20MintFee(
+        ERC20MintingFee erc20 = ERC20MintingFee(
             tokenFactory.deployERC20(
                 SERVICE_OWNER,
                 SERVICE_NAME,
