@@ -151,7 +151,7 @@ contract TestTokenFactory is Test {
             });
         }
         {
-            bytes4[] memory v3Selectors = new bytes4[](12);
+            bytes4[] memory v3Selectors = new bytes4[](9);
             v3Selectors[0] = forgeV3.mintERC20.selector;
             v3Selectors[1] = forgeV3.mintERC721.selector;
             v3Selectors[2] = forgeV3.mintERC1155.selector;
@@ -162,10 +162,7 @@ contract TestTokenFactory is Test {
             v3Selectors[6] = forgeV3.transferERC1155.selector;
             v3Selectors[7] = forgeV3.transferERC1155Batch.selector;
 
-            v3Selectors[8] = forgeV3.burnERC20.selector;
-            v3Selectors[9] = forgeV3.burnERC721.selector;
-            v3Selectors[10] = forgeV3.burnERC1155.selector;
-            v3Selectors[11] = forgeV3.burnERC1155Batch.selector;
+            v3Selectors[8] = forgeV3.burnERC20Permit.selector;
 
             addCuts[2] = IDiamondCut.FacetCut({
                 facetAddress: address(forgeV3),
