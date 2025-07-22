@@ -9,6 +9,7 @@ import {ERC721HolderUpgradeable} from
     "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC721/utils/ERC721HolderUpgradeable.sol";
 import {ERC721URIStorageUpgradeable} from
     "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
+import {EnumerableSet} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableSet.sol";
 import {IERC721Forge} from "../../../interfaces/IERC721Forge.sol";
 
 abstract contract ERC721Base is
@@ -25,7 +26,7 @@ abstract contract ERC721Base is
 
     /// @custom:storage-location erc7201:cross.storage.forge.erc721
     struct ERC721PresetStorage {
-        address forge;
+        EnumerableSet.AddressSet forges;
         string baseURI;
     }
 
@@ -40,29 +41,25 @@ abstract contract ERC721Base is
     }
 
     modifier onlyForge() {
-        if (_msgSender() != _getERC721PresetStorage().forge) revert ERC721Base__OnlyForge(_msgSender());
+        if (!_getERC721PresetStorage().forges.contains(_msgSender())) revert ERC721Base__OnlyForge(_msgSender());
         _;
     }
 
     function initialize(
         address owner,
-        address forge,
         string memory name,
         string memory symbol,
         string memory baseTokenURI,
         bytes memory
     ) external virtual initializer {
-        __ERC721Base_init(owner, forge, name, symbol, baseTokenURI);
+        __ERC721Base_init(owner, name, symbol, baseTokenURI);
     }
 
-    function __ERC721Base_init(
-        address owner,
-        address forge,
-        string memory name,
-        string memory symbol,
-        string memory baseTokenURI
-    ) internal onlyInitializing {
-        __ERC721Base_init_unchained(forge, name, symbol, baseTokenURI);
+    function __ERC721Base_init(address owner, string memory name, string memory symbol, string memory baseTokenURI)
+        internal
+        onlyInitializing
+    {
+        __ERC721Base_init_unchained(name, symbol, baseTokenURI);
 
         __ERC721_init(name, symbol);
         __ERC721Holder_init();
@@ -70,18 +67,26 @@ abstract contract ERC721Base is
         __Ownable_init(owner);
     }
 
-    function __ERC721Base_init_unchained(
-        address forge,
-        string memory name,
-        string memory symbol,
-        string memory baseTokenURI
-    ) private onlyInitializing {
+    function __ERC721Base_init_unchained(string memory name, string memory symbol, string memory baseTokenURI)
+        private
+        onlyInitializing
+    {
         if (bytes(name).length == 0) revert ERC721Base__NullInput("name");
         if (bytes(symbol).length == 0) revert ERC721Base__NullInput("symbol");
         if (bytes(baseTokenURI).length == 0) revert ERC721Base__NullInput("symbol");
         ERC721PresetStorage storage $ = _getERC721PresetStorage();
         $.baseURI = baseTokenURI;
-        $.forge = forge;
+    }
+
+    function setForges(address[] memory forges, bool add) external onlyOwner {
+        ERC721PresetStorage storage $ = _getERC721PresetStorage();
+        for (uint256 i = 0; i < forges.length; i++) {
+            if (add) {
+                $.forges.add(forges[i]);
+            } else {
+                $.forges.remove(forges[i]);
+            }
+        }
     }
 
     function mint(address to, uint256 tokenID) external onlyForge {

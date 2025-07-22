@@ -7,6 +7,7 @@ import {ERC165Upgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils
 import {ERC1155Upgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC1155/ERC1155Upgradeable.sol";
 import {ERC1155HolderUpgradeable} from
     "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
+import {EnumerableSet} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableSet.sol";
 import {IERC1155Forge} from "../../../interfaces/IERC1155Forge.sol";
 
 abstract contract ERC1155Base is
@@ -22,7 +23,7 @@ abstract contract ERC1155Base is
 
     /// @custom:storage-location erc7201:cross.storage.forge.erc1155
     struct ERC1155BaseStorage {
-        address forge;
+        EnumerableSet.AddressSet forges;
     }
 
     // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc1155")) - 1)) & ~bytes32(uint256(0xff))
@@ -36,30 +37,35 @@ abstract contract ERC1155Base is
     }
 
     modifier onlyForge() {
-        if (_msgSender() != _getERC1155BaseStorage().forge) revert ERC1155Base__OnlyForge(_msgSender());
+        if (!_getERC1155BaseStorage().forges.contains(_msgSender())) revert ERC1155Base__OnlyForge(_msgSender());
         _;
     }
 
-    function initialize(address owner, address forge, string memory baseTokenURI, bytes memory)
-        external
-        virtual
-        initializer
-    {
-        __ERC1155Base_init(owner, forge, baseTokenURI);
+    function initialize(address owner, string memory baseTokenURI, bytes memory) external virtual initializer {
+        __ERC1155Base_init(owner, baseTokenURI);
     }
 
-    function __ERC1155Base_init(address owner, address forge, string memory baseTokenURI) internal onlyInitializing {
-        __ERC1155Base_init_unchained(forge, baseTokenURI);
+    function __ERC1155Base_init(address owner, string memory baseTokenURI) internal onlyInitializing {
+        __ERC1155Base_init_unchained(baseTokenURI);
 
         __ERC1155_init(baseTokenURI);
         __ERC1155Holder_init();
         __Ownable_init(owner);
     }
 
-    function __ERC1155Base_init_unchained(address forge, string memory baseTokenURI) private onlyInitializing {
-        if (forge == address(0)) revert ERC1155Base__NullInput("forge");
+    function __ERC1155Base_init_unchained(string memory baseTokenURI) private onlyInitializing {
         if (bytes(baseTokenURI).length == 0) revert ERC1155Base__NullInput("baseTokenURI");
-        _getERC1155BaseStorage().forge = forge;
+    }
+
+    function setForges(address[] memory forges, bool add) external onlyOwner {
+        ERC1155BaseStorage storage $ = _getERC1155BaseStorage();
+        for (uint256 i = 0; i < forges.length; i++) {
+            if (add) {
+                $.forges.add(forges[i]);
+            } else {
+                $.forges.remove(forges[i]);
+            }
+        }
     }
 
     function mint(address to, uint256 tokenID, uint256 amount, bytes calldata data) external onlyForge {

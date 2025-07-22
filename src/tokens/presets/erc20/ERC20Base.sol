@@ -7,6 +7,7 @@ import {ERC20Upgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/token/
 import {ERC20PermitUpgradeable} from
     "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
 import {ERC165Upgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/introspection/ERC165Upgradeable.sol";
+import {EnumerableSet} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableSet.sol";
 import {IERC20Forge} from "../../../interfaces/IERC20Forge.sol";
 
 abstract contract ERC20Base is
@@ -21,9 +22,11 @@ abstract contract ERC20Base is
     error ERC20Base__InvalidInitialSupply(uint256 initialSupply);
     error ERC20Base__OnlyForge(address caller);
 
+    event ForgesUpdated(address[] forges, bool indexed add);
+
     /// @custom:storage-location erc7201:cross.storage.forge.erc20
     struct ERC20BaseStorage {
-        address forge;
+        EnumerableSet.AddressSet forges;
         uint8 decimals;
     }
 
@@ -38,31 +41,29 @@ abstract contract ERC20Base is
     }
 
     modifier onlyForge() {
-        if (_msgSender() != _getERC20PresetStorage().forge) revert ERC20Base__OnlyForge(_msgSender());
+        if (!_getERC20PresetStorage().forges.contains(_msgSender())) revert ERC20Base__OnlyForge(_msgSender());
         _;
     }
 
     function initialize(
         address _owner,
-        address _forge,
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
         uint256 _initialSupply,
         bytes memory
     ) external virtual initializer {
-        __ERC20Base_init(_owner, _forge, _name, _symbol, _decimals, _initialSupply);
+        __ERC20Base_init(_owner, _name, _symbol, _decimals, _initialSupply);
     }
 
     function __ERC20Base_init(
         address _owner,
-        address _forge,
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
         uint256 _initialSupply
     ) internal onlyInitializing {
-        __ERC20Base_init_unchained(_owner, _forge, _name, _symbol, _decimals, _initialSupply);
+        __ERC20Base_init_unchained(_owner, _name, _symbol, _decimals, _initialSupply);
 
         __ERC20_init(_name, _symbol);
         __ERC20Permit_init(_name);
@@ -71,7 +72,6 @@ abstract contract ERC20Base is
 
     function __ERC20Base_init_unchained(
         address _owner,
-        address _forge,
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
@@ -82,10 +82,23 @@ abstract contract ERC20Base is
         if (bytes(_symbol).length == 0) revert ERC20Base__NullInput("symbol");
         ERC20BaseStorage storage $ = _getERC20PresetStorage();
         $.decimals = _decimals;
-        $.forge = _forge;
         if (_initialSupply != 0) {
             _mint(_owner, _initialSupply);
         }
+    }
+
+    function setForges(address[] memory forges, bool add) external onlyOwner {
+        ERC20BaseStorage storage $ = _getERC20PresetStorage();
+        if (add) {
+            for (uint256 i = 0; i < forges.length; i++) {
+                $.forges.add(forges[i]);
+            }
+        } else {
+            for (uint256 i = 0; i < forges.length; i++) {
+                $.forges.remove(forges[i]);
+            }
+        }
+        emit ForgesUpdated(forges, add);
     }
 
     function mint(address to, uint256 amount) public virtual override onlyForge {
