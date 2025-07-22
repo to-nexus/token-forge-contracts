@@ -225,6 +225,18 @@ func (eRC20Mintable *ERC20Mintable) PackEip712Domain() []byte {
 	return enc
 }
 
+// Eip712DomainOutput serves as a container for the return parameters of contract
+// method Eip712Domain.
+type Eip712DomainOutput struct {
+	Fields            [1]byte
+	Name              string
+	Version           string
+	ChainId           *big.Int
+	VerifyingContract common.Address
+	Salt              [32]byte
+	Extensions        []*big.Int
+}
+
 // UnpackEip712Domain is the Go binding that unpacks the parameters returned
 // from invoking the contract method with ID 0x84b0196e.
 //
