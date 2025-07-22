@@ -10,7 +10,7 @@ import {TokenBase} from "../../TokenBase.sol";
 abstract contract ERC20Base is TokenBase, IERC20Forge, ERC20Upgradeable, ERC20PermitUpgradeable {
     // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20.decimals")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant ERC20DecimalsStorageLocation =
-        0x5336721aabdf58b9f67dce2b9c89749de013c2e87912f00ce8440ff438c6c800;
+        0x7c3cec2c3c3d573fa006ae6cf08c04c65698a48d9586626c622c1a81a45caf00;
 
     function initialize(
         address _owner,
