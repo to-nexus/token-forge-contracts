@@ -26,16 +26,16 @@ abstract contract ERC20Fee is ERC20Base {
         }
     }
 
-    function __ERC20Fee_init(address feeRecipient, uint256 feeBPS) internal onlyInitializing {
-        if (feeRecipient == address(0)) revert ERC20Base__NullInput("feeRecipient");
-        if (feeBPS > 10000) revert ERC20Fee__InvalidFeeBPS(feeBPS);
+    function __ERC20Fee_init(address _feeRecipient, uint256 _feeBPS) internal onlyInitializing {
+        if (_feeRecipient == address(0)) revert TokenBase__NullInput("feeRecipient");
+        if (_feeBPS > 10000) revert ERC20Fee__InvalidFeeBPS(_feeBPS);
 
         ERC20FeeStorage storage $ = _getERC20FeeStorage();
-        $.feeRecipient = feeRecipient;
-        $.feeBPS = uint96(feeBPS);
+        $.feeRecipient = _feeRecipient;
+        $.feeBPS = uint96(_feeBPS);
 
-        emit FeeRecipientUpdated(address(0), feeRecipient);
-        emit FeeBPSUpdated(0, feeBPS);
+        emit FeeRecipientUpdated(address(0), _feeRecipient);
+        emit FeeBPSUpdated(0, _feeBPS);
     }
 
     function feeBPS() public view returns (uint256) {
@@ -55,7 +55,7 @@ abstract contract ERC20Fee is ERC20Base {
     }
 
     function setFeeRecipient(address _feeRecipient) external onlyOwner {
-        if (_feeRecipient == address(0)) revert ERC20Base__NullInput("feeRecipient");
+        if (_feeRecipient == address(0)) revert TokenBase__NullInput("feeRecipient");
 
         ERC20FeeStorage storage $ = _getERC20FeeStorage();
         emit FeeRecipientUpdated($.feeRecipient, _feeRecipient);
