@@ -28,7 +28,7 @@ contract ERC20MintingFee is ERC20Base, ERC20Fee {
             if (fee != 0) {
                 amount -= fee;
                 ERC20Base.mint(feeRecipient, fee);
-                emit MintingFeeCollected(feeRecipient, fee);
+                emit FeeCollected(feeRecipient, fee);
             }
             ERC20Base.mint(to, amount);
         }

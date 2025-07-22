@@ -26,13 +26,9 @@ abstract contract TokenBase is UUPSUpgradeable, OwnableUpgradeable, ERC165Upgrad
     }
 
     function __TokenBase_init(address _owner) internal onlyInitializing {
-        __TokenBase_init_unchained(_owner);
-    }
-
-    function __TokenBase_init_unchained(address _owner) private onlyInitializing {
         __Ownable_init(_owner);
+        __UUPSUpgradeable_init();
         __ERC165_init();
-        transferOwnership(_owner);
     }
 
     modifier onlyForge() {
