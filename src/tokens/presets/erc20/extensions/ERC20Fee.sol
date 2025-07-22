@@ -8,7 +8,7 @@ abstract contract ERC20Fee is ERC20Base {
 
     event FeeRecipientUpdated(address indexed oldRecipient, address indexed newRecipient);
     event FeeBPSUpdated(uint256 oldBPS, uint256 newBPS);
-    event MintingFeeCollected(address indexed recipient, uint256 amount);
+    event FeeCollected(address indexed recipient, uint256 amount);
 
     /// @custom:storage-location erc7201:cross.storage.forge.erc20.fee
     struct ERC20FeeStorage {

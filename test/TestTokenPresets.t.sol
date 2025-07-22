@@ -24,7 +24,7 @@ import {ITokenFactory, TokenFactory} from "../src/tokens/TokenFactory.sol";
 import "./mock/StructHash.sol";
 
 import {ERC20Mintable} from "../src/tokens/presets/erc20/ERC20Mintable.sol";
-import {ERC20MintingFee} from "../src/tokens/presets/erc20/ERC20MintingFee.sol";
+import {ERC20Fee, ERC20MintingFee} from "../src/tokens/presets/erc20/ERC20MintingFee.sol";
 import {ERC20Fixed} from "../src/tokens/presets/erc20/ERC20Fixed.sol";
 
 contract TestTokenPresets is Test {
@@ -156,10 +156,7 @@ contract TestTokenPresets is Test {
             address tokenFactoryImpl = address(new TokenFactory());
             address tokenFactoryProxy = address(
                 new ERC1967Proxy(
-                    tokenFactoryImpl,
-                    abi.encodeCall(
-                        TokenFactory.initialize, (OWNER, address(forgeFactory), nullImpls, nullImpls, nullImpls)
-                    )
+                    tokenFactoryImpl, abi.encodeCall(TokenFactory.initialize, (OWNER, nullImpls, nullImpls, nullImpls))
                 )
             );
             tokenFactory = TokenFactory(tokenFactoryProxy);
@@ -174,11 +171,16 @@ contract TestTokenPresets is Test {
         vm.prank(OWNER);
         tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC20, erc20Impls, true);
         vm.prank(OWNER);
-        ERC20Mintable erc20 = ERC20Mintable(
-            tokenFactory.deployERC20(SERVICE_OWNER, SERVICE_NAME, "ERC20Mintable", "ERC20M", 18, 0, "", address(logic))
-        );
+        ERC20Mintable erc20 =
+            ERC20Mintable(tokenFactory.deployERC20(SERVICE_OWNER, "ERC20Mintable", "ERC20M", 18, 0, "", address(logic)));
         assertEq(erc20.balanceOf(SERVICE_OWNER), 0, "Initial supply should be 0");
 
+        {
+            address[] memory forges = new address[](1);
+            forges[0] = FORGE;
+            vm.prank(SERVICE_OWNER);
+            erc20.setForges(forges, true);
+        }
         // check minting
         uint256 amount = 100 ether;
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline
@@ -276,17 +278,16 @@ contract TestTokenPresets is Test {
         vm.prank(OWNER);
         ERC20MintingFee erc20 = ERC20MintingFee(
             tokenFactory.deployERC20(
-                SERVICE_OWNER,
-                SERVICE_NAME,
-                "ERC20Mintable",
-                "ERC20M",
-                18,
-                0,
-                abi.encode(SERVICE_OWNER, 100),
-                address(logic)
+                SERVICE_OWNER, "ERC20Mintable", "ERC20M", 18, 0, abi.encode(SERVICE_OWNER, 100), address(logic)
             )
         );
-        assertEq(erc20.balanceOf(SERVICE_OWNER), 0, "Initial supply should be 0");
+        {
+            assertEq(erc20.balanceOf(SERVICE_OWNER), 0, "Initial supply should be 0");
+            address[] memory forges = new address[](1);
+            forges[0] = FORGE;
+            vm.prank(SERVICE_OWNER);
+            erc20.setForges(forges, true);
+        }
 
         // check minting
         uint256 amount = 100 ether;
@@ -308,6 +309,8 @@ contract TestTokenPresets is Test {
             // expect emit
             vm.expectEmit();
             emit IERC20.Transfer(address(0), SERVICE_OWNER, expectFeeAmount);
+            vm.expectEmit();
+            emit ERC20Fee.FeeCollected(SERVICE_OWNER, expectFeeAmount);
             vm.expectEmit();
             emit IERC20.Transfer(address(0), ACCOUNT.addr, expectAccountAmount);
             vm.expectEmit(true, true, true, true, address(forgeFactory));
@@ -346,6 +349,8 @@ contract TestTokenPresets is Test {
             vm.expectEmit();
             emit IERC20.Transfer(address(0), SERVICE_OWNER, expectFeeAmount);
             vm.expectEmit();
+            emit ERC20Fee.FeeCollected(SERVICE_OWNER, expectFeeAmount);
+            vm.expectEmit();
             emit IERC20.Transfer(address(0), ACCOUNT.addr, expectAccountAmount);
             vm.expectEmit(true, true, true, true, address(forgeFactory));
             emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, address(erc20), amount);
@@ -367,6 +372,8 @@ contract TestTokenPresets is Test {
             // expect emit
             vm.expectEmit();
             emit IERC20.Transfer(address(0), SERVICE_OWNER, expectFeeAmount);
+            vm.expectEmit();
+            emit ERC20Fee.FeeCollected(SERVICE_OWNER, expectFeeAmount);
             vm.expectEmit();
             emit IERC20.Transfer(address(0), ACCOUNT.addr, expectAccountAmount);
             vm.expectEmit(true, true, true, true, address(forgeFactory));
@@ -396,19 +403,20 @@ contract TestTokenPresets is Test {
         tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC20, erc20Impls, true);
 
         // initialSupply cannot be 0
-        vm.expectRevert(abi.encodeWithSignature("ERC20Base__NullInput(bytes32)", bytes32("initialSupply")));
+        vm.expectRevert(abi.encodeWithSignature("TokenBase__NullInput(bytes32)", bytes32("initialSupply")));
         vm.prank(OWNER);
-        ERC20Fixed erc20 = ERC20Fixed(
-            tokenFactory.deployERC20(SERVICE_OWNER, SERVICE_NAME, "ERC20Fixed", "ERC20F", 18, 0, "", address(logic))
-        );
+        ERC20Fixed erc20 =
+            ERC20Fixed(tokenFactory.deployERC20(SERVICE_OWNER, "ERC20Fixed", "ERC20F", 18, 0, "", address(logic)));
 
         vm.prank(OWNER);
-        erc20 = ERC20Fixed(
-            tokenFactory.deployERC20(
-                SERVICE_OWNER, SERVICE_NAME, "ERC20Fixed", "ERC20F", 18, 1000e18, "", address(logic)
-            )
-        );
+        erc20 =
+            ERC20Fixed(tokenFactory.deployERC20(SERVICE_OWNER, "ERC20Fixed", "ERC20F", 18, 1000e18, "", address(logic)));
         assertEq(erc20.balanceOf(SERVICE_OWNER), 1000e18, "Initial supply should be 1000e18");
+
+        address[] memory forges = new address[](1);
+        forges[0] = FORGE;
+        vm.prank(SERVICE_OWNER);
+        erc20.setForges(forges, true);
 
         uint256 amount = 100 ether;
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline

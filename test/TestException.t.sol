@@ -168,22 +168,22 @@ contract TestException is Test {
             address tokenFactoryProxy = address(
                 new ERC1967Proxy(
                     tokenFactoryImpl,
-                    abi.encodeCall(
-                        TokenFactory.initialize, (OWNER, address(forgeFactory), erc20Impls, erc721Impls, erc1155Impls)
-                    )
+                    abi.encodeCall(TokenFactory.initialize, (OWNER, erc20Impls, erc721Impls, erc1155Impls))
                 )
             );
             tokenFactory = TokenFactory(tokenFactoryProxy);
         }
-        mockERC20 =
-            MockERC20(tokenFactory.deployERC20(OWNER, SERVICE_NAME, "MockERC20", "M20", 18, 0, "", mockERC20Impl));
+        mockERC20 = MockERC20(tokenFactory.deployERC20(OWNER, "MockERC20", "M20", 18, 0, "", mockERC20Impl));
         mockERC721 = MockERC721(
-            tokenFactory.deployERC721(
-                OWNER, SERVICE_NAME, "MockERC721", "M721", "https://xxx.yyy.zzz/", "", mockERC721Impl
-            )
+            tokenFactory.deployERC721(OWNER, "MockERC721", "M721", "https://xxx.yyy.zzz/", "", mockERC721Impl)
         );
-        mockERC1155 =
-            MockERC1155(tokenFactory.deployERC1155(OWNER, SERVICE_NAME, "https://xxx.yyy.zzz/", "", mockERC1155Impl));
+        mockERC1155 = MockERC1155(tokenFactory.deployERC1155(OWNER, "https://xxx.yyy.zzz/", "", mockERC1155Impl));
+
+        address[] memory forges = new address[](1);
+        forges[0] = FORGE;
+        mockERC20.setForges(forges, true);
+        mockERC721.setForges(forges, true);
+        mockERC1155.setForges(forges, true);
 
         vm.stopPrank();
     }
