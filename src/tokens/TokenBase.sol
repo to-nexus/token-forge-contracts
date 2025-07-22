@@ -29,8 +29,8 @@ abstract contract TokenBase is UUPSUpgradeable, OwnableUpgradeable, ERC165Upgrad
         __TokenBase_init_unchained(_owner);
     }
 
-    function __TokenBase_init_unchained(address _owner) internal onlyInitializing {
-        __Ownable_init();
+    function __TokenBase_init_unchained(address _owner) private onlyInitializing {
+        __Ownable_init(_owner);
         __ERC165_init();
         transferOwnership(_owner);
     }
@@ -56,12 +56,13 @@ abstract contract TokenBase is UUPSUpgradeable, OwnableUpgradeable, ERC165Upgrad
         return _getForgesStorage().contains(forge);
     }
 
-    function setForges(address[] calldata forges, bool add) external onlyOwner {
+    function setForges(address[] calldata _forges, bool add) external onlyOwner {
+        function (EnumerableSet.AddressSet storage, address) fn = add ? _addForge : _removeForge;
+
         EnumerableSet.AddressSet storage $ = _getForgesStorage();
-        function (EnumerableSet.AddressSet storage $, address forge) fn = add ? _addForge : _removeForge;
         unchecked {
-            for (uint256 i = 0; i < forges.length;) {
-                fn($, forges[i]);
+            for (uint256 i = 0; i < _forges.length;) {
+                fn($, _forges[i]);
                 ++i;
             }
         }
@@ -78,6 +79,10 @@ abstract contract TokenBase is UUPSUpgradeable, OwnableUpgradeable, ERC165Upgrad
         if ($.remove(forge)) {
             emit ForgeRemoved(forge);
         }
+    }
+
+    function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
+        return ERC165Upgradeable.supportsInterface(interfaceId);
     }
 
     function _authorizeUpgrade(address) internal override onlyOwner {}
