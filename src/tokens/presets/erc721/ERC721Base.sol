@@ -18,7 +18,7 @@ abstract contract ERC721Base is
 {
     // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc721.baseURI")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant ERC721BaseURIStorageLocation =
-        0xae399aba48b00e5fadd22cfd23d29924573cb21a1b3727798605d103f2a75a00;
+        0x614112defb2808fb2f424451bd65cd4db97803d41a04f6f5d04c43961d7c9300;
 
     function initialize(
         address owner,
