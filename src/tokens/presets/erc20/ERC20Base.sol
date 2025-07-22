@@ -1,49 +1,16 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.28;
 
-import {UUPSUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/proxy/utils/UUPSUpgradeable.sol";
-import {OwnableUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/access/OwnableUpgradeable.sol";
 import {ERC20Upgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC20/ERC20Upgradeable.sol";
 import {ERC20PermitUpgradeable} from
     "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC20/extensions/ERC20PermitUpgradeable.sol";
-import {ERC165Upgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/introspection/ERC165Upgradeable.sol";
-import {EnumerableSet} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableSet.sol";
 import {IERC20Forge} from "../../../interfaces/IERC20Forge.sol";
+import {TokenBase} from "../../TokenBase.sol";
 
-abstract contract ERC20Base is
-    IERC20Forge,
-    ERC165Upgradeable,
-    ERC20Upgradeable,
-    ERC20PermitUpgradeable,
-    OwnableUpgradeable,
-    UUPSUpgradeable
-{
-    error ERC20Base__NullInput(bytes32 field);
-    error ERC20Base__InvalidInitialSupply(uint256 initialSupply);
-    error ERC20Base__OnlyForge(address caller);
-
-    event ForgesUpdated(address[] forges, bool indexed add);
-
-    /// @custom:storage-location erc7201:cross.storage.forge.erc20
-    struct ERC20BaseStorage {
-        EnumerableSet.AddressSet forges;
-        uint8 decimals;
-    }
-
-    // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant ERC20BaseStorageLocation =
+abstract contract ERC20Base is TokenBase, IERC20Forge, ERC20Upgradeable, ERC20PermitUpgradeable {
+    // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20.decimals")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant ERC20DecimalsStorageLocation =
         0x5336721aabdf58b9f67dce2b9c89749de013c2e87912f00ce8440ff438c6c800;
-
-    function _getERC20PresetStorage() private pure returns (ERC20BaseStorage storage $) {
-        assembly {
-            $.slot := ERC20BaseStorageLocation
-        }
-    }
-
-    modifier onlyForge() {
-        if (!_getERC20PresetStorage().forges.contains(_msgSender())) revert ERC20Base__OnlyForge(_msgSender());
-        _;
-    }
 
     function initialize(
         address _owner,
@@ -52,7 +19,7 @@ abstract contract ERC20Base is
         uint8 _decimals,
         uint256 _initialSupply,
         bytes memory
-    ) external virtual initializer {
+    ) external virtual override initializer {
         __ERC20Base_init(_owner, _name, _symbol, _decimals, _initialSupply);
     }
 
@@ -63,11 +30,8 @@ abstract contract ERC20Base is
         uint8 _decimals,
         uint256 _initialSupply
     ) internal onlyInitializing {
+        __TokenBase_init(_owner);
         __ERC20Base_init_unchained(_owner, _name, _symbol, _decimals, _initialSupply);
-
-        __ERC20_init(_name, _symbol);
-        __ERC20Permit_init(_name);
-        __Ownable_init(_owner);
     }
 
     function __ERC20Base_init_unchained(
@@ -77,28 +41,14 @@ abstract contract ERC20Base is
         uint8 _decimals,
         uint256 _initialSupply
     ) private onlyInitializing {
-        // owner 는 __Ownable_init() 에서 address(0) 을 확인함
-        if (bytes(_name).length == 0) revert ERC20Base__NullInput("name");
-        if (bytes(_symbol).length == 0) revert ERC20Base__NullInput("symbol");
-        ERC20BaseStorage storage $ = _getERC20PresetStorage();
-        $.decimals = _decimals;
+        if (bytes(_name).length == 0) revert TokenBase__NullInput("name");
+        if (bytes(_symbol).length == 0) revert TokenBase__NullInput("symbol");
+        assembly {
+            sstore(ERC20DecimalsStorageLocation, _decimals)
+        }
         if (_initialSupply != 0) {
             _mint(_owner, _initialSupply);
         }
-    }
-
-    function setForges(address[] memory forges, bool add) external onlyOwner {
-        ERC20BaseStorage storage $ = _getERC20PresetStorage();
-        if (add) {
-            for (uint256 i = 0; i < forges.length; i++) {
-                $.forges.add(forges[i]);
-            }
-        } else {
-            for (uint256 i = 0; i < forges.length; i++) {
-                $.forges.remove(forges[i]);
-            }
-        }
-        emit ForgesUpdated(forges, add);
     }
 
     function mint(address to, uint256 amount) public virtual override onlyForge {
@@ -111,12 +61,14 @@ abstract contract ERC20Base is
     }
 
     function decimals() public view override returns (uint8) {
-        return _getERC20PresetStorage().decimals;
+        uint8 _decimals;
+        assembly {
+            _decimals := sload(ERC20DecimalsStorageLocation)
+        }
+        return _decimals;
     }
 
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IERC20Forge).interfaceId || super.supportsInterface(interfaceId);
     }
-
-    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 }

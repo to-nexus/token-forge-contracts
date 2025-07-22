@@ -7,14 +7,13 @@ import {ERC20Fee} from "./extensions/ERC20Fee.sol";
 contract ERC20MintingFee is ERC20Base, ERC20Fee {
     function initialize(
         address _owner,
-        address _forge,
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
         uint256 _initialSupply,
         bytes memory _data
     ) external override initializer {
-        ERC20Base.__ERC20Base_init(_owner, _forge, _name, _symbol, _decimals, _initialSupply);
+        ERC20Base.__ERC20Base_init(_owner, _name, _symbol, _decimals, _initialSupply);
         (address feeRecipient, uint256 feeBPS) = abi.decode(_data, (address, uint256));
         ERC20Fee.__ERC20Fee_init(feeRecipient, feeBPS);
     }

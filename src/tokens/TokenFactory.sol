@@ -118,8 +118,7 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
             }
             token = address(
                 new ERC1967Proxy(
-                    logic,
-                    abi.encodeCall(IERC20Forge.initialize, (owner, forge, name, symbol, decimals, initialSupply, data))
+                    logic, abi.encodeCall(IERC20Forge.initialize, (owner, name, symbol, decimals, initialSupply, data))
                 )
             );
         }
@@ -148,7 +147,7 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
             }
             token = address(
                 new ERC1967Proxy(
-                    logic, abi.encodeCall(IERC721Forge.initialize, (owner, forge, name, symbol, baseTokenURI, data))
+                    logic, abi.encodeCall(IERC721Forge.initialize, (owner, name, symbol, baseTokenURI, data))
                 )
             );
         }
@@ -171,8 +170,7 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
             if (!$.erc1155Impls.contains(logic)) {
                 revert TokenFactory__InvalidLogic(TokenType.ERC1155, logic);
             }
-            token =
-                address(new ERC1967Proxy(logic, abi.encodeCall(IERC1155Forge.initialize, (owner, forge, uri, data))));
+            token = address(new ERC1967Proxy(logic, abi.encodeCall(IERC1155Forge.initialize, (owner, uri, data))));
         }
         bytes32 service32 = ShortString.unwrap(ShortStrings.toShortString(service));
         if (token == address(0)) revert TokenFactory__DeployFailed(TokenType.ERC1155, service32, logic);
