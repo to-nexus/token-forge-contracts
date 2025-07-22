@@ -17,7 +17,7 @@ abstract contract TokenBase is UUPSUpgradeable, OwnableUpgradeable, ERC165Upgrad
 
     // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.token")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant TokenBaseStorageLocation =
-        0x5336721aabdf58b9f67dce2b9c89749de013c2e87912f00ce8440ff438c6c800;
+        0x226d89218e2374ee473292146d1b80fabdb6747a8e13760116d34b5eb2747400;
 
     function _getForgesStorage() private pure returns (EnumerableSet.AddressSet storage $) {
         assembly {

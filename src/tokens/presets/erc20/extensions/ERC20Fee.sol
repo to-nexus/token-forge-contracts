@@ -18,7 +18,7 @@ abstract contract ERC20Fee is ERC20Base {
 
     // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20.fee")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant ERC20FeeStorageLocation =
-        0x9e07bc4d06789dd0b871d60d502656ec22e58628182c2156c52dcfc63440ac00;
+        0xd0b546179495f4880d81845138f4b5012ee24fd5441f32d121fce6837dc28d00;
 
     function _getERC20FeeStorage() private pure returns (ERC20FeeStorage storage $) {
         assembly {
