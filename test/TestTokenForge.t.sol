@@ -25,6 +25,7 @@ import {IERC721} from "@openzeppelin-contracts-5.3.0/token/ERC721/IERC721.sol";
 import {IERC1155} from "@openzeppelin-contracts-5.3.0/token/ERC1155/IERC1155.sol";
 
 import {TokenFactory} from "../src/tokens/TokenFactory.sol";
+import {TokenBase} from "../src/tokens/TokenBase.sol";
 import {MockERC20} from "./mock/MockERC20.sol";
 import {MockERC721} from "./mock/MockERC721.sol";
 import {MockERC1155} from "./mock/MockERC1155.sol";
@@ -90,9 +91,7 @@ contract TestTokenForgeFactory is Test {
             address tokenFactoryProxy = address(
                 new ERC1967Proxy(
                     tokenFactoryImpl,
-                    abi.encodeCall(
-                        TokenFactory.initialize, (OWNER, address(forgeFactory), erc20Impls, erc721Impls, erc1155Impls)
-                    )
+                    abi.encodeCall(TokenFactory.initialize, (OWNER, erc20Impls, erc721Impls, erc1155Impls))
                 )
             );
             tokenFactory = TokenFactory(tokenFactoryProxy);
@@ -103,19 +102,33 @@ contract TestTokenForgeFactory is Test {
 
     function _deployERC20() internal returns (address) {
         vm.prank(OWNER);
-        return tokenFactory.deployERC20(OWNER, SERVICE_NAME, "MockERC20", "M20", 18, 0, "", mockERC20Impl);
+        address token = tokenFactory.deployERC20(OWNER, "MockERC20", "M20", 18, 0, "", mockERC20Impl);
+        address[] memory forges = new address[](1);
+        forges[0] = FORGE;
+        vm.prank(OWNER);
+        TokenBase(token).setForges(forges, true);
+        return token;
     }
 
     function _deployERC721() internal returns (address) {
         vm.prank(OWNER);
-        return tokenFactory.deployERC721(
-            OWNER, SERVICE_NAME, "MockERC721", "M721", "https://xxx.yyy.zzz", "", mockERC721Impl
-        );
+        address token =
+            tokenFactory.deployERC721(OWNER, "MockERC721", "M721", "https://xxx.yyy.zzz", "", mockERC721Impl);
+        address[] memory forges = new address[](1);
+        forges[0] = FORGE;
+        vm.prank(OWNER);
+        TokenBase(token).setForges(forges, true);
+        return token;
     }
 
     function _deployERC1155() internal returns (address) {
         vm.prank(OWNER);
-        return tokenFactory.deployERC1155(OWNER, SERVICE_NAME, "https://xxx.yyy.zzz", "", mockERC1155Impl);
+        address token = tokenFactory.deployERC1155(OWNER, "https://xxx.yyy.zzz", "", mockERC1155Impl);
+        address[] memory forges = new address[](1);
+        forges[0] = FORGE;
+        vm.prank(OWNER);
+        TokenBase(token).setForges(forges, true);
+        return token;
     }
 
     function test_mint_erc20_v1() external {

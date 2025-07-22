@@ -193,9 +193,7 @@ contract TestTokenFactory is Test {
             address tokenFactoryProxy = address(
                 new ERC1967Proxy(
                     tokenFactoryImpl,
-                    abi.encodeCall(
-                        TokenFactory.initialize, (OWNER, address(forgeFactory), erc20Impls, erc721Impls, erc1155Impls)
-                    )
+                    abi.encodeCall(TokenFactory.initialize, (OWNER, erc20Impls, erc721Impls, erc1155Impls))
                 )
             );
             tokenFactory = TokenFactory(tokenFactoryProxy);
@@ -230,10 +228,6 @@ contract TestTokenFactory is Test {
         tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC1155, logicAddresses, true);
 
         vm.stopPrank();
-    }
-
-    function test_token_factory_forge_factory() external view {
-        assertEq(address(forgeFactory), tokenFactory.getForgeFactory());
     }
 
     function test_token_factory_preset_logics() external {
@@ -312,58 +306,6 @@ contract TestTokenFactory is Test {
         erc1155Impls = tokenFactory.getPresetLogics(ITokenFactory.TokenType.ERC1155);
         assertEq(0, erc1155Impls.length);
 
-        vm.stopPrank();
-    }
-
-    function test_token_factory_service_tokens() external {
-        assertEq(0, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC20).length);
-        assertEq(0, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC721).length);
-        assertEq(0, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC1155).length);
-
-        vm.prank(OWNER);
-        tokenFactory.deployERC20(OWNER, SERVICE_NAME, "TestToken", "TTK", 18, 0, "", mockERC20Impl);
-        assertEq(1, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC20).length);
-        assertEq(0, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC721).length);
-        assertEq(0, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC1155).length);
-
-        vm.prank(OWNER);
-        tokenFactory.deployERC721(OWNER, SERVICE_NAME, "TestNFT", "TNFT", "https://xxx.yyy.zzz/", "", mockERC721Impl);
-        assertEq(1, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC20).length);
-        assertEq(1, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC721).length);
-        assertEq(0, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC1155).length);
-
-        vm.prank(OWNER);
-        tokenFactory.deployERC1155(OWNER, SERVICE_NAME, "https://xxx.yyy.zzz/", "", mockERC1155Impl);
-        assertEq(1, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC20).length);
-        assertEq(1, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC721).length);
-        assertEq(1, tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC1155).length);
-
-        address[] memory erc20Tokens = tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC20);
-        address[] memory erc721Tokens = tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC721);
-        address[] memory erc1155Tokens = tokenFactory.getServiceTokens(SERVICE_NAME, ITokenFactory.TokenType.ERC1155);
-        assertNotEq(erc20Tokens[0], address(0));
-        assertNotEq(erc721Tokens[0], address(0));
-        assertNotEq(erc1155Tokens[0], address(0));
-
-        assertNotEq(erc20Tokens[0], erc721Tokens[0]);
-        assertNotEq(erc1155Tokens[0], erc721Tokens[0]);
-        assertNotEq(erc1155Tokens[0], erc20Tokens[0]);
-    }
-
-    function test_token_factory_invalid_service_name() external {
-        string memory invalidServiceName = "InvalidService";
-
-        vm.startPrank(OWNER);
-        vm.expectRevert(abi.encodeWithSignature("TokenFactory__InvalidService(string)", invalidServiceName));
-        tokenFactory.deployERC20(OWNER, invalidServiceName, "TestToken", "TTK", 18, 0, "", mockERC20Impl);
-
-        vm.expectRevert(abi.encodeWithSignature("TokenFactory__InvalidService(string)", invalidServiceName));
-        tokenFactory.deployERC721(
-            OWNER, invalidServiceName, "TestNFT", "TNFT", "https://xxx.yyy.zzz/", "", mockERC721Impl
-        );
-
-        vm.expectRevert(abi.encodeWithSignature("TokenFactory__InvalidService(string)", invalidServiceName));
-        tokenFactory.deployERC1155(OWNER, invalidServiceName, "https://xxx.yyy.zzz/", "", mockERC1155Impl);
         vm.stopPrank();
     }
 }
