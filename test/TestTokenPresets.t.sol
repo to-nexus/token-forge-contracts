@@ -307,7 +307,7 @@ contract TestTokenPresets is Test {
             vm.expectEmit();
             emit IERC20.Transfer(address(0), SERVICE_OWNER, expectFeeAmount);
             vm.expectEmit();
-            emit ERC20Fee.FeeCollected(SERVICE_OWNER, expectFeeAmount);
+            emit ERC20Fee.FeeCollected(address(FORGE), SERVICE_OWNER, expectFeeAmount);
             vm.expectEmit();
             emit IERC20.Transfer(address(0), ACCOUNT.addr, expectAccountAmount);
             vm.expectEmit(true, true, true, true, address(forgeFactory));
@@ -346,7 +346,7 @@ contract TestTokenPresets is Test {
             vm.expectEmit();
             emit IERC20.Transfer(address(0), SERVICE_OWNER, expectFeeAmount);
             vm.expectEmit();
-            emit ERC20Fee.FeeCollected(SERVICE_OWNER, expectFeeAmount);
+            emit ERC20Fee.FeeCollected(address(FORGE), SERVICE_OWNER, expectFeeAmount);
             vm.expectEmit();
             emit IERC20.Transfer(address(0), ACCOUNT.addr, expectAccountAmount);
             vm.expectEmit(true, true, true, true, address(forgeFactory));
@@ -370,7 +370,7 @@ contract TestTokenPresets is Test {
             vm.expectEmit();
             emit IERC20.Transfer(address(0), SERVICE_OWNER, expectFeeAmount);
             vm.expectEmit();
-            emit ERC20Fee.FeeCollected(SERVICE_OWNER, expectFeeAmount);
+            emit ERC20Fee.FeeCollected(address(FORGE), SERVICE_OWNER, expectFeeAmount);
             vm.expectEmit();
             emit IERC20.Transfer(address(0), ACCOUNT.addr, expectAccountAmount);
             vm.expectEmit(true, true, true, true, address(forgeFactory));
