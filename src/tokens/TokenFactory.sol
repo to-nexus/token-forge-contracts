@@ -23,7 +23,7 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
     error TokenFactory__InvalidLogic(TokenType, address);
     error TokenFactory__DeployFailed(TokenType, address);
 
-    bytes32 public constant MANAGER_ROLE = keccak256(" MANAGER");
+    bytes32 public constant MANAGER_ROLE = keccak256("MANAGER");
 
     /// @custom:storage-location erc7201:cross.storage.forge.TokenFactory
     struct TokenFactoryStorage {
