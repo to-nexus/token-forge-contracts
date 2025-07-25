@@ -19,7 +19,7 @@ contract ERC20MintingFee is ERC20Base, ERC20Fee {
     }
 
     function mint(address to, uint256 amount) public override {
-        uint256 feeBPS = feeBPS();
+        uint256 feeBPS = feeBPS(msg.sender);
         if (feeBPS == 0) {
             ERC20Base.mint(to, amount);
         } else {
@@ -28,7 +28,7 @@ contract ERC20MintingFee is ERC20Base, ERC20Fee {
             if (fee != 0) {
                 amount -= fee;
                 ERC20Base.mint(feeRecipient, fee);
-                emit FeeCollected(feeRecipient, fee);
+                emit FeeCollected(msg.sender, feeRecipient, fee);
             }
             ERC20Base.mint(to, amount);
         }
