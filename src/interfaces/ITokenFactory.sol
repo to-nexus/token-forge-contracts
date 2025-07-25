@@ -13,7 +13,6 @@ interface ITokenFactory {
     /**
      * @dev ERC20 토큰 배포
      * @param owner 새 토큰의 소유자 EOA
-     * @param service ForgeFactory에 등록된 서비스 이름
      * @param name 토큰 이름
      * @param symbol 토큰 심볼
      * @param decimals 토큰 소수점 자리수
@@ -23,18 +22,17 @@ interface ITokenFactory {
      */
     function deployERC20(
         address owner,
-        string calldata service,
-        string calldata name,
-        string calldata symbol,
+        string memory name,
+        string memory symbol,
         uint8 decimals,
         uint256 initialSupply,
+        bytes memory data,
         address logic
     ) external returns (address tokenAddress);
 
     /**
      * @dev ERC721 토큰 배포
      * @param owner 새 토큰의 소유자 EOA
-     * @param service ForgeFactory에 등록된 서비스 이름
      * @param name 토큰 이름
      * @param symbol 토큰 심볼
      * @param baseTokenURI 기본 토큰 URI
@@ -43,22 +41,21 @@ interface ITokenFactory {
      */
     function deployERC721(
         address owner,
-        string calldata service,
-        string calldata name,
-        string calldata symbol,
-        string calldata baseTokenURI,
+        string memory name,
+        string memory symbol,
+        string memory baseTokenURI,
+        bytes memory data,
         address logic
     ) external returns (address tokenAddress);
 
     /**
      * @dev ERC1155 토큰 배포
      * @param owner 새 토큰의 소유자 EOA
-     * @param service ForgeFactory에 등록된 서비스 이름
      * @param uri 토큰 URI 템플릿
      * @param logic 사용할 로직 컨트랙트 주소 (optional, 0이면 기본 프리셋 사용)
      * @return tokenAddress 배포된 토큰 프록시 주소
      */
-    function deployERC1155(address owner, string calldata service, string calldata uri, address logic)
+    function deployERC1155(address owner, string memory uri, bytes memory data, address logic)
         external
         returns (address tokenAddress);
     //
@@ -85,28 +82,11 @@ interface ITokenFactory {
     // ========== 조회 함수 ==========
 
     /**
-     * @dev 서비스별 배포된 토큰 주소 조회
-     * @param service 서비스 이름
-     * @param tokenType 토큰 타입 (0:20, 1:721, 2:1155)
-     * @return tokenAddresses 배포된 토큰 주소 배열
-     */
-    function getServiceTokens(string calldata service, TokenType tokenType)
-        external
-        view
-        returns (address[] memory tokenAddresses);
-
-    /**
      * @dev 프리셋 로직 주소 조회
      * @param tokenType 토큰 타입 (0:20, 1:721, 2:1155)
      * @return logicAddress 로직 컨트랙트 주소
      */
     function getPresetLogics(TokenType tokenType) external view returns (address[] memory);
-
-    /**
-     * @dev ForgeFactory 주소 조회
-     * @return forgeFactory ForgeFactory 컨트랙트 주소
-     */
-    function getForgeFactory() external view returns (address forgeFactory);
 
     // ========== 관리자 함수 ==========
 
@@ -118,13 +98,7 @@ interface ITokenFactory {
 
     // ========== 이벤트 ==========
 
-    event TokenDeployed(
-        bytes32 indexed service,
-        address indexed owner,
-        TokenType indexed tokenType,
-        address tokenAddress,
-        address logicAddress
-    );
+    event TokenDeployed(address indexed owner, TokenType indexed tokenType, address tokenAddress, address logicAddress);
 
     event PresetLogicSet(TokenType indexed tokenType, address indexed logicAddress);
 

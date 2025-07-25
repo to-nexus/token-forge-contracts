@@ -37,12 +37,12 @@ contract TestStorageLog is Test {
         }
     }
 
-    function test_storage_token_erc20() external pure {
+    function test_storage_token_erc20_decimals() external pure {
         bytes32 location;
         {
-            location =
-                keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20")) - 1)) & ~bytes32(uint256(0xff));
-            console.log("\nERC20Base");
+            location = keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20.decimals")) - 1))
+                & ~bytes32(uint256(0xff));
+            console.log("\nERC20 Decimals");
             console.logBytes32(location);
         }
     }
@@ -50,19 +50,29 @@ contract TestStorageLog is Test {
     function test_storage_token_erc721() external pure {
         bytes32 location;
         {
-            location =
-                keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc721")) - 1)) & ~bytes32(uint256(0xff));
-            console.log("\nERC721Base");
+            location = keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc721.baseURI")) - 1))
+                & ~bytes32(uint256(0xff));
+            console.log("\nERC721 BaseURI");
             console.logBytes32(location);
         }
     }
 
-    function test_storage_token_erc1155() external pure {
+    function test_storage_token_erc20_mintingfee() external pure {
         bytes32 location;
         {
             location =
-                keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc1155")) - 1)) & ~bytes32(uint256(0xff));
-            console.log("\nERC1155Base");
+                keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20.fee")) - 1)) & ~bytes32(uint256(0xff));
+            console.log("\nERC20Fee");
+            console.logBytes32(location);
+        }
+    }
+
+    function test_storage_token_forges() external pure {
+        bytes32 location;
+        {
+            location =
+                keccak256(abi.encode(uint256(keccak256("cross.storage.forge.token")) - 1)) & ~bytes32(uint256(0xff));
+            console.log("\nToken Forges");
             console.logBytes32(location);
         }
     }

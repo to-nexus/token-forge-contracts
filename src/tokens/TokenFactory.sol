@@ -20,19 +20,16 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
     using EnumerableSet for EnumerableSet.AddressSet;
 
     error TokenFactory__ZeroAddress(bytes32 field);
-    error TokenFactory__InvalidService(string service);
     error TokenFactory__InvalidLogic(TokenType, address);
-    error TokenFactory__DeployFailed(TokenType, bytes32, address);
+    error TokenFactory__DeployFailed(TokenType, address);
 
     bytes32 public constant MANAGER_ROLE = keccak256(" MANAGER");
 
     /// @custom:storage-location erc7201:cross.storage.forge.TokenFactory
     struct TokenFactoryStorage {
-        IForgeFactoryForgeByService forgeFactory;
         EnumerableSet.AddressSet erc20Impls;
         EnumerableSet.AddressSet erc721Impls;
         EnumerableSet.AddressSet erc1155Impls;
-        mapping(bytes32 service => mapping(TokenType => EnumerableSet.AddressSet)) registeredTokens;
     }
 
     // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.TokenFactory")) - 1)) & ~bytes32(uint256(0xff))
@@ -47,41 +44,31 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
 
     function initialize(
         address owner,
-        address forgeFactory,
         address[] calldata erc20Impls,
         address[] calldata erc721Impls,
         address[] calldata erc1155Impls
     ) external initializer {
         __AccessControl_init();
         __UUPSUpgradeable_init();
-        __TokenFactory_init(owner, forgeFactory, erc20Impls, erc721Impls, erc1155Impls);
+        __TokenFactory_init(owner, erc20Impls, erc721Impls, erc1155Impls);
     }
 
     function __TokenFactory_init(
         address owner,
-        address forgeFactory,
         address[] calldata erc20Impls,
         address[] calldata erc721Impls,
         address[] calldata erc1155Impls
     ) private onlyInitializing {
         if (owner == address(0)) revert TokenFactory__ZeroAddress("owner");
-        if (forgeFactory == address(0)) revert TokenFactory__ZeroAddress("forgeFactory");
 
         _setRoleAdmin(MANAGER_ROLE, DEFAULT_ADMIN_ROLE);
         _grantRole(MANAGER_ROLE, owner);
         _grantRole(DEFAULT_ADMIN_ROLE, owner);
 
         TokenFactoryStorage storage $ = _getTokenFactoryStorage();
-        $.forgeFactory = IForgeFactoryForgeByService(forgeFactory);
-
         _setImpls(TokenType.ERC20, type(IERC20Forge).interfaceId, $.erc20Impls, erc20Impls, true);
         _setImpls(TokenType.ERC721, type(IERC721Forge).interfaceId, $.erc721Impls, erc721Impls, true);
         _setImpls(TokenType.ERC1155, type(IERC1155Forge).interfaceId, $.erc1155Impls, erc1155Impls, true);
-    }
-
-    function getServiceTokens(string calldata service, TokenType tokenType) external view returns (address[] memory) {
-        bytes32 service32 = ShortString.unwrap(ShortStrings.toShortString(service));
-        return _getTokenFactoryStorage().registeredTokens[service32][tokenType].values();
     }
 
     function getPresetLogics(TokenType tokenType) external view returns (address[] memory) {
@@ -95,86 +82,70 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
         }
     }
 
-    function getForgeFactory() external view returns (address) {
-        return address(_getTokenFactoryStorage().forgeFactory);
-    }
-
     function deployERC20(
         address owner,
-        string calldata service,
-        string calldata name,
-        string calldata symbol,
+        string memory name,
+        string memory symbol,
         uint8 decimals,
         uint256 initialSupply,
+        bytes memory data,
         address logic
     ) external onlyRole(MANAGER_ROLE) returns (address token) {
         TokenFactoryStorage storage $ = _getTokenFactoryStorage();
         {
-            (address forge, bool running) = $.forgeFactory.forgeByService(service);
-            if (forge == address(0) || !running) revert TokenFactory__InvalidService(service);
             if (!$.erc20Impls.contains(logic)) {
                 revert TokenFactory__InvalidLogic(TokenType.ERC20, logic);
             }
             token = address(
                 new ERC1967Proxy(
-                    logic, abi.encodeCall(IERC20Forge.initialize, (owner, forge, name, symbol, decimals, initialSupply))
+                    logic, abi.encodeCall(IERC20Forge.initialize, (owner, name, symbol, decimals, initialSupply, data))
                 )
             );
         }
-        bytes32 service32 = ShortString.unwrap(ShortStrings.toShortString(service));
-        if (token == address(0)) revert TokenFactory__DeployFailed(TokenType.ERC20, service32, logic);
+        if (token == address(0)) revert TokenFactory__DeployFailed(TokenType.ERC20, logic);
 
-        $.registeredTokens[service32][TokenType.ERC20].add(token);
-        emit TokenDeployed(service32, owner, TokenType.ERC20, token, logic);
+        emit TokenDeployed(owner, TokenType.ERC20, token, logic);
     }
 
     function deployERC721(
         address owner,
-        string calldata service,
-        string calldata name,
-        string calldata symbol,
-        string calldata baseTokenURI,
+        string memory name,
+        string memory symbol,
+        string memory baseTokenURI,
+        bytes memory data,
         address logic
     ) external onlyRole(MANAGER_ROLE) returns (address token) {
         TokenFactoryStorage storage $ = _getTokenFactoryStorage();
         {
-            (address forge, bool running) = $.forgeFactory.forgeByService(service);
-            if (forge == address(0) || !running) revert TokenFactory__InvalidService(service);
             if (!$.erc721Impls.contains(logic)) {
                 revert TokenFactory__InvalidLogic(TokenType.ERC721, logic);
             }
             token = address(
                 new ERC1967Proxy(
-                    logic, abi.encodeCall(IERC721Forge.initialize, (owner, forge, name, symbol, baseTokenURI))
+                    logic, abi.encodeCall(IERC721Forge.initialize, (owner, name, symbol, baseTokenURI, data))
                 )
             );
         }
-        bytes32 service32 = ShortString.unwrap(ShortStrings.toShortString(service));
-        if (token == address(0)) revert TokenFactory__DeployFailed(TokenType.ERC721, service32, logic);
+        if (token == address(0)) revert TokenFactory__DeployFailed(TokenType.ERC721, logic);
 
-        $.registeredTokens[service32][TokenType.ERC721].add(token);
-        emit TokenDeployed(service32, owner, TokenType.ERC721, token, logic);
+        emit TokenDeployed(owner, TokenType.ERC721, token, logic);
     }
 
-    function deployERC1155(address owner, string calldata service, string calldata uri, address logic)
+    function deployERC1155(address owner, string memory uri, bytes memory data, address logic)
         external
         onlyRole(MANAGER_ROLE)
         returns (address token)
     {
         TokenFactoryStorage storage $ = _getTokenFactoryStorage();
         {
-            (address forge, bool running) = $.forgeFactory.forgeByService(service);
-            if (forge == address(0) || !running) revert TokenFactory__InvalidService(service);
             if (!$.erc1155Impls.contains(logic)) {
                 revert TokenFactory__InvalidLogic(TokenType.ERC1155, logic);
             }
-            token = address(new ERC1967Proxy(logic, abi.encodeCall(IERC1155Forge.initialize, (owner, forge, uri))));
+            token = address(new ERC1967Proxy(logic, abi.encodeCall(IERC1155Forge.initialize, (owner, uri, data))));
         }
-        bytes32 service32 = ShortString.unwrap(ShortStrings.toShortString(service));
-        if (token == address(0)) revert TokenFactory__DeployFailed(TokenType.ERC1155, service32, logic);
+        if (token == address(0)) revert TokenFactory__DeployFailed(TokenType.ERC1155, logic);
 
-        $.registeredTokens[service32][TokenType.ERC1155].add(token);
-        emit TokenDeployed(service32, owner, TokenType.ERC1155, token, logic);
+        emit TokenDeployed(owner, TokenType.ERC1155, token, logic);
     }
 
     function setPresetLogics(TokenType tokenType, address[] calldata logicAddress, bool add)
