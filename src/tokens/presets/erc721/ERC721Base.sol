@@ -36,6 +36,10 @@ abstract contract ERC721Base is
     {
         __TokenBase_init(owner);
         __ERC721Base_init_unchained(name, symbol, baseTokenURI);
+
+        __ERC721_init(name, symbol);
+        __ERC721Holder_init();
+        __ERC721URIStorage_init();
     }
 
     function __ERC721Base_init_unchained(string memory name, string memory symbol, string memory baseTokenURI)

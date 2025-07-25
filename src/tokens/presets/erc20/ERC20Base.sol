@@ -32,6 +32,9 @@ abstract contract ERC20Base is TokenBase, IERC20Forge, ERC20Upgradeable, ERC20Pe
     ) internal onlyInitializing {
         __TokenBase_init(_owner);
         __ERC20Base_init_unchained(_owner, _name, _symbol, _decimals, _initialSupply);
+
+        __ERC20_init(_name, _symbol);
+        __ERC20Permit_init(_name);
     }
 
     function __ERC20Base_init_unchained(
