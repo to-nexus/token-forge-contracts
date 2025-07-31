@@ -88,6 +88,13 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
         factory.alertTransfer(tokenType, uuid, token, data);
     }
 
+    function _alertTransferFromToFactory(TokenType tokenType, uint256 uuid, address token, bytes memory data)
+        internal
+    {
+        IForgeFactoryAlert factory = IForgeFactoryAlert(_getBaseForgeStorage()._factory);
+        factory.alertTransferFrom(tokenType, uuid, token, data);
+    }
+
     function _alertBurnToFactory(TokenType tokenType, uint256 uuid, address token, bytes memory data) internal {
         IForgeFactoryAlert factory = IForgeFactoryAlert(_getBaseForgeStorage()._factory);
         factory.alertBurn(tokenType, uuid, token, data);
