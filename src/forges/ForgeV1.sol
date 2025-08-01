@@ -56,10 +56,10 @@ abstract contract ERC20ForgeV1 is BaseForge {
             _verifyValidatorSignature(hash, validatorSig);
         }
         (uint256 fee, uint256 value) = _erc20CalcFee(feeRecipient, feeBPS, amount);
+        IERC20Forge(token).mint(recipient, value);
         if (fee != 0) {
             IERC20Forge(token).mint(feeRecipient, fee);
         }
-        IERC20Forge(token).mint(recipient, value);
         _alertMintToFactory(
             TokenType.ERC20, _calcUUID(recipient, nonce), token, abi.encode(recipient, amount, feeRecipient, fee)
         );
@@ -85,10 +85,10 @@ abstract contract ERC20ForgeV1 is BaseForge {
         }
 
         (uint256 fee, uint256 value) = _erc20CalcFee(feeRecipient, feeBPS, amount);
+        IERC20(token).safeTransfer(recipient, value);
         if (fee != 0) {
             IERC20(token).safeTransfer(feeRecipient, fee);
         }
-        IERC20(token).safeTransfer(recipient, value);
         _alertTransferToFactory(
             TokenType.ERC20, _calcUUID(recipient, nonce), token, abi.encode(recipient, amount, feeRecipient, fee)
         );
@@ -136,7 +136,7 @@ abstract contract ERC20ForgeV1 is BaseForge {
             _verifyValidatorSignature(hash, validatorSig);
         }
 
-        (uint256 fee, uint256 value) = _erc20CalcFee(feeRecipient, feeBPS, amount);
+        (uint256 fee,) = _erc20CalcFee(feeRecipient, feeBPS, amount);
         IERC20(token).safeTransferFrom(from, address(this), amount);
         if (fee != 0) {
             IERC20(token).safeTransfer(feeRecipient, fee);
@@ -190,10 +190,10 @@ abstract contract ERC20ForgeV1 is BaseForge {
         }
 
         (uint256 fee, uint256 value) = _erc20CalcFee(feeRecipient, feeBPS, amount);
+        IERC20Forge(token).burnFrom(from, value);
         if (fee != 0) {
             IERC20(token).safeTransferFrom(from, feeRecipient, fee);
         }
-        IERC20Forge(token).burnFrom(from, value);
         _alertBurnToFactory(TokenType.ERC20, _calcUUID(from, nonce), token, abi.encode(from, amount, feeRecipient, fee));
     }
 }

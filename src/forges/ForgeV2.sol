@@ -172,7 +172,7 @@ abstract contract ERC20ForgeV2 is BaseForge {
             _verifyValidatorSignature(validatorHash, validatorSig);
         }
 
-        (uint256 fee, uint256 value) = _erc20CalcFee(feeRecipient, feeBPS, amount);
+        (uint256 fee,) = _erc20CalcFee(feeRecipient, feeBPS, amount);
         IERC20(token).safeTransferFrom(from, address(this), amount);
         if (fee != 0) {
             IERC20(token).safeTransfer(feeRecipient, fee);
