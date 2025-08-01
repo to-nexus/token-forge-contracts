@@ -7,6 +7,8 @@ bytes32 constant ERC20_MINT_TYPE_HASH_V1 =
     keccak256("ERC20Mint(address recipient,address token,uint256 amount,uint256 nonce,uint256 deadline)");
 bytes32 constant ERC20_TRANSFER_TYPE_HASH_V1 =
     keccak256("ERC20Transfer(address recipient,address token,uint256 amount,uint256 nonce,uint256 deadline)");
+bytes32 constant ERC20_TRANSFER_FROM_TYPE_HASH_V1 =
+    keccak256("ERC20TransferFrom(address from,address token,uint256 amount,uint256 nonce,uint256 deadline)");
 bytes32 constant ERC20_BURN_TYPE_HASH_V1 =
     keccak256("ERC20Burn(address from,address token,uint256 amount,uint256 nonce,uint256 deadline)");
 // ERC721
@@ -46,6 +48,11 @@ bytes32 constant ERC20_TRANSFER_TYPE_HASH_V2 =
     keccak256("ERC20Transfer(address token,uint256 amount,uint256 nonce,uint256 deadline)");
 bytes32 constant ERC20_VALIDATOR_TRANSFER_TYPE_HASH_V2 =
     keccak256("ValidatorERC20Transfer(address recipient,bytes recipientSig)");
+
+bytes32 constant ERC20_TRANSFER_FROM_TYPE_HASH_V2 =
+    keccak256("ERC20TransferFrom(address token,uint256 amount,uint256 nonce,uint256 deadline)");
+bytes32 constant ERC20_VALIDATOR_TRANSFER_FROM_TYPE_HASH_V2 =
+    keccak256("ValidatorERC20TransferFrom(address from,bytes fromSig)");
 
 bytes32 constant ERC20_BURN_TYPE_HASH_V2 =
     keccak256("ERC20Burn(address token,uint256 amount,uint256 nonce,uint256 deadline)");
@@ -98,6 +105,7 @@ bytes32 constant ERC1155_VALIDATOR_BURN_BATCH_TYPE_HASH_V2 =
 // ERC20
 bytes32 constant ERC20_MINT_TYPE_HASH_V3 = ERC20_MINT_TYPE_HASH_V1;
 bytes32 constant ERC20_TRANSFER_TYPE_HASH_V3 = ERC20_TRANSFER_TYPE_HASH_V1;
+bytes32 constant ERC20_TRANSFER_FROM_TYPE_HASH_V3 = ERC20_TRANSFER_FROM_TYPE_HASH_V1;
 bytes32 constant ERC20_BURN_TYPE_HASH_V3 = ERC20_BURN_TYPE_HASH_V1;
 // ERC721
 bytes32 constant ERC721_MINT_TYPE_HASH_V3 = ERC721_MINT_TYPE_HASH_V1;
