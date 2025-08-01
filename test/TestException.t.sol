@@ -2415,6 +2415,51 @@ contract TestException is Test {
         }
     }
 
+    function test_invalid_erc20_fee_data() external {
+        address token = address(mockERC20);
+        uint256 amount = 100 ether;
+        uint256 deadline = block.timestamp + 1 days;
+        // feeBPS > 10000
+        {
+            address feeRecipient = address(bytes20("FEE_RECIPIENT"));
+            uint256 feeBPS = 10001;
+            bytes32 structHash = keccak256(
+                abi.encode(
+                    ERC20_MINT_TYPE_HASH_V3,
+                    ACCOUNT.addr,
+                    token,
+                    amount,
+                    feeRecipient,
+                    feeBPS,
+                    BaseForge(FORGE).nonces(ACCOUNT.addr),
+                    deadline
+                )
+            );
+            bytes memory validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
+            vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidFeeData(address,uint256)", feeRecipient, feeBPS));
+            ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, validatorSignature);
+        }
+        // feeBPS != 0 && feeRecipient == address(0)
+        {
+            uint256 feeBPS = 100;
+            bytes32 structHash = keccak256(
+                abi.encode(
+                    ERC20_MINT_TYPE_HASH_V3,
+                    ACCOUNT.addr,
+                    token,
+                    amount,
+                    address(0),
+                    feeBPS,
+                    BaseForge(FORGE).nonces(ACCOUNT.addr),
+                    deadline
+                )
+            );
+            bytes memory validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
+            vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidFeeData(address,uint256)", address(0), feeBPS));
+            ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, address(0), feeBPS, deadline, validatorSignature);
+        }
+    }
+
     function _sign_with_domain_separator(bytes32 hash, Vm.Wallet memory wallet) internal returns (bytes memory) {
         bytes32 messageHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, hash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(wallet, messageHash);
