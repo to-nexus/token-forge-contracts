@@ -788,7 +788,6 @@ contract TestTokenForgeFactory is Test {
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
 
         bytes memory recipientSig;
-
         {
             bytes32 recipientStructHash =
                 keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
@@ -1037,7 +1036,6 @@ contract TestTokenForgeFactory is Test {
         MockERC20(token).forceMint(FORGE, amount);
 
         bytes memory recipientSig;
-
         {
             bytes32 recipientStructHash =
                 keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
@@ -2763,6 +2761,524 @@ contract TestTokenForgeFactory is Test {
             );
             assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "TransferFrom Permit amount mismatch");
         }
+
+        assertEq(expectedFee * 6, IERC20(token).balanceOf(feeRecipient), "Fee recipient balance mismatch");
+    }
+
+    function test_erc20_fee_v2() external {
+        IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
+        {
+            // set v2 funcs
+            bytes4[] memory functionSelectors = new bytes4[](6);
+            functionSelectors[0] = forgeV2.mintERC20.selector;
+            functionSelectors[1] = forgeV2.transferERC20.selector;
+            functionSelectors[2] = forgeV2.transferFromERC20.selector;
+            functionSelectors[3] = forgeV2.transferFromERC20Permit.selector;
+            functionSelectors[4] = forgeV2.burnERC20.selector;
+            functionSelectors[5] = forgeV2.burnERC20Permit.selector;
+
+            addCuts[0] = IDiamondCut.FacetCut({
+                facetAddress: address(forgeV2),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: functionSelectors
+            });
+        }
+
+        // deploy forge
+        vm.prank(OWNER);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        vm.label(FORGE, "Forge");
+        bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
+
+        // deploy mock erc20
+        address token = _deployERC20();
+        vm.label(token, "MockERC20");
+
+        // set test variables
+        uint256 amount = 100 ether;
+        uint256 deadline = block.timestamp + 30; // 30 seconds deadline
+        uint256 expectedFee = (amount * feeBPS) / 10_000;
+        uint256 expectValue = amount - expectedFee;
+        // mint
+        {
+            uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+            uint256 uuid = _calcUUID(nonce);
+
+            // expect emit
+            vm.expectEmit();
+            emit IERC20.Transfer(address(0), ACCOUNT.addr, expectValue);
+            vm.expectEmit();
+            emit IERC20.Transfer(address(0), feeRecipient, expectedFee);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            bytes memory recipientSig;
+            {
+                bytes32 recipientStructHash =
+                    keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V2, token, amount, feeRecipient, feeBPS, nonce, deadline));
+                bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
+                recipientSig = abi.encodePacked(r, s, v);
+            }
+            bytes memory validatorSig;
+            {
+                bytes32 validatorStructHash =
+                    keccak256(abi.encode(ERC20_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, keccak256(recipientSig)));
+                bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
+                validatorSig = abi.encodePacked(r, s, v);
+            }
+            // send transaction
+            vm.prank(ACCOUNT.addr);
+            ForgeV2(FORGE).mintERC20(
+                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, recipientSig, validatorSig
+            );
+            assertEq(expectValue, MockERC20(token).balanceOf(ACCOUNT.addr), "Minted amount mismatch");
+        }
+        vm.prank(OWNER);
+        MockERC20(token).forceMint(ACCOUNT.addr, expectedFee); // charge token to
+        // burnFrom
+        {
+            vm.prank(ACCOUNT.addr);
+            IERC20(token).approve(FORGE, amount);
+
+            uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+            uint256 uuid = _calcUUID(nonce);
+
+            // expect emit
+            vm.expectEmit();
+            emit IERC20.Transfer(ACCOUNT.addr, address(0), expectValue);
+            vm.expectEmit();
+            emit IERC20.Transfer(ACCOUNT.addr, feeRecipient, expectedFee);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            bytes memory recipientSig;
+            {
+                bytes32 recipientStructHash =
+                    keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, feeRecipient, feeBPS, nonce, deadline));
+                bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
+                recipientSig = abi.encodePacked(r, s, v);
+            }
+            bytes memory validatorSig;
+            {
+                bytes32 validatorStructHash =
+                    keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, keccak256(recipientSig)));
+                bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
+                validatorSig = abi.encodePacked(r, s, v);
+            }
+
+            // send transaction
+            ForgeV2(FORGE).burnERC20(
+                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, recipientSig, validatorSig
+            );
+            assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Burned amount mismatch");
+        }
+        vm.prank(OWNER);
+        MockERC20(token).forceMint(ACCOUNT.addr, amount);
+        // burnFromPermit
+        {
+            uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+            uint256 uuid = _calcUUID(nonce);
+            // expect emit
+            vm.expectEmit();
+            emit IERC20.Approval(ACCOUNT.addr, address(FORGE), amount);
+            vm.expectEmit();
+            emit IERC20.Transfer(ACCOUNT.addr, address(0), expectValue);
+            vm.expectEmit();
+            emit IERC20.Transfer(ACCOUNT.addr, feeRecipient, expectedFee);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            bytes memory recipientSig;
+            {
+                bytes32 recipientStructHash =
+                    keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, feeRecipient, feeBPS, nonce, deadline));
+                bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
+                recipientSig = abi.encodePacked(r, s, v);
+            }
+            bytes memory validatorSig;
+            {
+                bytes32 validatorStructHash =
+                    keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, keccak256(recipientSig)));
+                bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
+                validatorSig = abi.encodePacked(r, s, v);
+            }
+            // make permit signature
+            bytes memory permitSig;
+            {
+                uint256 permitNonce = IERC20Permit(token).nonces(ACCOUNT.addr);
+                bytes32 structHash =
+                    keccak256(abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline));
+
+                bytes32 domainSeparator = IERC20Permit(token).DOMAIN_SEPARATOR();
+                bytes32 hash = MessageHashUtils.toTypedDataHash(domainSeparator, structHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, hash);
+                permitSig = abi.encodePacked(r, s, v);
+            }
+            // send transaction
+            ForgeV2(FORGE).burnERC20Permit(
+                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, recipientSig, validatorSig, permitSig
+            );
+            assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Burned amount mismatch");
+        }
+
+        vm.prank(OWNER);
+        MockERC20(token).forceMint(FORGE, amount);
+        // transfer
+        {
+            uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+            uint256 uuid = _calcUUID(nonce);
+
+            // expect emit
+            vm.expectEmit();
+            emit IERC20.Transfer(FORGE, ACCOUNT.addr, expectValue);
+            vm.expectEmit();
+            emit IERC20.Transfer(FORGE, feeRecipient, expectedFee);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+
+            bytes memory recipientSig;
+            {
+                bytes32 recipientStructHash = keccak256(
+                    abi.encode(ERC20_TRANSFER_TYPE_HASH_V2, token, amount, feeRecipient, feeBPS, nonce, deadline)
+                );
+                bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
+                recipientSig = abi.encodePacked(r, s, v);
+            }
+            bytes memory validatorSig;
+            {
+                bytes32 validatorStructHash =
+                    keccak256(abi.encode(ERC20_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, keccak256(recipientSig)));
+                bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
+                validatorSig = abi.encodePacked(r, s, v);
+            }
+            // send transaction
+            ForgeV2(FORGE).transferERC20(
+                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, recipientSig, validatorSig
+            );
+            assertEq(expectValue, MockERC20(token).balanceOf(ACCOUNT.addr), "Transfer amount mismatch");
+        }
+        vm.prank(OWNER);
+        MockERC20(token).forceMint(ACCOUNT.addr, expectedFee);
+        // transferFrom
+        {
+            vm.prank(ACCOUNT.addr);
+            IERC20(token).approve(FORGE, amount);
+
+            uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+            uint256 uuid = _calcUUID(nonce);
+
+            // expect emit
+            vm.expectEmit();
+            emit IERC20.Transfer(ACCOUNT.addr, address(FORGE), amount);
+            vm.expectEmit();
+            emit IERC20.Transfer(address(FORGE), feeRecipient, expectedFee);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20TransferredFrom(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+
+            bytes memory fromSig;
+            {
+                bytes32 fromStructHash = keccak256(
+                    abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH_V2, token, amount, feeRecipient, feeBPS, nonce, deadline)
+                );
+                bytes32 fromHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, fromStructHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, fromHash);
+                fromSig = abi.encodePacked(r, s, v);
+            }
+            bytes memory validatorSig;
+            {
+                bytes32 validatorStructHash =
+                    keccak256(abi.encode(ERC20_VALIDATOR_TRANSFER_FROM_TYPE_HASH_V2, ACCOUNT.addr, keccak256(fromSig)));
+                bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
+                validatorSig = abi.encodePacked(r, s, v);
+            }
+
+            // send transaction
+            ForgeV2(FORGE).transferFromERC20(
+                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, fromSig, validatorSig
+            );
+            assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "TransferFrom amount mismatch");
+        }
+        vm.prank(OWNER);
+        MockERC20(token).forceMint(ACCOUNT.addr, amount);
+        // transferFromPermit
+        {
+            uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+            uint256 uuid = _calcUUID(nonce);
+
+            // expect emit
+            vm.expectEmit(true, true, true, true, token);
+            emit IERC20.Approval(ACCOUNT.addr, address(FORGE), amount);
+            vm.expectEmit();
+            emit IERC20.Transfer(ACCOUNT.addr, address(FORGE), amount);
+            vm.expectEmit();
+            emit IERC20.Transfer(address(FORGE), feeRecipient, expectedFee);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20TransferredFrom(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+
+            bytes memory fromSig;
+            {
+                bytes32 fromStructHash = keccak256(
+                    abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH_V2, token, amount, feeRecipient, feeBPS, nonce, deadline)
+                );
+                bytes32 fromHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, fromStructHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, fromHash);
+                fromSig = abi.encodePacked(r, s, v);
+            }
+            bytes memory validatorSig;
+            {
+                bytes32 validatorStructHash =
+                    keccak256(abi.encode(ERC20_VALIDATOR_TRANSFER_FROM_TYPE_HASH_V2, ACCOUNT.addr, keccak256(fromSig)));
+                bytes32 validatorHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, validatorStructHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, validatorHash);
+                validatorSig = abi.encodePacked(r, s, v);
+            }
+
+            // make permit signature
+            bytes memory permitSig;
+            {
+                uint256 permitNonce = IERC20Permit(token).nonces(ACCOUNT.addr);
+                bytes32 structHash =
+                    keccak256(abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline));
+
+                bytes32 domainSeparator = IERC20Permit(token).DOMAIN_SEPARATOR();
+                bytes32 hash = MessageHashUtils.toTypedDataHash(domainSeparator, structHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, hash);
+                permitSig = abi.encodePacked(r, s, v);
+            }
+            vm.prank(ACCOUNT.addr);
+            ForgeV2(FORGE).transferFromERC20Permit(
+                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, fromSig, validatorSig, permitSig
+            );
+            assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "TransferFrom Permit amount mismatch");
+        }
+
+        assertEq(expectedFee * 6, IERC20(token).balanceOf(feeRecipient), "Fee recipient balance mismatch");
+    }
+
+    function test_erc20_fee_v3() external {
+        IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
+        {
+            // set v3 funcs
+            bytes4[] memory functionSelectors = new bytes4[](4);
+            functionSelectors[0] = forgeV3.mintERC20.selector;
+            functionSelectors[1] = forgeV3.transferERC20.selector;
+            functionSelectors[2] = forgeV3.transferFromERC20Permit.selector;
+            functionSelectors[3] = forgeV3.burnERC20Permit.selector;
+
+            addCuts[0] = IDiamondCut.FacetCut({
+                facetAddress: address(forgeV3),
+                action: IDiamondCut.FacetCutAction.Add,
+                functionSelectors: functionSelectors
+            });
+        }
+
+        // deploy forge
+        vm.prank(OWNER);
+        FORGE = forgeFactory.addService(SERVICE_OWNER, VALIDATOR.addr, SERVICE_NAME, addCuts);
+        vm.label(FORGE, "Forge");
+        bytes32 DOMAIN_SEPARATOR = BaseForge(FORGE).DOMAIN_SEPARATOR();
+
+        // deploy mock erc20
+        address token = _deployERC20();
+        vm.label(token, "MockERC20");
+
+        // set test variables
+        uint256 amount = 100 ether;
+        uint256 deadline = block.timestamp + 30; // 30 seconds deadline
+        uint256 expectedFee = (amount * feeBPS) / 10_000;
+        uint256 expectValue = amount - expectedFee;
+        // mint
+        {
+            uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+            uint256 uuid = _calcUUID(nonce);
+
+            // expect emit
+            vm.expectEmit();
+            emit IERC20.Transfer(address(0), ACCOUNT.addr, expectValue);
+            vm.expectEmit();
+            emit IERC20.Transfer(address(0), feeRecipient, expectedFee);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+
+            bytes memory validatorSig;
+            {
+                bytes32 structHash = keccak256(
+                    abi.encode(
+                        ERC20_MINT_TYPE_HASH_V3, ACCOUNT.addr, token, amount, feeRecipient, feeBPS, nonce, deadline
+                    )
+                );
+                bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+                validatorSig = abi.encodePacked(r, s, v);
+            }
+
+            // send transaction
+            ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, validatorSig);
+            assertEq(expectValue, MockERC20(token).balanceOf(ACCOUNT.addr), "Minted amount mismatch");
+        }
+        vm.prank(OWNER);
+        MockERC20(token).forceMint(ACCOUNT.addr, expectedFee); // charge token to
+        // burnFromPermit
+        {
+            vm.prank(ACCOUNT.addr);
+            IERC20(token).approve(FORGE, amount);
+
+            uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+            uint256 uuid = _calcUUID(nonce);
+
+            // expect emit
+            vm.expectEmit();
+            emit IERC20.Transfer(ACCOUNT.addr, address(0), expectValue);
+            vm.expectEmit();
+            emit IERC20.Transfer(ACCOUNT.addr, feeRecipient, expectedFee);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+
+            bytes memory validatorSig;
+            {
+                bytes32 structHash = keccak256(
+                    abi.encode(
+                        ERC20_BURN_TYPE_HASH_V3, ACCOUNT.addr, token, amount, feeRecipient, feeBPS, nonce, deadline
+                    )
+                );
+                bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+                validatorSig = abi.encodePacked(r, s, v);
+            }
+
+            // make permit signature
+            bytes memory permitSig;
+            {
+                uint256 permitNonce = IERC20Permit(token).nonces(ACCOUNT.addr);
+                bytes32 structHash =
+                    keccak256(abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline));
+
+                bytes32 domainSeparator = IERC20Permit(token).DOMAIN_SEPARATOR();
+                bytes32 hash = MessageHashUtils.toTypedDataHash(domainSeparator, structHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, hash);
+                permitSig = abi.encodePacked(r, s, v);
+            }
+
+            // send transaction
+            ForgeV3(FORGE).burnERC20Permit(
+                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, validatorSig, permitSig
+            );
+            assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Burned amount mismatch");
+        }
+        vm.prank(OWNER);
+        MockERC20(token).forceMint(FORGE, amount);
+        // transfer
+        {
+            uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+            uint256 uuid = _calcUUID(nonce);
+
+            // expect emit
+            vm.expectEmit();
+            emit IERC20.Transfer(FORGE, ACCOUNT.addr, expectValue);
+            vm.expectEmit();
+            emit IERC20.Transfer(FORGE, feeRecipient, expectedFee);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+
+            bytes memory validatorSig;
+            {
+                bytes32 structHash = keccak256(
+                    abi.encode(
+                        ERC20_TRANSFER_TYPE_HASH_V3, ACCOUNT.addr, token, amount, feeRecipient, feeBPS, nonce, deadline
+                    )
+                );
+                bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+                validatorSig = abi.encodePacked(r, s, v);
+            }
+
+            // send transaction
+            ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, validatorSig);
+            assertEq(expectValue, MockERC20(token).balanceOf(ACCOUNT.addr), "Transfer amount mismatch");
+        }
+        vm.prank(OWNER);
+        MockERC20(token).forceMint(ACCOUNT.addr, expectedFee);
+        // transferFromPermit
+        {
+            uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+            uint256 uuid = _calcUUID(nonce);
+
+            // expect emit
+            vm.expectEmit();
+            emit IERC20.Approval(ACCOUNT.addr, address(FORGE), amount);
+            vm.expectEmit();
+            emit IERC20.Transfer(ACCOUNT.addr, address(FORGE), amount);
+            vm.expectEmit();
+            emit IERC20.Transfer(address(FORGE), feeRecipient, expectedFee);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20TransferredFrom(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
+            vm.expectEmit();
+            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+
+            bytes memory validatorSig;
+            {
+                bytes32 structHash = keccak256(
+                    abi.encode(
+                        ERC20_TRANSFER_FROM_TYPE_HASH_V3,
+                        ACCOUNT.addr,
+                        token,
+                        amount,
+                        feeRecipient,
+                        feeBPS,
+                        nonce,
+                        deadline
+                    )
+                );
+                bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+                validatorSig = abi.encodePacked(r, s, v);
+            }
+
+            // make permit signature
+            bytes memory permitSig;
+            {
+                uint256 permitNonce = IERC20Permit(token).nonces(ACCOUNT.addr);
+                bytes32 structHash =
+                    keccak256(abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline));
+
+                bytes32 domainSeparator = IERC20Permit(token).DOMAIN_SEPARATOR();
+                bytes32 hash = MessageHashUtils.toTypedDataHash(domainSeparator, structHash);
+                (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, hash);
+                permitSig = abi.encodePacked(r, s, v);
+            }
+
+            // send transaction
+            ForgeV3(FORGE).transferFromERC20Permit(
+                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, validatorSig, permitSig
+            );
+            assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "TransferFrom Permit amount mismatch");
+        }
+
+        assertEq(expectedFee * 4, IERC20(token).balanceOf(feeRecipient), "Fee recipient balance mismatch");
     }
 
     function _calcUUID(uint256 nonce) internal view returns (uint256) {
