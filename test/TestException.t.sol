@@ -204,14 +204,15 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash =
-                    keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
-                ForgeV1(FORGE).mintERC20(token, amount, deadline, signature);
+                ForgeV1(FORGE).mintERC20(token, amount, address(0), 0, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
-                ForgeV1(FORGE).mintERC20(token, amount, deadline, signature);
+                ForgeV1(FORGE).mintERC20(token, amount, address(0), 0, deadline, signature);
             }
             // erc721
             {
@@ -282,14 +283,15 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash =
-                    keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
-                ForgeV1(FORGE).transferERC20(token, amount, deadline, signature);
+                ForgeV1(FORGE).transferERC20(token, amount, address(0), 0, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
-                ForgeV1(FORGE).transferERC20(token, amount, deadline, signature);
+                ForgeV1(FORGE).transferERC20(token, amount, address(0), 0, deadline, signature);
             }
             // erc721
             {
@@ -359,14 +361,15 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash =
-                    keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
-                ForgeV1(FORGE).burnERC20(token, amount, deadline, signature);
+                ForgeV1(FORGE).burnERC20(token, amount, address(0), 0, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
-                ForgeV1(FORGE).burnERC20(token, amount, deadline, signature);
+                ForgeV1(FORGE).burnERC20(token, amount, address(0), 0, deadline, signature);
             }
             // erc721
             {
@@ -449,15 +452,20 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash = keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V2, token, amount, nonce, deadline));
+                structHash =
+                    keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
                 accountSignature = _sign_with_domain_separator(structHash, ACCOUNT);
                 structHash =
                     keccak256(abi.encode(ERC20_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature)));
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("ERC20ForgeV2__InvalidAccountSignature(address)", otherAccount));
-                ForgeV2(FORGE).mintERC20(otherAccount, token, amount, deadline, accountSignature, validatorSignature);
+                ForgeV2(FORGE).mintERC20(
+                    otherAccount, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
+                );
                 // check success
-                ForgeV2(FORGE).mintERC20(ACCOUNT.addr, token, amount, deadline, accountSignature, validatorSignature);
+                ForgeV2(FORGE).mintERC20(
+                    ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
+                );
             }
             // erc721
             {
@@ -544,7 +552,8 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash = keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V2, token, amount, nonce, deadline));
+                structHash =
+                    keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
                 accountSignature = _sign_with_domain_separator(structHash, ACCOUNT);
                 structHash = keccak256(
                     abi.encode(ERC20_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature))
@@ -552,11 +561,11 @@ contract TestException is Test {
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("ERC20ForgeV2__InvalidAccountSignature(address)", otherAccount));
                 ForgeV2(FORGE).transferERC20(
-                    otherAccount, token, amount, deadline, accountSignature, validatorSignature
+                    otherAccount, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
                 );
                 // check success
                 ForgeV2(FORGE).transferERC20(
-                    ACCOUNT.addr, token, amount, deadline, accountSignature, validatorSignature
+                    ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
                 );
             }
             // erc721
@@ -650,15 +659,20 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash = keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, nonce, deadline));
+                structHash =
+                    keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
                 accountSignature = _sign_with_domain_separator(structHash, ACCOUNT);
                 structHash =
                     keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature)));
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("ERC20ForgeV2__InvalidAccountSignature(address)", otherAccount));
-                ForgeV2(FORGE).burnERC20(otherAccount, token, amount, deadline, accountSignature, validatorSignature);
+                ForgeV2(FORGE).burnERC20(
+                    otherAccount, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
+                );
                 // check success
-                ForgeV2(FORGE).burnERC20(ACCOUNT.addr, token, amount, deadline, accountSignature, validatorSignature);
+                ForgeV2(FORGE).burnERC20(
+                    ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
+                );
             }
             // erc721
             {
@@ -756,12 +770,13 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash =
-                    keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ExpiredSignature(uint256)", deadline));
                 vm.prank(ACCOUNT.addr);
-                ForgeV1(FORGE).mintERC20(token, amount, deadline, validatorSignature);
+                ForgeV1(FORGE).mintERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {
@@ -820,12 +835,13 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash =
-                    keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ExpiredSignature(uint256)", deadline));
                 vm.prank(ACCOUNT.addr);
-                ForgeV1(FORGE).transferERC20(token, amount, deadline, validatorSignature);
+                ForgeV1(FORGE).transferERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {
@@ -884,12 +900,13 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash =
-                    keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ExpiredSignature(uint256)", deadline));
                 vm.prank(ACCOUNT.addr);
-                ForgeV1(FORGE).burnERC20(token, amount, deadline, validatorSignature);
+                ForgeV1(FORGE).burnERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {
@@ -949,13 +966,16 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash = keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V2, token, amount, nonce, deadline));
+                structHash =
+                    keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
                 accountSignature = _sign_with_domain_separator(structHash, ACCOUNT);
                 structHash =
                     keccak256(abi.encode(ERC20_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature)));
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ExpiredSignature(uint256)", deadline));
-                ForgeV2(FORGE).mintERC20(ACCOUNT.addr, token, amount, deadline, accountSignature, validatorSignature);
+                ForgeV2(FORGE).mintERC20(
+                    ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
+                );
             }
             // erc721
             {
@@ -1022,7 +1042,8 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash = keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V2, token, amount, nonce, deadline));
+                structHash =
+                    keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
                 accountSignature = _sign_with_domain_separator(structHash, ACCOUNT);
                 structHash = keccak256(
                     abi.encode(ERC20_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature))
@@ -1030,7 +1051,7 @@ contract TestException is Test {
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ExpiredSignature(uint256)", deadline));
                 ForgeV2(FORGE).transferERC20(
-                    ACCOUNT.addr, token, amount, deadline, accountSignature, validatorSignature
+                    ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
                 );
             }
             // erc721
@@ -1103,13 +1124,16 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash = keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, nonce, deadline));
+                structHash =
+                    keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
                 accountSignature = _sign_with_domain_separator(structHash, ACCOUNT);
                 structHash =
                     keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature)));
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ExpiredSignature(uint256)", deadline));
-                ForgeV2(FORGE).burnERC20(ACCOUNT.addr, token, amount, deadline, accountSignature, validatorSignature);
+                ForgeV2(FORGE).burnERC20(
+                    ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
+                );
             }
             // erc721
             {
@@ -1177,11 +1201,12 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash =
-                    keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V3, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_MINT_TYPE_HASH_V3, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ExpiredSignature(uint256)", deadline));
-                ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, deadline, validatorSignature);
+                ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {
@@ -1239,11 +1264,12 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash =
-                    keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V3, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_TRANSFER_TYPE_HASH_V3, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ExpiredSignature(uint256)", deadline));
-                ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, deadline, validatorSignature);
+                ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {
@@ -1319,12 +1345,13 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash =
-                    keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
-                ForgeV1(FORGE).mintERC20(token, amount, deadline, validatorSignature);
+                ForgeV1(FORGE).mintERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {
@@ -1383,12 +1410,13 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash =
-                    keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
-                ForgeV1(FORGE).transferERC20(token, amount, deadline, validatorSignature);
+                ForgeV1(FORGE).transferERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {
@@ -1447,12 +1475,13 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash =
-                    keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
-                ForgeV1(FORGE).burnERC20(token, amount, deadline, validatorSignature);
+                ForgeV1(FORGE).burnERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {
@@ -1512,13 +1541,16 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash = keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V2, token, amount, nonce, deadline));
+                structHash =
+                    keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
                 accountSignature = _sign_with_domain_separator(structHash, ACCOUNT);
                 structHash =
                     keccak256(abi.encode(ERC20_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature)));
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
-                ForgeV2(FORGE).mintERC20(ACCOUNT.addr, token, amount, deadline, accountSignature, validatorSignature);
+                ForgeV2(FORGE).mintERC20(
+                    ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
+                );
             }
             // erc721
             {
@@ -1583,7 +1615,8 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash = keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V2, token, amount, nonce, deadline));
+                structHash =
+                    keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
                 accountSignature = _sign_with_domain_separator(structHash, ACCOUNT);
                 structHash = keccak256(
                     abi.encode(ERC20_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature))
@@ -1591,7 +1624,7 @@ contract TestException is Test {
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
                 ForgeV2(FORGE).transferERC20(
-                    ACCOUNT.addr, token, amount, deadline, accountSignature, validatorSignature
+                    ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
                 );
             }
             // erc721
@@ -1662,13 +1695,16 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash = keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, nonce, deadline));
+                structHash =
+                    keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
                 accountSignature = _sign_with_domain_separator(structHash, ACCOUNT);
                 structHash =
                     keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature)));
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
-                ForgeV2(FORGE).burnERC20(ACCOUNT.addr, token, amount, deadline, accountSignature, validatorSignature);
+                ForgeV2(FORGE).burnERC20(
+                    ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
+                );
             }
             // erc721
             {
@@ -1734,11 +1770,12 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash =
-                    keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V3, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_MINT_TYPE_HASH_V3, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
-                ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, deadline, validatorSignature);
+                ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {
@@ -1796,11 +1833,12 @@ contract TestException is Test {
                 token = address(mockERC20);
                 nonce = BaseForge(FORGE).nonces(ACCOUNT.addr);
                 uuid = _calcUUID(nonce);
-                structHash =
-                    keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V3, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_TRANSFER_TYPE_HASH_V3, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
-                ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, deadline, validatorSignature);
+                ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {
@@ -1869,10 +1907,12 @@ contract TestException is Test {
         // spend nonce
         {
             token = address(mockERC20);
-            structHash = keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+            structHash = keccak256(
+                abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+            );
             validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
             vm.prank(ACCOUNT.addr);
-            ForgeV1(FORGE).mintERC20(token, amount, deadline, validatorSignature);
+            ForgeV1(FORGE).mintERC20(token, amount, address(0), 0, deadline, validatorSignature);
         }
 
         // v1 mint
@@ -1880,12 +1920,13 @@ contract TestException is Test {
             // erc20
             {
                 token = address(mockERC20);
-                structHash =
-                    keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
-                ForgeV1(FORGE).mintERC20(token, amount, deadline, validatorSignature);
+                ForgeV1(FORGE).mintERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {
@@ -1936,12 +1977,13 @@ contract TestException is Test {
             // erc20
             {
                 token = address(mockERC20);
-                structHash =
-                    keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
-                ForgeV1(FORGE).transferERC20(token, amount, deadline, validatorSignature);
+                ForgeV1(FORGE).transferERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {
@@ -1992,12 +2034,13 @@ contract TestException is Test {
             // erc20
             {
                 token = address(mockERC20);
-                structHash =
-                    keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
-                ForgeV1(FORGE).burnERC20(token, amount, deadline, validatorSignature);
+                ForgeV1(FORGE).burnERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {
@@ -2049,13 +2092,16 @@ contract TestException is Test {
             // erc20
             {
                 token = address(mockERC20);
-                structHash = keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V2, token, amount, nonce, deadline));
+                structHash =
+                    keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
                 accountSignature = _sign_with_domain_separator(structHash, ACCOUNT);
                 structHash =
                     keccak256(abi.encode(ERC20_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature)));
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("ERC20ForgeV2__InvalidAccountSignature(address)", ACCOUNT.addr));
-                ForgeV2(FORGE).mintERC20(ACCOUNT.addr, token, amount, deadline, accountSignature, validatorSignature);
+                ForgeV2(FORGE).mintERC20(
+                    ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
+                );
             }
             // erc721
             {
@@ -2111,7 +2157,8 @@ contract TestException is Test {
             // erc20
             {
                 token = address(mockERC20);
-                structHash = keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V2, token, amount, nonce, deadline));
+                structHash =
+                    keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
                 accountSignature = _sign_with_domain_separator(structHash, ACCOUNT);
                 structHash = keccak256(
                     abi.encode(ERC20_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature))
@@ -2119,7 +2166,7 @@ contract TestException is Test {
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("ERC20ForgeV2__InvalidAccountSignature(address)", ACCOUNT.addr));
                 ForgeV2(FORGE).transferERC20(
-                    ACCOUNT.addr, token, amount, deadline, accountSignature, validatorSignature
+                    ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
                 );
             }
             // erc721
@@ -2188,13 +2235,16 @@ contract TestException is Test {
             // erc20
             {
                 token = address(mockERC20);
-                structHash = keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, nonce, deadline));
+                structHash =
+                    keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
                 accountSignature = _sign_with_domain_separator(structHash, ACCOUNT);
                 structHash =
                     keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature)));
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("ERC20ForgeV2__InvalidAccountSignature(address)", ACCOUNT.addr));
-                ForgeV2(FORGE).burnERC20(ACCOUNT.addr, token, amount, deadline, accountSignature, validatorSignature);
+                ForgeV2(FORGE).burnERC20(
+                    ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
+                );
             }
             // erc721
             {
@@ -2258,11 +2308,12 @@ contract TestException is Test {
             // erc20
             {
                 token = address(mockERC20);
-                structHash =
-                    keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V3, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_MINT_TYPE_HASH_V3, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
-                ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, deadline, validatorSignature);
+                ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {
@@ -2312,11 +2363,12 @@ contract TestException is Test {
             // erc20
             {
                 token = address(mockERC20);
-                structHash =
-                    keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V3, ACCOUNT.addr, token, amount, nonce, deadline));
+                structHash = keccak256(
+                    abi.encode(ERC20_TRANSFER_TYPE_HASH_V3, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+                );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
                 vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
-                ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, deadline, validatorSignature);
+                ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
             {

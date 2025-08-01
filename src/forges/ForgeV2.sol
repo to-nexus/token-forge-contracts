@@ -57,8 +57,8 @@ abstract contract ERC20ForgeV2 is BaseForge {
         address feeRecipient,
         uint256 feeBPS,
         uint256 deadline,
-        bytes calldata recipientSig,
-        bytes calldata validatorSig
+        bytes memory recipientSig,
+        bytes memory validatorSig
     ) external checkDeadline(deadline) {
         uint256 nonce = _useNonce(recipient);
         {
@@ -94,8 +94,8 @@ abstract contract ERC20ForgeV2 is BaseForge {
         address feeRecipient,
         uint256 feeBPS,
         uint256 deadline,
-        bytes calldata recipientSig,
-        bytes calldata validatorSig
+        bytes memory recipientSig,
+        bytes memory validatorSig
     ) external checkDeadline(deadline) {
         uint256 nonce = _useNonce(recipient);
         {
@@ -132,8 +132,8 @@ abstract contract ERC20ForgeV2 is BaseForge {
         address feeRecipient,
         uint256 feeBPS,
         uint256 deadline,
-        bytes calldata fromSig,
-        bytes calldata validatorSig
+        bytes memory fromSig,
+        bytes memory validatorSig
     ) external checkDeadline(deadline) {
         _transferFromERC20(from, token, amount, feeRecipient, feeBPS, deadline, fromSig, validatorSig);
     }
@@ -145,8 +145,8 @@ abstract contract ERC20ForgeV2 is BaseForge {
         address feeRecipient,
         uint256 feeBPS,
         uint256 deadline,
-        bytes calldata fromSig,
-        bytes calldata validatorSig,
+        bytes memory fromSig,
+        bytes memory validatorSig,
         bytes memory permitSig
     ) external checkDeadline(deadline) erc20Permit(from, token, amount, deadline, permitSig) {
         _transferFromERC20(from, token, amount, feeRecipient, feeBPS, deadline, fromSig, validatorSig);
@@ -159,8 +159,8 @@ abstract contract ERC20ForgeV2 is BaseForge {
         address feeRecipient,
         uint256 feeBPS,
         uint256 deadline,
-        bytes calldata fromSig,
-        bytes calldata validatorSig
+        bytes memory fromSig,
+        bytes memory validatorSig
     ) private {
         uint256 nonce = _useNonce(from);
         {
@@ -195,8 +195,8 @@ abstract contract ERC20ForgeV2 is BaseForge {
         address feeRecipient,
         uint256 feeBPS,
         uint256 deadline,
-        bytes calldata fromSig,
-        bytes calldata validatorSig
+        bytes memory fromSig,
+        bytes memory validatorSig
     ) external checkDeadline(deadline) {
         _burnERC20(from, token, amount, feeRecipient, feeBPS, deadline, fromSig, validatorSig);
     }
@@ -208,8 +208,8 @@ abstract contract ERC20ForgeV2 is BaseForge {
         address feeRecipient,
         uint256 feeBPS,
         uint256 deadline,
-        bytes calldata fromSig,
-        bytes calldata validatorSig,
+        bytes memory fromSig,
+        bytes memory validatorSig,
         bytes memory permitSig
     ) external checkDeadline(deadline) erc20Permit(from, token, amount, deadline, permitSig) {
         _burnERC20(from, token, amount, feeRecipient, feeBPS, deadline, fromSig, validatorSig);
@@ -222,8 +222,8 @@ abstract contract ERC20ForgeV2 is BaseForge {
         address feeRecipient,
         uint256 feeBPS,
         uint256 deadline,
-        bytes calldata fromSig,
-        bytes calldata validatorSig
+        bytes memory fromSig,
+        bytes memory validatorSig
     ) private {
         uint256 nonce = _useNonce(from);
         {

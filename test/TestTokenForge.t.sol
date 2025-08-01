@@ -158,7 +158,7 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
 
         bytes32 structHash =
-            keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+            keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -170,7 +170,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV1(FORGE).mintERC20(token, amount, deadline, abi.encodePacked(r, s, v));
+        ForgeV1(FORGE).mintERC20(token, amount, address(0), 0, deadline, abi.encodePacked(r, s, v));
         assertEq(amount, MockERC20(token).balanceOf(ACCOUNT.addr), "Minted amount mismatch");
     }
 
@@ -353,8 +353,9 @@ contract TestTokenForgeFactory is Test {
         vm.prank(OWNER);
         MockERC20(token).forceMint(FORGE, amount);
 
-        bytes32 structHash =
-            keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+        bytes32 structHash = keccak256(
+            abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+        );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -366,7 +367,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV1(FORGE).transferERC20(token, amount, deadline, abi.encodePacked(r, s, v));
+        ForgeV1(FORGE).transferERC20(token, amount, address(0), 0, deadline, abi.encodePacked(r, s, v));
         assertEq(amount, MockERC20(token).balanceOf(ACCOUNT.addr), "Transfered amount mismatch");
     }
 
@@ -573,7 +574,7 @@ contract TestTokenForgeFactory is Test {
         MockERC20(token).approve(FORGE, amount);
 
         bytes32 structHash =
-            keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+            keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -585,7 +586,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV1(FORGE).burnERC20(token, amount, deadline, abi.encodePacked(r, s, v));
+        ForgeV1(FORGE).burnERC20(token, amount, address(0), 0, deadline, abi.encodePacked(r, s, v));
         assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Burned amount mismatch");
     }
 
@@ -789,7 +790,8 @@ contract TestTokenForgeFactory is Test {
         bytes memory recipientSig;
 
         {
-            bytes32 recipientStructHash = keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V2, token, amount, nonce, deadline));
+            bytes32 recipientStructHash =
+                keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
             bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
             recipientSig = abi.encodePacked(r, s, v);
@@ -811,7 +813,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).mintERC20(ACCOUNT.addr, token, amount, deadline, recipientSig, validatorSig);
+        ForgeV2(FORGE).mintERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, recipientSig, validatorSig);
         assertEq(amount, MockERC20(token).balanceOf(ACCOUNT.addr), "Minted amount mismatch");
     }
 
@@ -1038,7 +1040,7 @@ contract TestTokenForgeFactory is Test {
 
         {
             bytes32 recipientStructHash =
-                keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V2, token, amount, nonce, deadline));
+                keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
             bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
             recipientSig = abi.encodePacked(r, s, v);
@@ -1060,7 +1062,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).transferERC20(ACCOUNT.addr, token, amount, deadline, recipientSig, validatorSig);
+        ForgeV2(FORGE).transferERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, recipientSig, validatorSig);
         assertEq(amount, MockERC20(token).balanceOf(ACCOUNT.addr), "Transfered amount mismatch");
     }
 
@@ -1308,7 +1310,8 @@ contract TestTokenForgeFactory is Test {
 
         bytes memory fromSig;
         {
-            bytes32 fromStructHash = keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, nonce, deadline));
+            bytes32 fromStructHash =
+                keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
             bytes32 fromHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, fromStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, fromHash);
             fromSig = abi.encodePacked(r, s, v);
@@ -1330,7 +1333,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).burnERC20(ACCOUNT.addr, token, amount, deadline, fromSig, validatorSig);
+        ForgeV2(FORGE).burnERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, fromSig, validatorSig);
         assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Burned amount mismatch");
     }
 
@@ -1566,7 +1569,7 @@ contract TestTokenForgeFactory is Test {
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
         uint256 uuid = _calcUUID(nonce);
         bytes32 structHash =
-            keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+            keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline));
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -1577,7 +1580,7 @@ contract TestTokenForgeFactory is Test {
         emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
-        ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, deadline, abi.encodePacked(r, s, v));
+        ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, abi.encodePacked(r, s, v));
         assertEq(amount, MockERC20(token).balanceOf(ACCOUNT.addr), "Minted amount mismatch");
     }
 
@@ -1760,8 +1763,9 @@ contract TestTokenForgeFactory is Test {
         vm.prank(OWNER);
         MockERC20(token).forceMint(FORGE, amount);
 
-        bytes32 structHash =
-            keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+        bytes32 structHash = keccak256(
+            abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+        );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -1772,7 +1776,7 @@ contract TestTokenForgeFactory is Test {
         emit ForgeFactory.ERC20Transferred(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
-        ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, deadline, abi.encodePacked(r, s, v));
+        ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, abi.encodePacked(r, s, v));
         assertEq(amount, MockERC20(token).balanceOf(ACCOUNT.addr), "Transfered amount mismatch");
     }
 
@@ -1978,8 +1982,9 @@ contract TestTokenForgeFactory is Test {
 
         bytes memory validatorSig;
         {
-            bytes32 structHash =
-                keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+            bytes32 structHash = keccak256(
+                abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+            );
             bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -2008,7 +2013,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV1(FORGE).burnERC20Permit(token, amount, deadline, validatorSig, permitSig);
+        ForgeV1(FORGE).burnERC20Permit(token, amount, address(0), 0, deadline, validatorSig, permitSig);
         assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Burned amount mismatch");
     }
 
@@ -2047,7 +2052,8 @@ contract TestTokenForgeFactory is Test {
 
         bytes memory fromSig;
         {
-            bytes32 fromStructHash = keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, nonce, deadline));
+            bytes32 fromStructHash =
+                keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
             bytes32 fromHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, fromStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, fromHash);
             fromSig = abi.encodePacked(r, s, v);
@@ -2084,7 +2090,9 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).burnERC20Permit(ACCOUNT.addr, token, amount, deadline, fromSig, validatorSig, permitSig);
+        ForgeV2(FORGE).burnERC20Permit(
+            ACCOUNT.addr, token, amount, address(0), 0, deadline, fromSig, validatorSig, permitSig
+        );
         assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Burned amount mismatch");
     }
 
@@ -2124,8 +2132,9 @@ contract TestTokenForgeFactory is Test {
         bytes memory validatorSig;
         {
             // validator signature
-            bytes32 structHash =
-                keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+            bytes32 structHash = keccak256(
+                abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+            );
             bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -2152,7 +2161,7 @@ contract TestTokenForgeFactory is Test {
         emit ForgeFactory.ERC20Burned(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
-        ForgeV3(FORGE).burnERC20Permit(ACCOUNT.addr, token, amount, deadline, validatorSig, permitSig);
+        ForgeV3(FORGE).burnERC20Permit(ACCOUNT.addr, token, amount, address(0), 0, deadline, validatorSig, permitSig);
         assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Burned amount mismatch");
     }
 
@@ -2188,8 +2197,9 @@ contract TestTokenForgeFactory is Test {
         vm.prank(ACCOUNT.addr);
         MockERC20(token).approve(FORGE, amount);
 
-        bytes32 structHash =
-            keccak256(abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+        bytes32 structHash = keccak256(
+            abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
+        );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -2201,7 +2211,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV1(FORGE).transferFromERC20(token, amount, deadline, abi.encodePacked(r, s, v));
+        ForgeV1(FORGE).transferFromERC20(token, amount, address(0), 0, deadline, abi.encodePacked(r, s, v));
         assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Account balance should be 0");
         assertEq(amount, MockERC20(token).balanceOf(FORGE), "Forge balance should be amount");
     }
@@ -2241,7 +2251,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory fromSig;
         {
             bytes32 fromStructHash =
-                keccak256(abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH_V2, token, amount, nonce, deadline));
+                keccak256(abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
             bytes32 fromHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, fromStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, fromHash);
             fromSig = abi.encodePacked(r, s, v);
@@ -2263,7 +2273,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).transferFromERC20(ACCOUNT.addr, token, amount, deadline, fromSig, validatorSig);
+        ForgeV2(FORGE).transferFromERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, fromSig, validatorSig);
         assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Account balance should be 0");
         assertEq(amount, MockERC20(token).balanceOf(FORGE), "Forge balance should be amount");
     }
@@ -2300,8 +2310,11 @@ contract TestTokenForgeFactory is Test {
 
         bytes memory validatorSig;
         {
-            bytes32 structHash =
-                keccak256(abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH_V1, ACCOUNT.addr, token, amount, nonce, deadline));
+            bytes32 structHash = keccak256(
+                abi.encode(
+                    ERC20_TRANSFER_FROM_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline
+                )
+            );
             bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -2330,7 +2343,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV1(FORGE).transferFromERC20Permit(token, amount, deadline, validatorSig, permitSig);
+        ForgeV1(FORGE).transferFromERC20Permit(token, amount, address(0), 0, deadline, validatorSig, permitSig);
         assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Account balance should be 0");
         assertEq(amount, MockERC20(token).balanceOf(FORGE), "Forge balance should be amount");
     }
@@ -2368,7 +2381,7 @@ contract TestTokenForgeFactory is Test {
         bytes memory fromSig;
         {
             bytes32 fromStructHash =
-                keccak256(abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH_V2, token, amount, nonce, deadline));
+                keccak256(abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH_V2, token, amount, address(0), 0, nonce, deadline));
             bytes32 fromHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, fromStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, fromHash);
             fromSig = abi.encodePacked(r, s, v);
@@ -2405,7 +2418,9 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).transferFromERC20Permit(ACCOUNT.addr, token, amount, deadline, fromSig, validatorSig, permitSig);
+        ForgeV2(FORGE).transferFromERC20Permit(
+            ACCOUNT.addr, token, amount, address(0), 0, deadline, fromSig, validatorSig, permitSig
+        );
         assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Account balance should be 0");
         assertEq(amount, MockERC20(token).balanceOf(FORGE), "Forge balance should be amount");
     }
@@ -2442,8 +2457,11 @@ contract TestTokenForgeFactory is Test {
 
         bytes memory validatorSig;
         {
-            bytes32 structHash =
-                keccak256(abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH_V3, ACCOUNT.addr, token, amount, nonce, deadline));
+            bytes32 structHash = keccak256(
+                abi.encode(
+                    ERC20_TRANSFER_FROM_TYPE_HASH_V3, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline
+                )
+            );
             bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
             validatorSig = abi.encodePacked(r, s, v);
@@ -2471,7 +2489,9 @@ contract TestTokenForgeFactory is Test {
         emit ForgeFactory.ERC20TransferredFrom(SERVICE_NAME_B32, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
-        ForgeV3(FORGE).transferFromERC20Permit(ACCOUNT.addr, token, amount, deadline, validatorSig, permitSig);
+        ForgeV3(FORGE).transferFromERC20Permit(
+            ACCOUNT.addr, token, amount, address(0), 0, deadline, validatorSig, permitSig
+        );
         assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Account balance should be 0");
         assertEq(amount, MockERC20(token).balanceOf(FORGE), "Forge balance should be amount");
     }

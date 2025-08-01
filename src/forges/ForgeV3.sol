@@ -44,15 +44,17 @@ abstract contract ERC20ForgeV3 is BaseForge {
         address feeRecipient,
         uint256 feeBPS,
         uint256 deadline,
-        bytes calldata validatorSig
+        bytes memory validatorSig
     ) external checkDeadline(deadline) {
         uint256 nonce = _useNonce(recipient);
-        bytes32 structHash =
-            keccak256(abi.encode(ERC20_MINT_TYPE_HASH, recipient, token, amount, feeRecipient, feeBPS, nonce, deadline));
+        {
+            bytes32 structHash = keccak256(
+                abi.encode(ERC20_MINT_TYPE_HASH, recipient, token, amount, feeRecipient, feeBPS, nonce, deadline)
+            );
 
-        bytes32 hash = _hashTypedDataV4(structHash);
-        _verifyValidatorSignature(hash, validatorSig);
-
+            bytes32 hash = _hashTypedDataV4(structHash);
+            _verifyValidatorSignature(hash, validatorSig);
+        }
         (uint256 fee, uint256 value) = _erc20CalcFee(feeRecipient, feeBPS, amount);
         if (fee != 0) {
             IERC20Forge(token).mint(feeRecipient, fee);
@@ -73,16 +75,17 @@ abstract contract ERC20ForgeV3 is BaseForge {
         address feeRecipient,
         uint256 feeBPS,
         uint256 deadline,
-        bytes calldata validatorSig
+        bytes memory validatorSig
     ) external checkDeadline(deadline) {
         uint256 nonce = _useNonce(recipient);
-        bytes32 structHash = keccak256(
-            abi.encode(ERC20_TRANSFER_TYPE_HASH, recipient, token, amount, feeRecipient, feeBPS, nonce, deadline)
-        );
+        {
+            bytes32 structHash = keccak256(
+                abi.encode(ERC20_TRANSFER_TYPE_HASH, recipient, token, amount, feeRecipient, feeBPS, nonce, deadline)
+            );
 
-        bytes32 hash = _hashTypedDataV4(structHash);
-        _verifyValidatorSignature(hash, validatorSig);
-
+            bytes32 hash = _hashTypedDataV4(structHash);
+            _verifyValidatorSignature(hash, validatorSig);
+        }
         (uint256 fee, uint256 value) = _erc20CalcFee(feeRecipient, feeBPS, amount);
         if (fee != 0) {
             IERC20(token).safeTransfer(feeRecipient, fee);
@@ -103,7 +106,7 @@ abstract contract ERC20ForgeV3 is BaseForge {
         address feeRecipient,
         uint256 feeBPS,
         uint256 deadline,
-        bytes calldata validatorSig,
+        bytes memory validatorSig,
         bytes memory permitSig
     ) external checkDeadline(deadline) erc20Permit(from, token, amount, deadline, permitSig) {
         _transferFromERC20(from, token, amount, feeRecipient, feeBPS, deadline, validatorSig);
@@ -116,16 +119,17 @@ abstract contract ERC20ForgeV3 is BaseForge {
         address feeRecipient,
         uint256 feeBPS,
         uint256 deadline,
-        bytes calldata validatorSig
+        bytes memory validatorSig
     ) private {
         uint256 nonce = _useNonce(from);
-        bytes32 structHash = keccak256(
-            abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH, from, token, amount, feeRecipient, feeBPS, nonce, deadline)
-        );
+        {
+            bytes32 structHash = keccak256(
+                abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH, from, token, amount, feeRecipient, feeBPS, nonce, deadline)
+            );
 
-        bytes32 hash = _hashTypedDataV4(structHash);
-        _verifyValidatorSignature(hash, validatorSig);
-
+            bytes32 hash = _hashTypedDataV4(structHash);
+            _verifyValidatorSignature(hash, validatorSig);
+        }
         (uint256 fee, uint256 value) = _erc20CalcFee(feeRecipient, feeBPS, amount);
         IERC20(token).safeTransferFrom(from, address(this), amount);
         if (fee != 0) {
@@ -143,7 +147,7 @@ abstract contract ERC20ForgeV3 is BaseForge {
         address feeRecipient,
         uint256 feeBPS,
         uint256 deadline,
-        bytes calldata validatorSig,
+        bytes memory validatorSig,
         bytes memory permitSig
     ) external checkDeadline(deadline) erc20Permit(from, token, amount, deadline, permitSig) {
         _burnERC20(from, token, amount, feeRecipient, feeBPS, deadline, validatorSig);
@@ -156,15 +160,16 @@ abstract contract ERC20ForgeV3 is BaseForge {
         address feeRecipient,
         uint256 feeBPS,
         uint256 deadline,
-        bytes calldata validatorSig
+        bytes memory validatorSig
     ) private {
         uint256 nonce = _useNonce(from);
-        bytes32 structHash =
-            keccak256(abi.encode(ERC20_BURN_TYPE_HASH, from, token, amount, feeRecipient, feeBPS, nonce, deadline));
+        {
+            bytes32 structHash =
+                keccak256(abi.encode(ERC20_BURN_TYPE_HASH, from, token, amount, feeRecipient, feeBPS, nonce, deadline));
 
-        bytes32 hash = _hashTypedDataV4(structHash);
-        _verifyValidatorSignature(hash, validatorSig);
-
+            bytes32 hash = _hashTypedDataV4(structHash);
+            _verifyValidatorSignature(hash, validatorSig);
+        }
         (uint256 fee, uint256 value) = _erc20CalcFee(feeRecipient, feeBPS, amount);
         if (fee != 0) {
             IERC20(token).safeTransferFrom(from, feeRecipient, fee);
