@@ -24,7 +24,6 @@ import {ITokenFactory, TokenFactory} from "../src/tokens/TokenFactory.sol";
 import "./mock/StructHash.sol";
 
 import {ERC20Mintable} from "../src/tokens/presets/erc20/ERC20Mintable.sol";
-import {ERC20Fee, ERC20MintingFee} from "../src/tokens/presets/erc20/ERC20MintingFee.sol";
 import {ERC20Fixed} from "../src/tokens/presets/erc20/ERC20Fixed.sol";
 
 contract TestTokenPresets is Test {
