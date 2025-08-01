@@ -72,16 +72,7 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
         uint256 amount
     );
 
-    event ERC20FeeCollected(
-        bytes32 indexed service,
-        address indexed from,
-        address indexed feeRecipient,
-        address token,
-        uint256 amount,
-        uint256 feeBps,
-        uint256 fee,
-        uint256 value
-    );
+    event ERC20FeeCollected(uint256 indexed uuid, address indexed feeRecipient, address indexed token, uint256 fee);
 
     event ServiceRegistered(bytes32 indexed service, address indexed forge);
     event ServiceUnregistered(bytes32 indexed service);
@@ -208,11 +199,11 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     function alertMint(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external {
         bytes32 service = _checkRunningService(_getForgeFactoryStorage(), msg.sender);
         if (tokenType == TokenType.ERC20) {
-            (address to, uint256 amount, address feeRecipient, uint256 feeBPS, uint256 fee, uint256 value) =
-                abi.decode(data, (address, uint256, address, uint256, uint256, uint256));
+            (address to, uint256 amount, address feeRecipient, uint256 fee) =
+                abi.decode(data, (address, uint256, address, uint256));
             emit ERC20Minted(service, uuid, to, token, amount);
             if (fee != 0) {
-                emit ERC20FeeCollected(service, to, feeRecipient, token, amount, feeBPS, fee, value);
+                emit ERC20FeeCollected(uuid, feeRecipient, token, fee);
             }
         } else if (tokenType == TokenType.ERC721) {
             (address to, uint256 tokenID) = abi.decode(data, (address, uint256));
@@ -240,11 +231,11 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     function alertTransfer(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external {
         bytes32 service = _checkRunningService(_getForgeFactoryStorage(), msg.sender);
         if (tokenType == TokenType.ERC20) {
-            (address to, uint256 amount, address feeRecipient, uint256 feeBPS, uint256 fee, uint256 value) =
-                abi.decode(data, (address, uint256, address, uint256, uint256, uint256));
+            (address to, uint256 amount, address feeRecipient, uint256 fee) =
+                abi.decode(data, (address, uint256, address, uint256));
             emit ERC20Transferred(service, uuid, to, token, amount);
             if (fee != 0) {
-                emit ERC20FeeCollected(service, to, feeRecipient, token, amount, feeBPS, fee, value);
+                emit ERC20FeeCollected(uuid, feeRecipient, token, fee);
             }
         } else if (tokenType == TokenType.ERC721) {
             (address to, uint256 tokenID) = abi.decode(data, (address, uint256));
@@ -272,11 +263,11 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     function alertTransferFrom(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external {
         bytes32 service = _checkRunningService(_getForgeFactoryStorage(), msg.sender);
         if (tokenType == TokenType.ERC20) {
-            (address from, uint256 amount, address feeRecipient, uint256 feeBPS, uint256 fee, uint256 value) =
-                abi.decode(data, (address, uint256, address, uint256, uint256, uint256));
+            (address from, uint256 amount, address feeRecipient, uint256 fee) =
+                abi.decode(data, (address, uint256, address, uint256));
             emit ERC20TransferredFrom(service, uuid, from, token, amount);
             if (fee != 0) {
-                emit ERC20FeeCollected(service, from, feeRecipient, token, amount, feeBPS, fee, value);
+                emit ERC20FeeCollected(uuid, feeRecipient, token, fee);
             }
         } else {
             revert TokenForge__InvalidTokenType();
@@ -286,11 +277,11 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     function alertBurn(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external {
         bytes32 service = _checkRunningService(_getForgeFactoryStorage(), msg.sender);
         if (tokenType == TokenType.ERC20) {
-            (address from, uint256 amount, address feeRecipient, uint256 feeBPS, uint256 fee, uint256 value) =
-                abi.decode(data, (address, uint256, address, uint256, uint256, uint256));
+            (address from, uint256 amount, address feeRecipient, uint256 fee) =
+                abi.decode(data, (address, uint256, address, uint256));
             emit ERC20Burned(service, uuid, from, token, amount);
             if (fee != 0) {
-                emit ERC20FeeCollected(service, from, feeRecipient, token, amount, feeBPS, fee, value);
+                emit ERC20FeeCollected(uuid, feeRecipient, token, fee);
             }
         } else if (tokenType == TokenType.ERC721) {
             (address from, uint256 tokenID) = abi.decode(data, (address, uint256));

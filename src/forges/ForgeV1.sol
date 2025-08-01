@@ -61,10 +61,7 @@ abstract contract ERC20ForgeV1 is BaseForge {
         }
         IERC20Forge(token).mint(recipient, value);
         _alertMintToFactory(
-            TokenType.ERC20,
-            _calcUUID(recipient, nonce),
-            token,
-            abi.encode(recipient, amount, feeRecipient, feeBPS, fee, value)
+            TokenType.ERC20, _calcUUID(recipient, nonce), token, abi.encode(recipient, amount, feeRecipient, fee)
         );
     }
 
@@ -93,10 +90,7 @@ abstract contract ERC20ForgeV1 is BaseForge {
         }
         IERC20(token).safeTransfer(recipient, value);
         _alertTransferToFactory(
-            TokenType.ERC20,
-            _calcUUID(recipient, nonce),
-            token,
-            abi.encode(recipient, amount, feeRecipient, feeBPS, fee, value)
+            TokenType.ERC20, _calcUUID(recipient, nonce), token, abi.encode(recipient, amount, feeRecipient, fee)
         );
     }
 
@@ -148,7 +142,7 @@ abstract contract ERC20ForgeV1 is BaseForge {
             IERC20(token).safeTransfer(feeRecipient, fee);
         }
         _alertTransferFromToFactory(
-            TokenType.ERC20, _calcUUID(from, nonce), token, abi.encode(from, amount, feeRecipient, feeBPS, fee, value)
+            TokenType.ERC20, _calcUUID(from, nonce), token, abi.encode(from, amount, feeRecipient, fee)
         );
     }
 
@@ -200,9 +194,7 @@ abstract contract ERC20ForgeV1 is BaseForge {
             IERC20(token).safeTransferFrom(from, feeRecipient, fee);
         }
         IERC20Forge(token).burnFrom(from, value);
-        _alertBurnToFactory(
-            TokenType.ERC20, _calcUUID(from, nonce), token, abi.encode(from, amount, feeRecipient, feeBPS, fee, value)
-        );
+        _alertBurnToFactory(TokenType.ERC20, _calcUUID(from, nonce), token, abi.encode(from, amount, feeRecipient, fee));
     }
 }
 
