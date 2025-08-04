@@ -28,8 +28,8 @@ contract ERC20Capped is ERC20Upgradeable, ERC20Base, ERC20CappedUpgradeable {
         if (cap_ < _initialSupply) revert ERC20Capped__CapTooLow(cap_, _initialSupply);
 
         // Initialize parent contracts
-        __ERC20Base_init(_owner, _name, _symbol, _decimals, _initialSupply);
         __ERC20Capped_init(cap_);
+        __ERC20Base_init(_owner, _name, _symbol, _decimals, _initialSupply);
     }
 
     function remainingSupply() external view returns (uint256) {

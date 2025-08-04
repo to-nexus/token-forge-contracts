@@ -25,6 +25,7 @@ import "./mock/StructHash.sol";
 
 import {ERC20Mintable} from "../src/tokens/presets/erc20/ERC20Mintable.sol";
 import {ERC20Fixed} from "../src/tokens/presets/erc20/ERC20Fixed.sol";
+import {ERC20Capped} from "../src/tokens/presets/erc20/ERC20Capped.sol";
 
 contract TestTokenPresets is Test {
     address public constant OWNER = address(bytes20("OWNER"));
@@ -383,6 +384,177 @@ contract TestTokenPresets is Test {
         vm.expectRevert(abi.encodeWithSignature("ERC20Fixed__BurningNotAllowed()"));
         erc20.burnFrom(ACCOUNT.addr, amount);
         assertEq(amount, erc20.balanceOf(ACCOUNT.addr), "Burned amount mismatch");
+    }
+
+    function test_erc20_capped() external {
+        ERC20Capped logic = new ERC20Capped();
+        address[] memory erc20Impls = new address[](1);
+        erc20Impls[0] = address(logic);
+
+        vm.prank(OWNER);
+        tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC20, erc20Impls, true);
+
+        uint256 initialSupply = 1000e18;
+        uint256 cap = 2000e18;
+        bytes memory capData = abi.encode(cap);
+
+        vm.prank(OWNER);
+        ERC20Capped erc20 = ERC20Capped(
+            tokenFactory.deployERC20(SERVICE_OWNER, "ERC20Capped", "ERC20C", 18, initialSupply, capData, address(logic))
+        );
+
+        assertEq(erc20.balanceOf(SERVICE_OWNER), initialSupply, "Initial supply should match");
+        assertEq(erc20.cap(), cap, "Cap should match");
+        assertEq(erc20.remainingSupply(), cap - initialSupply, "Remaining supply should match");
+        assertEq(erc20.isCapReached(), false, "Cap should not be reached initially");
+
+        {
+            address[] memory forges = new address[](1);
+            forges[0] = FORGE;
+            vm.prank(SERVICE_OWNER);
+            erc20.setForges(forges, true);
+        }
+
+        uint256 mintAmount = 500e18; // This should work (total: 1500e18 < 2000e18)
+        uint256 deadline = block.timestamp + 30;
+        uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+        uint256 uuid = _calcUUID(nonce);
+
+        bytes32 structHash = keccak256(
+            abi.encode(
+                ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, address(erc20), mintAmount, address(0), 0, nonce, deadline
+            )
+        );
+        bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        vm.expectEmit();
+        emit IERC20.Transfer(address(0), ACCOUNT.addr, mintAmount);
+        vm.expectEmit(true, true, true, true, address(forgeFactory));
+        emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, address(erc20), mintAmount);
+
+        vm.prank(ACCOUNT.addr);
+        ForgeV1(FORGE).mintERC20(address(erc20), mintAmount, address(0), 0, deadline, abi.encodePacked(r, s, v));
+
+        assertEq(erc20.balanceOf(ACCOUNT.addr), mintAmount, "Minted amount should match");
+        assertEq(erc20.totalSupply(), initialSupply + mintAmount, "Total supply should match");
+    }
+
+    function test_erc20_capped_mint_exceed_cap() external {
+        ERC20Capped erc20 = _setupCappedToken();
+        _setupCappedTokenForges(erc20);
+
+        // First mint to get closer to cap
+        _mintCappedToken(erc20, 500e18);
+
+        // Try to mint amount that would exceed cap
+        uint256 excessAmount = 600e18; // This would make total: 1500e18 + 600e18 = 2100e18 > 2000e18
+        uint256 deadline = block.timestamp + 30;
+
+        uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+
+        bytes32 structHash = keccak256(
+            abi.encode(
+                ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, address(erc20), excessAmount, address(0), 0, nonce, deadline
+            )
+        );
+        bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        vm.prank(ACCOUNT.addr);
+        vm.expectRevert(abi.encodeWithSignature("ERC20ExceededCap(uint256,uint256)", 1500e18 + excessAmount, 2000e18));
+        ForgeV1(FORGE).mintERC20(address(erc20), excessAmount, address(0), 0, deadline, abi.encodePacked(r, s, v));
+    }
+
+    function test_erc20_capped_mint_exact_remaining() external {
+        ERC20Capped erc20 = _setupCappedToken();
+        _setupCappedTokenForges(erc20);
+
+        // First mint to get closer to cap
+        _mintCappedToken(erc20, 500e18);
+
+        // Mint exact remaining amount
+        uint256 remainingAmount = erc20.remainingSupply();
+        uint256 deadline = block.timestamp + 30;
+
+        uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+
+        bytes32 structHash = keccak256(
+            abi.encode(
+                ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, address(erc20), remainingAmount, address(0), 0, nonce, deadline
+            )
+        );
+        bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        vm.prank(ACCOUNT.addr);
+        ForgeV1(FORGE).mintERC20(address(erc20), remainingAmount, address(0), 0, deadline, abi.encodePacked(r, s, v));
+
+        assertEq(erc20.totalSupply(), 2000e18, "Total supply should equal cap");
+        assertEq(erc20.remainingSupply(), 0, "Remaining supply should be 0");
+        assertEq(erc20.isCapReached(), true, "Cap should be reached");
+    }
+
+    function test_erc20_capped_mint_when_cap_reached() external {
+        ERC20Capped erc20 = _setupCappedToken();
+        _setupCappedTokenForges(erc20);
+
+        // Mint to reach cap
+        _mintCappedToken(erc20, 1000e18); // Total becomes 2000e18 (cap reached)
+
+        // Try to mint when cap is reached
+        uint256 deadline = block.timestamp + 30;
+        uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+
+        bytes32 structHash = keccak256(
+            abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, address(erc20), 1, address(0), 0, nonce, deadline)
+        );
+        bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        vm.prank(ACCOUNT.addr);
+        vm.expectRevert(abi.encodeWithSignature("ERC20ExceededCap(uint256,uint256)", 2000e18 + 1, 2000e18));
+        ForgeV1(FORGE).mintERC20(address(erc20), 1, address(0), 0, deadline, abi.encodePacked(r, s, v));
+    }
+
+    // Helper functions
+    function _setupCappedToken() internal returns (ERC20Capped) {
+        ERC20Capped logic = new ERC20Capped();
+        address[] memory erc20Impls = new address[](1);
+        erc20Impls[0] = address(logic);
+
+        vm.prank(OWNER);
+        tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC20, erc20Impls, true);
+
+        uint256 initialSupply = 1000e18;
+        uint256 cap = 2000e18;
+        bytes memory capData = abi.encode(cap);
+
+        vm.prank(OWNER);
+        return ERC20Capped(
+            tokenFactory.deployERC20(SERVICE_OWNER, "ERC20Capped", "ERC20C", 18, initialSupply, capData, address(logic))
+        );
+    }
+
+    function _setupCappedTokenForges(ERC20Capped erc20) internal {
+        address[] memory forges = new address[](1);
+        forges[0] = FORGE;
+        vm.prank(SERVICE_OWNER);
+        erc20.setForges(forges, true);
+    }
+
+    function _mintCappedToken(ERC20Capped erc20, uint256 amount) internal {
+        uint256 deadline = block.timestamp + 30;
+        uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+
+        bytes32 structHash = keccak256(
+            abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, address(erc20), amount, address(0), 0, nonce, deadline)
+        );
+        bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        vm.prank(ACCOUNT.addr);
+        ForgeV1(FORGE).mintERC20(address(erc20), amount, address(0), 0, deadline, abi.encodePacked(r, s, v));
     }
 
     function _calcUUID(uint256 nonce) internal view returns (uint256) {
