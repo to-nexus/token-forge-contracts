@@ -30,8 +30,7 @@ contract TestTokenPresets is Test {
     address public constant OWNER = address(bytes20("OWNER"));
     address public constant SERVICE_OWNER = address(bytes20("SERVICE_OWNER"));
 
-    string public constant SERVICE_NAME = "TestService";
-    bytes32 public SERVICE_NAME_B32 = ShortString.unwrap(ShortStrings.toShortString(SERVICE_NAME));
+    bytes32 public constant SERVICE_NAME = bytes32("TestService");
     Vm.Wallet public VALIDATOR = vm.createWallet("Validator");
     Vm.Wallet public ACCOUNT = vm.createWallet("Account");
 
@@ -199,7 +198,7 @@ contract TestTokenPresets is Test {
             vm.expectEmit();
             emit IERC20.Transfer(address(0), ACCOUNT.addr, amount);
             vm.expectEmit(true, true, true, true, address(forgeFactory));
-            emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, address(erc20), amount);
+            emit ForgeFactory.ERC20Minted(SERVICE_NAME, uuid, ACCOUNT.addr, address(erc20), amount);
 
             // send transaction
             vm.prank(ACCOUNT.addr);
@@ -234,7 +233,7 @@ contract TestTokenPresets is Test {
             vm.expectEmit();
             emit IERC20.Transfer(address(0), ACCOUNT.addr, amount);
             vm.expectEmit(true, true, true, true, address(forgeFactory));
-            emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, address(erc20), amount);
+            emit ForgeFactory.ERC20Minted(SERVICE_NAME, uuid, ACCOUNT.addr, address(erc20), amount);
 
             // send transaction
             ForgeV2(FORGE).mintERC20(
@@ -258,7 +257,7 @@ contract TestTokenPresets is Test {
             vm.expectEmit();
             emit IERC20.Transfer(address(0), ACCOUNT.addr, amount);
             vm.expectEmit(true, true, true, true, address(forgeFactory));
-            emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, address(erc20), amount);
+            emit ForgeFactory.ERC20Minted(SERVICE_NAME, uuid, ACCOUNT.addr, address(erc20), amount);
 
             // send transaction
             ForgeV3(FORGE).mintERC20(

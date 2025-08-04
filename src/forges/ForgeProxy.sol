@@ -14,7 +14,7 @@ contract ForgeProxy {
         address owner,
         address validator,
         IDiamondCut.FacetCut[] memory addCuts,
-        string memory service,
+        bytes32 service,
         address diamondImpl,
         address baseImpl
     ) payable {

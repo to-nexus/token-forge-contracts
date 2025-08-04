@@ -29,7 +29,7 @@ contract TestException is Test {
     address public constant OWNER = address(bytes20("OWNER"));
     address public constant SERVICE_OWNER = address(bytes20("SERVICE_OWNER"));
 
-    string public constant SERVICE_NAME = "TestService";
+    bytes32 public constant SERVICE_NAME = bytes32("TestService");
     Vm.Wallet public VALIDATOR = vm.createWallet("Validator");
     Vm.Wallet public ACCOUNT = vm.createWallet("Account");
 
