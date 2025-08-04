@@ -28,6 +28,8 @@ abstract contract ERC20ForgeV3 is BaseForge {
         keccak256("ERC20Mint(address recipient,address token,uint256 amount,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC20_TRANSFER_TYPE_HASH =
         keccak256("ERC20Transfer(address recipient,address token,uint256 amount,uint256 nonce,uint256 deadline)");
+    bytes32 private constant ERC20_TRANSFER_FROM_TYPE_HASH =
+        keccak256("ERC20TransferFrom(address from,address token,uint256 amount,uint256 nonce,uint256 deadline)");
     bytes32 private constant ERC20_BURN_TYPE_HASH =
         keccak256("ERC20Burn(address from,address token,uint256 amount,uint256 nonce,uint256 deadline)");
 
@@ -60,6 +62,34 @@ abstract contract ERC20ForgeV3 is BaseForge {
 
         IERC20(token).safeTransfer(recipient, amount);
         _alertTransferToFactory(TokenType.ERC20, _calcUUID(recipient, nonce), token, abi.encode(recipient, amount));
+    }
+
+    function transferFromERC20Permit(
+        address from,
+        address token,
+        uint256 amount,
+        uint256 deadline,
+        bytes calldata validatorSig,
+        bytes memory permitSig
+    ) external checkDeadline(deadline) erc20Permit(from, token, amount, deadline, permitSig) {
+        _transferFromERC20(from, token, amount, deadline, validatorSig);
+    }
+
+    function _transferFromERC20(
+        address from,
+        address token,
+        uint256 amount,
+        uint256 deadline,
+        bytes calldata validatorSig
+    ) private {
+        uint256 nonce = _useNonce(from);
+        bytes32 structHash = keccak256(abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH, from, token, amount, nonce, deadline));
+
+        bytes32 hash = _hashTypedDataV4(structHash);
+        _verifyValidatorSignature(hash, validatorSig);
+
+        IERC20(token).safeTransferFrom(from, address(this), amount);
+        _alertTransferFromToFactory(TokenType.ERC20, _calcUUID(from, nonce), token, abi.encode(from, amount));
     }
 
     function burnERC20Permit(

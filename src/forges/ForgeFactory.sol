@@ -42,6 +42,9 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     event ERC20Transferred(
         bytes32 indexed service, uint256 indexed uuid, address indexed to, address token, uint256 amount
     );
+    event ERC20TransferredFrom(
+        bytes32 indexed service, uint256 indexed uuid, address indexed from, address token, uint256 amount
+    );
     event ERC721Transferred(
         bytes32 indexed service, uint256 indexed uuid, address indexed to, address token, uint256 tokenID
     );
@@ -242,6 +245,16 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
                 (address to, uint256 tokenID, uint256 amount) = abi.decode(data1155, (address, uint256, uint256));
                 emit ERC1155Transferred(service, uuid, to, token, tokenID, amount);
             }
+        } else {
+            revert TokenForge__InvalidTokenType();
+        }
+    }
+
+    function alertTransferFrom(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external {
+        bytes32 service = _checkRunningService(_getForgeFactoryStorage(), msg.sender);
+        if (tokenType == TokenType.ERC20) {
+            (address from, uint256 amount) = abi.decode(data, (address, uint256));
+            emit ERC20TransferredFrom(service, uuid, from, token, amount);
         } else {
             revert TokenForge__InvalidTokenType();
         }
