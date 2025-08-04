@@ -15,6 +15,7 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
     error BaseForge__ECDSAInvalidValidatorSignature();
     error BaseForge__ECDSAInvalidPermitSignature();
     error BaseForge__ExpiredSignature(uint256 deadline);
+    error BaseForge__InvalidFeeData(address feeRecipient, uint256 feeBPS);
 
     event ValidatorUpdated(address indexed validator);
 
@@ -127,6 +128,21 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
             v := byte(0, mload(add(sig, 0x60)))
         }
         IERC20Permit(token).permit(from, address(this), value, deadline, v, r, s);
+    }
+
+    function _erc20CalcFee(address feeRecipient, uint256 feeBPS, uint256 amount)
+        internal
+        pure
+        returns (uint256 fee, uint256 value)
+    {
+        if (feeBPS == 0) return (0, amount); // No fee to collect
+        if (feeRecipient == address(0) || feeBPS > 10_000) revert BaseForge__InvalidFeeData(feeRecipient, feeBPS);
+
+        // Calculate the fee based on the amount and feeBPS
+        unchecked {
+            fee = (amount * feeBPS) / 10_000;
+            value = amount - fee;
+        }
     }
 }
 

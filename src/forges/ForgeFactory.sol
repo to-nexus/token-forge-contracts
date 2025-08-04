@@ -72,6 +72,8 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
         uint256 amount
     );
 
+    event ERC20FeeCollected(uint256 indexed uuid, address indexed feeRecipient, address indexed token, uint256 fee);
+
     event ServiceRegistered(bytes32 indexed service, address indexed forge);
     event ServiceUnregistered(bytes32 indexed service);
     event ServicePaused(bytes32 indexed service, bool paused);
@@ -197,8 +199,12 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     function alertMint(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external {
         bytes32 service = _checkRunningService(_getForgeFactoryStorage(), msg.sender);
         if (tokenType == TokenType.ERC20) {
-            (address to, uint256 amount) = abi.decode(data, (address, uint256));
+            (address to, uint256 amount, address feeRecipient, uint256 fee) =
+                abi.decode(data, (address, uint256, address, uint256));
             emit ERC20Minted(service, uuid, to, token, amount);
+            if (fee != 0) {
+                emit ERC20FeeCollected(uuid, feeRecipient, token, fee);
+            }
         } else if (tokenType == TokenType.ERC721) {
             (address to, uint256 tokenID) = abi.decode(data, (address, uint256));
             emit ERC721Minted(service, uuid, to, token, tokenID);
@@ -225,8 +231,12 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     function alertTransfer(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external {
         bytes32 service = _checkRunningService(_getForgeFactoryStorage(), msg.sender);
         if (tokenType == TokenType.ERC20) {
-            (address to, uint256 amount) = abi.decode(data, (address, uint256));
+            (address to, uint256 amount, address feeRecipient, uint256 fee) =
+                abi.decode(data, (address, uint256, address, uint256));
             emit ERC20Transferred(service, uuid, to, token, amount);
+            if (fee != 0) {
+                emit ERC20FeeCollected(uuid, feeRecipient, token, fee);
+            }
         } else if (tokenType == TokenType.ERC721) {
             (address to, uint256 tokenID) = abi.decode(data, (address, uint256));
             emit ERC721Transferred(service, uuid, to, token, tokenID);
@@ -253,8 +263,12 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     function alertTransferFrom(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external {
         bytes32 service = _checkRunningService(_getForgeFactoryStorage(), msg.sender);
         if (tokenType == TokenType.ERC20) {
-            (address from, uint256 amount) = abi.decode(data, (address, uint256));
+            (address from, uint256 amount, address feeRecipient, uint256 fee) =
+                abi.decode(data, (address, uint256, address, uint256));
             emit ERC20TransferredFrom(service, uuid, from, token, amount);
+            if (fee != 0) {
+                emit ERC20FeeCollected(uuid, feeRecipient, token, fee);
+            }
         } else {
             revert TokenForge__InvalidTokenType();
         }
@@ -263,8 +277,12 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     function alertBurn(TokenType tokenType, uint256 uuid, address token, bytes calldata data) external {
         bytes32 service = _checkRunningService(_getForgeFactoryStorage(), msg.sender);
         if (tokenType == TokenType.ERC20) {
-            (address from, uint256 amount) = abi.decode(data, (address, uint256));
+            (address from, uint256 amount, address feeRecipient, uint256 fee) =
+                abi.decode(data, (address, uint256, address, uint256));
             emit ERC20Burned(service, uuid, from, token, amount);
+            if (fee != 0) {
+                emit ERC20FeeCollected(uuid, feeRecipient, token, fee);
+            }
         } else if (tokenType == TokenType.ERC721) {
             (address from, uint256 tokenID) = abi.decode(data, (address, uint256));
             emit ERC721Burned(service, uuid, from, token, tokenID);

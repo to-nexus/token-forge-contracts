@@ -24,96 +24,152 @@ abstract contract ERC20ForgeV3 is BaseForge {
     using ECDSA for bytes32;
     using SafeERC20 for IERC20;
 
-    bytes32 private constant ERC20_MINT_TYPE_HASH =
-        keccak256("ERC20Mint(address recipient,address token,uint256 amount,uint256 nonce,uint256 deadline)");
-    bytes32 private constant ERC20_TRANSFER_TYPE_HASH =
-        keccak256("ERC20Transfer(address recipient,address token,uint256 amount,uint256 nonce,uint256 deadline)");
-    bytes32 private constant ERC20_TRANSFER_FROM_TYPE_HASH =
-        keccak256("ERC20TransferFrom(address from,address token,uint256 amount,uint256 nonce,uint256 deadline)");
-    bytes32 private constant ERC20_BURN_TYPE_HASH =
-        keccak256("ERC20Burn(address from,address token,uint256 amount,uint256 nonce,uint256 deadline)");
+    bytes32 private constant ERC20_MINT_TYPE_HASH = keccak256(
+        "ERC20Mint(address recipient,address token,uint256 amount,address feeRecipient,uint256 feeBPS,uint256 nonce,uint256 deadline)"
+    );
+    bytes32 private constant ERC20_TRANSFER_TYPE_HASH = keccak256(
+        "ERC20Transfer(address recipient,address token,uint256 amount,address feeRecipient,uint256 feeBPS,uint256 nonce,uint256 deadline)"
+    );
+    bytes32 private constant ERC20_TRANSFER_FROM_TYPE_HASH = keccak256(
+        "ERC20TransferFrom(address from,address token,uint256 amount,address feeRecipient,uint256 feeBPS,uint256 nonce,uint256 deadline)"
+    );
+    bytes32 private constant ERC20_BURN_TYPE_HASH = keccak256(
+        "ERC20Burn(address from,address token,uint256 amount,address feeRecipient,uint256 feeBPS,uint256 nonce,uint256 deadline)"
+    );
 
-    function mintERC20(address recipient, address token, uint256 amount, uint256 deadline, bytes calldata validatorSig)
-        external
-        checkDeadline(deadline)
-    {
+    function mintERC20(
+        address recipient,
+        address token,
+        uint256 amount,
+        address feeRecipient,
+        uint256 feeBPS,
+        uint256 deadline,
+        bytes memory validatorSig
+    ) external checkDeadline(deadline) {
         uint256 nonce = _useNonce(recipient);
-        bytes32 structHash = keccak256(abi.encode(ERC20_MINT_TYPE_HASH, recipient, token, amount, nonce, deadline));
+        {
+            bytes32 structHash = keccak256(
+                abi.encode(ERC20_MINT_TYPE_HASH, recipient, token, amount, feeRecipient, feeBPS, nonce, deadline)
+            );
 
-        bytes32 hash = _hashTypedDataV4(structHash);
-        _verifyValidatorSignature(hash, validatorSig);
-
-        IERC20Forge(token).mint(recipient, amount);
-        _alertMintToFactory(TokenType.ERC20, _calcUUID(recipient, nonce), token, abi.encode(recipient, amount));
+            bytes32 hash = _hashTypedDataV4(structHash);
+            _verifyValidatorSignature(hash, validatorSig);
+        }
+        (uint256 fee, uint256 value) = _erc20CalcFee(feeRecipient, feeBPS, amount);
+        IERC20Forge(token).mint(recipient, value);
+        if (fee != 0) {
+            IERC20Forge(token).mint(feeRecipient, fee);
+        }
+        _alertMintToFactory(
+            TokenType.ERC20, _calcUUID(recipient, nonce), token, abi.encode(recipient, amount, feeRecipient, fee)
+        );
     }
 
     function transferERC20(
         address recipient,
         address token,
         uint256 amount,
+        address feeRecipient,
+        uint256 feeBPS,
         uint256 deadline,
-        bytes calldata validatorSig
+        bytes memory validatorSig
     ) external checkDeadline(deadline) {
         uint256 nonce = _useNonce(recipient);
-        bytes32 structHash = keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH, recipient, token, amount, nonce, deadline));
+        {
+            bytes32 structHash = keccak256(
+                abi.encode(ERC20_TRANSFER_TYPE_HASH, recipient, token, amount, feeRecipient, feeBPS, nonce, deadline)
+            );
 
-        bytes32 hash = _hashTypedDataV4(structHash);
-        _verifyValidatorSignature(hash, validatorSig);
-
-        IERC20(token).safeTransfer(recipient, amount);
-        _alertTransferToFactory(TokenType.ERC20, _calcUUID(recipient, nonce), token, abi.encode(recipient, amount));
+            bytes32 hash = _hashTypedDataV4(structHash);
+            _verifyValidatorSignature(hash, validatorSig);
+        }
+        (uint256 fee, uint256 value) = _erc20CalcFee(feeRecipient, feeBPS, amount);
+        IERC20(token).safeTransfer(recipient, value);
+        if (fee != 0) {
+            IERC20(token).safeTransfer(feeRecipient, fee);
+        }
+        _alertTransferToFactory(
+            TokenType.ERC20, _calcUUID(recipient, nonce), token, abi.encode(recipient, amount, feeRecipient, fee)
+        );
     }
 
     function transferFromERC20Permit(
         address from,
         address token,
         uint256 amount,
+        address feeRecipient,
+        uint256 feeBPS,
         uint256 deadline,
-        bytes calldata validatorSig,
+        bytes memory validatorSig,
         bytes memory permitSig
     ) external checkDeadline(deadline) erc20Permit(from, token, amount, deadline, permitSig) {
-        _transferFromERC20(from, token, amount, deadline, validatorSig);
+        _transferFromERC20(from, token, amount, feeRecipient, feeBPS, deadline, validatorSig);
     }
 
     function _transferFromERC20(
         address from,
         address token,
         uint256 amount,
+        address feeRecipient,
+        uint256 feeBPS,
         uint256 deadline,
-        bytes calldata validatorSig
+        bytes memory validatorSig
     ) private {
         uint256 nonce = _useNonce(from);
-        bytes32 structHash = keccak256(abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH, from, token, amount, nonce, deadline));
+        {
+            bytes32 structHash = keccak256(
+                abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH, from, token, amount, feeRecipient, feeBPS, nonce, deadline)
+            );
 
-        bytes32 hash = _hashTypedDataV4(structHash);
-        _verifyValidatorSignature(hash, validatorSig);
-
+            bytes32 hash = _hashTypedDataV4(structHash);
+            _verifyValidatorSignature(hash, validatorSig);
+        }
+        (uint256 fee,) = _erc20CalcFee(feeRecipient, feeBPS, amount);
         IERC20(token).safeTransferFrom(from, address(this), amount);
-        _alertTransferFromToFactory(TokenType.ERC20, _calcUUID(from, nonce), token, abi.encode(from, amount));
+        if (fee != 0) {
+            IERC20(token).safeTransfer(feeRecipient, fee);
+        }
+        _alertTransferFromToFactory(
+            TokenType.ERC20, _calcUUID(from, nonce), token, abi.encode(from, amount, feeRecipient, fee)
+        );
     }
 
     function burnERC20Permit(
         address from,
         address token,
         uint256 amount,
+        address feeRecipient,
+        uint256 feeBPS,
         uint256 deadline,
-        bytes calldata validatorSig,
+        bytes memory validatorSig,
         bytes memory permitSig
     ) external checkDeadline(deadline) erc20Permit(from, token, amount, deadline, permitSig) {
-        _burnERC20(from, token, amount, deadline, validatorSig);
+        _burnERC20(from, token, amount, feeRecipient, feeBPS, deadline, validatorSig);
     }
 
-    function _burnERC20(address from, address token, uint256 amount, uint256 deadline, bytes calldata validatorSig)
-        private
-    {
+    function _burnERC20(
+        address from,
+        address token,
+        uint256 amount,
+        address feeRecipient,
+        uint256 feeBPS,
+        uint256 deadline,
+        bytes memory validatorSig
+    ) private {
         uint256 nonce = _useNonce(from);
-        bytes32 structHash = keccak256(abi.encode(ERC20_BURN_TYPE_HASH, from, token, amount, nonce, deadline));
+        {
+            bytes32 structHash =
+                keccak256(abi.encode(ERC20_BURN_TYPE_HASH, from, token, amount, feeRecipient, feeBPS, nonce, deadline));
 
-        bytes32 hash = _hashTypedDataV4(structHash);
-        _verifyValidatorSignature(hash, validatorSig);
-
-        IERC20Forge(token).burnFrom(from, amount);
-        _alertBurnToFactory(TokenType.ERC20, _calcUUID(from, nonce), token, abi.encode(from, amount));
+            bytes32 hash = _hashTypedDataV4(structHash);
+            _verifyValidatorSignature(hash, validatorSig);
+        }
+        (uint256 fee, uint256 value) = _erc20CalcFee(feeRecipient, feeBPS, amount);
+        IERC20Forge(token).burnFrom(from, value);
+        if (fee != 0) {
+            IERC20(token).safeTransferFrom(from, feeRecipient, fee);
+        }
+        _alertBurnToFactory(TokenType.ERC20, _calcUUID(from, nonce), token, abi.encode(from, amount, feeRecipient, fee));
     }
 }
 
