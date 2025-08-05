@@ -54,10 +54,10 @@ contract TestForgeFactory is Test {
     }
 
     function test_factory_add_pause_remove_service() external {
-        string memory service = "TestService";
+        bytes32 service = bytes32("TestService");
         address serviceOwner = address(bytes20("TestServiceOwner"));
 
-        Vm.Wallet memory validator = vm.createWallet(service);
+        Vm.Wallet memory validator = vm.createWallet(string(abi.encodePacked(service)));
         IDiamondCut.FacetCut[] memory addCuts;
         vm.prank(OWNER);
         address forgeProxy = forgeFactory.addService(serviceOwner, validator.addr, service, addCuts);
@@ -68,7 +68,7 @@ contract TestForgeFactory is Test {
             assertNotEq(domainSeparator, bytes32(0), "Domain separator should not be zero");
             bytes32 TYPE_HASH =
                 keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
-            bytes32 nameHash = keccak256(bytes(service));
+            bytes32 nameHash = keccak256(abi.encodePacked(service));
             bytes32 versionHash = keccak256(bytes("1"));
             uint256 chainID = block.chainid;
             address thisAddress = forgeProxy;
@@ -113,7 +113,7 @@ contract TestForgeFactory is Test {
         // check factory data
         {
             // allForges
-            (string[] memory services, address[] memory forges) = forgeFactory.allForges();
+            (bytes32[] memory services, address[] memory forges) = forgeFactory.allForges();
             assertEq(services.length, 1, "Expected 1 service in the factory");
             assertEq(services.length, forges.length, "Services and forges length mismatch");
             assertEq(services[0], service, "Service name mismatch");
@@ -124,7 +124,7 @@ contract TestForgeFactory is Test {
             assertEq(lengthAllForges, 1, "Expected 1 forge in the factory");
 
             // forgeByIndex
-            (string memory serviceName, address forge, bool running) = forgeFactory.forgeByIndex(0);
+            (bytes32 serviceName, address forge, bool running) = forgeFactory.forgeByIndex(0);
             assertEq(service, serviceName, "Service name mismatch by index");
             assertEq(forgeProxy, forge, "Service name mismatch by index");
             assertTrue(running, "Service should be running");
@@ -193,7 +193,7 @@ contract TestForgeFactory is Test {
             vm.prank(OWNER);
             forgeFactory.removeService(service);
             // allForges
-            (string[] memory services, address[] memory forges) = forgeFactory.allForges();
+            (bytes32[] memory services, address[] memory forges) = forgeFactory.allForges();
             assertEq(services.length, 0, "Expected 0 services in the factory after removal");
             assertEq(services.length, forges.length, "Services and forges length mismatch after removal");
             // lengthAllForges
@@ -212,9 +212,9 @@ contract TestForgeFactory is Test {
     }
 
     function test_factory_2forge() external {
-        (string memory service1, address serviceOwner1, Vm.Wallet memory validator1) =
+        (bytes32 service1, address serviceOwner1, Vm.Wallet memory validator1) =
             ("TestService1", address(bytes20("TestServiceOwner1")), vm.createWallet("TestServiceOwner1"));
-        (string memory service2, address serviceOwner2, Vm.Wallet memory validator2) =
+        (bytes32 service2, address serviceOwner2, Vm.Wallet memory validator2) =
             ("TestService2", address(bytes20("TestServiceOwner2")), vm.createWallet("TestServiceOwner2"));
         assertNotEq(service1, service2, "Service names should be different");
         assertNotEq(serviceOwner1, serviceOwner2, "Service owners should be different");

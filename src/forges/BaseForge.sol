@@ -45,8 +45,8 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
         _;
     }
 
-    function __BaseForge_init(string memory service_, address validator_) internal onlyInitializing {
-        __EIP712_init(service_, "1");
+    function __BaseForge_init(bytes32 service_, address validator_) internal onlyInitializing {
+        __EIP712_init(string(abi.encodePacked(service_)), "1");
         __Nonces_init();
         __BaseForge_init_unchained(validator_);
     }
@@ -163,7 +163,7 @@ contract BaseForgeFacet is IDefaultDiamondCut, IBaseForgeFacet, BaseForge {
         ];
     }
 
-    function initialize(string memory service_, address validator_) external override initializer {
+    function initialize(bytes32 service_, address validator_) external override initializer {
         __BaseForge_init(service_, validator_);
     }
 

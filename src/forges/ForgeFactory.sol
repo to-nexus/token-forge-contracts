@@ -7,7 +7,6 @@ import {AccessControlUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.
 import {UUPSUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/proxy/utils/UUPSUpgradeable.sol";
 
 import {ECDSA} from "@openzeppelin-contracts-5.3.0/utils/cryptography/ECDSA.sol";
-import {ShortString, ShortStrings} from "@openzeppelin-contracts-5.3.0/utils/ShortStrings.sol";
 import {EnumerableMap} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableMap.sol";
 import {Create2} from "@openzeppelin-contracts-5.3.0/utils/Create2.sol";
 
@@ -146,50 +145,43 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     // View functions //
     ////////////////////
 
-    function allForges() external view returns (string[] memory, address[] memory) {
+    function allForges() external view returns (bytes32[] memory, address[] memory) {
         ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
 
         uint256 length = $._serviceToForge.length();
-        string[] memory services = new string[](length);
+        bytes32[] memory services = new bytes32[](length);
         address[] memory forges = new address[](length);
         unchecked {
             for (uint256 i = 0; i < length; ++i) {
-                bytes32 _service;
-                (_service, forges[i]) = $._serviceToForge.at(i);
-                services[i] = ShortStrings.toString(ShortString.wrap(_service));
+                (services[i], forges[i]) = $._serviceToForge.at(i);
             }
         }
         return (services, forges);
     }
 
-    function isRunningForge(address forge) external view returns (string memory service, bool running) {
+    function isRunningForge(address forge) external view returns (bytes32 service, bool running) {
         ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
-        bytes32 service32 = $._forgeToService[forge];
-        if (service32 != bytes32(0)) {
-            service = ShortStrings.toString(ShortString.wrap(service32));
-            running = $._isRunning[service32];
+        service = $._forgeToService[forge];
+        if (service != bytes32(0)) {
+            running = $._isRunning[service];
         }
     }
 
-    function forgeByService(string memory service) external view returns (address forge, bool running) {
-        bytes32 _service = ShortString.unwrap(ShortStrings.toShortString(service));
-
+    function forgeByService(bytes32 service) external view returns (address forge, bool running) {
         ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
         bool ok;
-        (ok, forge) = $._serviceToForge.tryGet(_service);
-        if (ok) running = $._isRunning[_service];
+        (ok, forge) = $._serviceToForge.tryGet(service);
+        if (ok) running = $._isRunning[service];
     }
 
     function lengthAllForges() external view returns (uint256) {
         return _getForgeFactoryStorage()._serviceToForge.length();
     }
 
-    function forgeByIndex(uint256 index) external view returns (string memory service, address forge, bool running) {
+    function forgeByIndex(uint256 index) external view returns (bytes32 service, address forge, bool running) {
         ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
-        bytes32 _service;
-        (_service, forge) = $._serviceToForge.at(index);
-        service = ShortStrings.toString(ShortString.wrap(_service));
-        running = $._isRunning[_service];
+        (service, forge) = $._serviceToForge.at(index);
+        running = $._isRunning[service];
     }
 
     /////////////////////
@@ -321,25 +313,22 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
     // Role functions //
     ////////////////////
 
-    function addService(
-        address owner,
-        address validator,
-        string calldata service,
-        IDiamondCut.FacetCut[] calldata addCuts
-    ) external onlyRole(MANAGER_ROLE) returns (address forge) {
+    function addService(address owner, address validator, bytes32 service, IDiamondCut.FacetCut[] calldata addCuts)
+        external
+        onlyRole(MANAGER_ROLE)
+        returns (address forge)
+    {
         if (owner == address(0)) revert TokenForgeFactory__InvalidData("owner");
         if (validator == address(0)) revert TokenForgeFactory__InvalidData("validator");
-        if (bytes(service).length == 0) revert TokenForgeFactory__InvalidData("service");
-
-        bytes32 _service = ShortString.unwrap(ShortStrings.toShortString(service));
+        if (service == bytes32(0)) revert TokenForgeFactory__InvalidData("service");
 
         ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
-        if ($._serviceToForge.contains(_service)) revert TokenForgeFactory__AlreadyUsedService(_service);
+        if ($._serviceToForge.contains(service)) revert TokenForgeFactory__AlreadyUsedService(service);
 
         // deploy forge proxy
         forge = Create2.deploy(
             0,
-            _service, // salt is service name
+            service, // salt is service name
             abi.encodePacked(
                 $._forgeProxyCode.code(), abi.encode(owner, validator, addCuts, service, $._diamondImpl, $._baseImpl)
             )
@@ -347,37 +336,34 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
         if (forge == address(0)) revert TokenForgeFactory__InvalidData("forge deploy");
 
         // enroll service&forge to storage
-        $._serviceToForge.set(_service, forge);
-        $._forgeToService[forge] = _service;
-        $._isRunning[_service] = true;
-        emit ServiceRegistered(_service, forge);
+        $._serviceToForge.set(service, forge);
+        $._forgeToService[forge] = service;
+        $._isRunning[service] = true;
+        emit ServiceRegistered(service, forge);
     }
 
-    function removeService(string memory service) external onlyRole(MANAGER_ROLE) {
-        bytes32 _service = ShortString.unwrap(ShortStrings.toShortString(service));
+    function removeService(bytes32 service) external onlyRole(MANAGER_ROLE) {
         ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
 
         // check if service exists
-        (bool ok, address forge) = $._serviceToForge.tryGet(_service);
-        if (!ok) revert TokenForgeFactory__ServiceNotFound(_service);
+        (bool ok, address forge) = $._serviceToForge.tryGet(service);
+        if (!ok) revert TokenForgeFactory__ServiceNotFound(service);
 
         // remove data
-        $._serviceToForge.remove(_service);
+        $._serviceToForge.remove(service);
         delete $._forgeToService[forge];
-        delete $._isRunning[_service];
-        emit ServiceUnregistered(_service);
+        delete $._isRunning[service];
+        emit ServiceUnregistered(service);
     }
 
-    function pauseService(string memory service, bool paused) external onlyRole(MANAGER_ROLE) {
-        bytes32 _service = ShortString.unwrap(ShortStrings.toShortString(service));
-
+    function pauseService(bytes32 service, bool paused) external onlyRole(MANAGER_ROLE) {
         ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
-        if (!$._serviceToForge.contains(_service)) revert TokenForgeFactory__ServiceNotFound(_service);
-        if ($._isRunning[_service] == paused) {
-            if (paused) delete $._isRunning[_service];
-            else $._isRunning[_service] = true;
+        if (!$._serviceToForge.contains(service)) revert TokenForgeFactory__ServiceNotFound(service);
+        if ($._isRunning[service] == paused) {
+            if (paused) delete $._isRunning[service];
+            else $._isRunning[service] = true;
 
-            emit ServicePaused(_service, paused);
+            emit ServicePaused(service, paused);
         }
     }
 
