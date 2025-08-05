@@ -48,7 +48,7 @@ abstract contract ERC721Base is
     {
         if (bytes(name).length == 0) revert TokenBase__NullInput("name");
         if (bytes(symbol).length == 0) revert TokenBase__NullInput("symbol");
-        if (bytes(baseTokenURI).length == 0) revert TokenBase__NullInput("symbol");
+        if (bytes(baseTokenURI).length == 0) revert TokenBase__NullInput("baseTokenURI");
         assembly {
             sstore(ERC721BaseURIStorageLocation, baseTokenURI)
         }
