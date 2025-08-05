@@ -63,7 +63,7 @@ abstract contract ERC20Base is TokenBase, IERC20Forge, ERC20Upgradeable, ERC20Pe
         _burn(from, amount);
     }
 
-    function decimals() public view override returns (uint8) {
+    function decimals() public view virtual override returns (uint8) {
         uint8 _decimals;
         assembly {
             _decimals := sload(ERC20DecimalsStorageLocation)
