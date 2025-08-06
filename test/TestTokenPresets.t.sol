@@ -430,7 +430,7 @@ contract TestTokenPresets is Test {
         vm.expectEmit();
         emit IERC20.Transfer(address(0), ACCOUNT.addr, mintAmount);
         vm.expectEmit(true, true, true, true, address(forgeFactory));
-        emit ForgeFactory.ERC20Minted(SERVICE_NAME_B32, uuid, ACCOUNT.addr, address(erc20), mintAmount);
+        emit ForgeFactory.ERC20Minted(SERVICE_NAME, uuid, ACCOUNT.addr, address(erc20), mintAmount);
 
         vm.prank(ACCOUNT.addr);
         ForgeV1(FORGE).mintERC20(address(erc20), mintAmount, address(0), 0, deadline, abi.encodePacked(r, s, v));
