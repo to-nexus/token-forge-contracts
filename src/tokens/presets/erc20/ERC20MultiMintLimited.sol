@@ -24,8 +24,8 @@ contract ERC20MultiMintLimited is ERC20PeriodsMintLimit {
         if (cap_ < _initialSupply) revert ERC20MultiMintLimited__CapTooLow(cap_, _initialSupply);
 
         // Initialize parent contracts
-        __ERC20Capable_init(cap_);
         __ERC20PeriodsMintLimit_init(periods, limits);
+        __ERC20Capable_init(cap_);
         __ERC20Base_init(_owner, _name, _symbol, _decimals, _initialSupply);
     }
 }

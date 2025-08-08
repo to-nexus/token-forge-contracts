@@ -3,7 +3,7 @@ pragma solidity 0.8.28;
 
 import {ERC20Base, ERC20Capable} from "./ERC20Capable.sol";
 
-contract ERC20PeriodsMintLimit is ERC20Capable {
+abstract contract ERC20PeriodsMintLimit is ERC20Capable {
     error ERC20PeriodsMintLimit__InvalidLength();
     error ERC20PeriodsMintLimit__InvalidLimitData(uint256 index);
     error ERC20PeriodsMintLimit__ExceedsPeriodLimit(uint256 period, uint256 requested, uint256 available);
@@ -22,7 +22,7 @@ contract ERC20PeriodsMintLimit is ERC20Capable {
 
     // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20.ERC20PeriodsMintLimit")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant ERC20PeriodsMintLimitStorageLocation =
-        0x0f070392f17d5f958cc1ac31867dabecfc5c9758b4a419a200803226d7155d00;
+        0x70751f9b068a2d675ee078361261fbe89193a5378437f7a2680d0d1e667b9d00;
 
     function _getERC20PeriodsMintLimitStorage() private pure returns (ERC20PeriodsMintLimitStorage storage $) {
         assembly {
@@ -38,6 +38,7 @@ contract ERC20PeriodsMintLimit is ERC20Capable {
         if (length == 0 || length != periods.length) {
             revert ERC20PeriodsMintLimit__InvalidLength();
         }
+
         uint256 minPeriod = 0;
         uint256 minLimit = 0;
         for (uint256 i = 0; i < length;) {
@@ -59,6 +60,8 @@ contract ERC20PeriodsMintLimit is ERC20Capable {
         $.length = length;
         $.limits = limits;
         $.periods = periods;
+        $.periodStartBlocks = new uint256[](length);
+        $.periodCapacities = new uint256[](length);
     }
 
     function mint(address to, uint256 amount) public virtual override {
@@ -66,8 +69,8 @@ contract ERC20PeriodsMintLimit is ERC20Capable {
 
         uint256[] storage _periodStartBlocks = $.periodStartBlocks;
         uint256[] storage _periodCapacities = $.periodCapacities;
-
         uint256[] memory currentPeriodStartBlocks = periodStartBlocks();
+
         uint256 length = $.length;
         for (uint256 i = 0; i < length;) {
             (uint256 periodCapacity, uint256 periodStartBlock, uint256 currentPeriodStartBlock) =
@@ -83,7 +86,7 @@ contract ERC20PeriodsMintLimit is ERC20Capable {
                 emit PeriodStarted(currentPeriodStartBlock, limit);
             }
             // Check available capacity
-            if (amount > periodCapacity) {
+            if (periodCapacity < amount) {
                 revert ERC20PeriodsMintLimit__ExceedsPeriodLimit($.periods[i], amount, periodCapacity);
             }
             // Update available capacity
@@ -135,11 +138,9 @@ contract ERC20PeriodsMintLimit is ERC20Capable {
         uint256 _currentBlock = block.number;
         for (uint256 i = 0; i < length;) {
             uint256 _period = _periods[i];
-            uint256 _block;
             unchecked {
-                _block = _currentBlock - (_currentBlock & _period);
+                startBlocks[i] = _currentBlock - (_currentBlock % _period);
             }
-            startBlocks[i] = _block;
             unchecked {
                 ++i;
             }

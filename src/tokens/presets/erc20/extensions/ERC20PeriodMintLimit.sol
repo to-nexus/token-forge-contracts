@@ -21,7 +21,7 @@ contract ERC20PeriodMintLimit is ERC20Capable {
 
     // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20.ERC20PeriodMintLimit")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant ERC20PeriodMintLimitStorageLocation =
-        0x0f070392f17d5f958cc1ac31867dabecfc5c9758b4a419a200803226d7155d00;
+        0x02a11301204be66f32a67781798c285672cc036f4b261d5c0050a8b03927de00;
 
     function _getERC20PeriodMintLimitStorage() private pure returns (ERC20PeriodMintLimitStorage storage $) {
         assembly {

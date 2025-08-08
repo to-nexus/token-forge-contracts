@@ -23,8 +23,8 @@ contract ERC20SingleMintLimited is ERC20PeriodMintLimit {
         if (cap_ < _initialSupply) revert ERC20SingleMintLimited__CapTooLow(cap_, _initialSupply);
 
         // Initialize parent contracts
-        __ERC20Capable_init(cap_);
         __ERC20PeriodMintLimit_init(period, limit);
+        __ERC20Capable_init(cap_);
         __ERC20Base_init(_owner, _name, _symbol, _decimals, _initialSupply);
     }
 }

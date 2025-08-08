@@ -23,12 +23,13 @@ abstract contract ERC20Capable is ERC20Upgradeable, ERC20Base, ERC20CappedUpgrad
         }
     }
 
-    function decimals() public view override(ERC20Upgradeable, ERC20Base) returns (uint8) {
+    function decimals() public view virtual override(ERC20Upgradeable, ERC20Base) returns (uint8) {
         return ERC20Base.decimals();
     }
 
     function _update(address from, address to, uint256 value)
         internal
+        virtual
         override(ERC20Upgradeable, ERC20CappedUpgradeable)
     {
         ERC20CappedUpgradeable._update(from, to, value);
