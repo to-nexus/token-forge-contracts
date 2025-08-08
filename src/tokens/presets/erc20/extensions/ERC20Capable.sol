@@ -10,10 +10,7 @@ import {ERC20Base} from "../ERC20Base.sol";
 abstract contract ERC20Capable is ERC20Upgradeable, ERC20Base, ERC20CappedUpgradeable {
     function __ERC20Capable_init(uint256 cap_) internal onlyInitializing {
         ERC20CappedUpgradeable.__ERC20Capped_init(cap_);
-        __ERC20Capable_init_unchained(cap_);
     }
-
-    function __ERC20Capable_init_unchained(uint256 cap_) private onlyInitializing {}
 
     function remainingSupply() external view returns (uint256) {
         uint256 currentSupply = totalSupply();

@@ -17,15 +17,15 @@ contract ERC20MultiMintLimited is ERC20PeriodsMintLimit {
     ) external override initializer {
         // Decode cap from _data
         if (_data.length <= 32 * 3) revert ERC20MultiMintLimited__InvalidInitialData();
-        (uint256 cap_, uint256[] memory periods, uint256[] memory limits) =
+        (uint256 _cap, uint256[] memory periods, uint256[] memory limits) =
             abi.decode(_data, (uint256, uint256[], uint256[]));
 
         // Validate cap
-        if (cap_ < _initialSupply) revert ERC20MultiMintLimited__CapTooLow(cap_, _initialSupply);
+        if (_cap < _initialSupply) revert ERC20MultiMintLimited__CapTooLow(_cap, _initialSupply);
 
         // Initialize parent contracts
         __ERC20PeriodsMintLimit_init(periods, limits);
-        __ERC20Capable_init(cap_);
+        __ERC20Capable_init(_cap);
         __ERC20Base_init(_owner, _name, _symbol, _decimals, _initialSupply);
     }
 }

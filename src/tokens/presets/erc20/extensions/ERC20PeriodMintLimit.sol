@@ -3,7 +3,7 @@ pragma solidity 0.8.28;
 
 import {ERC20Base, ERC20Capable} from "./ERC20Capable.sol";
 
-contract ERC20PeriodMintLimit is ERC20Capable {
+abstract contract ERC20PeriodMintLimit is ERC20Capable {
     error ERC20PeriodMintLimit__InvalidLength();
     error ERC20PeriodMintLimit__InvalidLimitData();
     error ERC20PeriodMintLimit__ExceedsPeriodLimit(uint256 requested, uint256 available);
@@ -96,7 +96,7 @@ contract ERC20PeriodMintLimit is ERC20Capable {
         return _block;
     }
 
-    function updateMintLimits(uint256 newLimit) external onlyOwner {
+    function updateMintLimit(uint256 newLimit) external onlyOwner {
         if (newLimit == 0) revert TokenBase__NullInput("newLimit");
 
         ERC20PeriodMintLimitStorage storage $ = _getERC20PeriodMintLimitStorage();
