@@ -1,0 +1,107 @@
+// SPDX-License-Identifier: UNLICENSED
+pragma solidity 0.8.28;
+
+import {ERC20Base, ERC20Capable} from "./ERC20Capable.sol";
+
+contract ERC20PeriodMintLimit is ERC20Capable {
+    error ERC20PeriodMintLimit__InvalidLength();
+    error ERC20PeriodMintLimit__InvalidLimitData();
+    error ERC20PeriodMintLimit__ExceedsPeriodLimit(uint256 requested, uint256 available);
+
+    event PeriodStarted(uint256 indexed periodStartBlock, uint256 availableCapacity);
+    event MintLimitUpdated(uint256 oldLimits, uint256 newLimits);
+
+    /// @custom:storage-location erc7201:cross.storage.forge.erc20.ERC20PeriodMintLimit
+    struct ERC20PeriodMintLimitStorage {
+        uint256 limit;
+        uint256 period;
+        uint256 periodStartBlock;
+        uint256 periodCapacity;
+    }
+
+    // keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20.ERC20PeriodMintLimit")) - 1)) & ~bytes32(uint256(0xff))
+    bytes32 private constant ERC20PeriodMintLimitStorageLocation =
+        0x0f070392f17d5f958cc1ac31867dabecfc5c9758b4a419a200803226d7155d00;
+
+    function _getERC20PeriodMintLimitStorage() private pure returns (ERC20PeriodMintLimitStorage storage $) {
+        assembly {
+            $.slot := ERC20PeriodMintLimitStorageLocation
+        }
+    }
+
+    function __ERC20PeriodMintLimit_init(uint256 period, uint256 limit) internal onlyInitializing {
+        if (period == 0 || limit == 0) {
+            revert TokenBase__NullInput("limit or period");
+        }
+
+        ERC20PeriodMintLimitStorage storage $ = _getERC20PeriodMintLimitStorage();
+        $.period = period;
+        $.limit = limit;
+    }
+
+    function mint(address to, uint256 amount) public virtual override {
+        ERC20PeriodMintLimitStorage storage $ = _getERC20PeriodMintLimitStorage();
+
+        uint256 periodCapacity = $.periodCapacity;
+        {
+            uint256 currentPeriodStartBlock = periodStartBlock();
+            // Check if the period has started
+            if ($.periodStartBlock != currentPeriodStartBlock) {
+                // Initialize the period start block if not set
+                uint256 limit = $.limit;
+                $.periodStartBlock = currentPeriodStartBlock;
+                periodCapacity = limit;
+
+                emit PeriodStarted(currentPeriodStartBlock, limit);
+            }
+        }
+
+        // Check available capacity
+        if (periodCapacity < amount) {
+            revert ERC20PeriodMintLimit__ExceedsPeriodLimit(amount, periodCapacity);
+        }
+        // Update available capacity
+        unchecked {
+            $.periodCapacity = periodCapacity - amount;
+        }
+
+        // Mint the tokens
+        ERC20Base.mint(to, amount);
+    }
+
+    function periodBlock() external view returns (uint256) {
+        return _getERC20PeriodMintLimitStorage().period;
+    }
+
+    function maxMintPerPeriod() external view returns (uint256) {
+        return _getERC20PeriodMintLimitStorage().limit;
+    }
+
+    function availableMintCapacity() external view returns (uint256) {
+        ERC20PeriodMintLimitStorage storage $ = _getERC20PeriodMintLimitStorage();
+        if ($.periodStartBlock == periodStartBlock()) {
+            return $.periodCapacity;
+        } else {
+            return $.limit;
+        }
+    }
+
+    function periodStartBlock() public view returns (uint256) {
+        ERC20PeriodMintLimitStorage storage $ = _getERC20PeriodMintLimitStorage();
+        uint256 _block;
+        uint256 _currentBlock = block.number;
+        unchecked {
+            _block = _currentBlock - (_currentBlock % $.period);
+        }
+        return _block;
+    }
+
+    function updateMintLimits(uint256 newLimit) external onlyOwner {
+        if (newLimit == 0) revert TokenBase__NullInput("newLimit");
+
+        ERC20PeriodMintLimitStorage storage $ = _getERC20PeriodMintLimitStorage();
+        // Update limit
+        emit MintLimitUpdated($.limit, newLimit);
+        $.limit = newLimit;
+    }
+}

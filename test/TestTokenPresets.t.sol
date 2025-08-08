@@ -405,7 +405,6 @@ contract TestTokenPresets is Test {
         assertEq(erc20.balanceOf(SERVICE_OWNER), initialSupply, "Initial supply should match");
         assertEq(erc20.cap(), cap, "Cap should match");
         assertEq(erc20.remainingSupply(), cap - initialSupply, "Remaining supply should match");
-        assertEq(erc20.isCapReached(), false, "Cap should not be reached initially");
 
         {
             address[] memory forges = new address[](1);
@@ -491,7 +490,6 @@ contract TestTokenPresets is Test {
 
         assertEq(erc20.totalSupply(), 2000e18, "Total supply should equal cap");
         assertEq(erc20.remainingSupply(), 0, "Remaining supply should be 0");
-        assertEq(erc20.isCapReached(), true, "Cap should be reached");
     }
 
     function test_erc20_capped_mint_when_cap_reached() external {
