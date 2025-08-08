@@ -13,9 +13,9 @@ abstract contract ERC20PeriodMintLimit is ERC20Capable {
 
     /// @custom:storage-location erc7201:cross.storage.forge.erc20.ERC20PeriodMintLimit
     struct ERC20PeriodMintLimitStorage {
-        uint256 limit;
         uint256 period;
         uint256 periodStartBlock;
+        uint256 limit;
         uint256 periodCapacity;
     }
 
@@ -48,11 +48,10 @@ abstract contract ERC20PeriodMintLimit is ERC20Capable {
             // Check if the period has started
             if ($.periodStartBlock != currentPeriodStartBlock) {
                 // Initialize the period start block if not set
-                uint256 limit = $.limit;
                 $.periodStartBlock = currentPeriodStartBlock;
-                periodCapacity = limit;
+                periodCapacity = $.limit;
 
-                emit PeriodStarted(currentPeriodStartBlock, limit);
+                emit PeriodStarted(currentPeriodStartBlock, periodCapacity);
             }
         }
 
@@ -87,13 +86,11 @@ abstract contract ERC20PeriodMintLimit is ERC20Capable {
     }
 
     function periodStartBlock() public view returns (uint256) {
-        ERC20PeriodMintLimitStorage storage $ = _getERC20PeriodMintLimitStorage();
-        uint256 _block;
+        uint256 period = _getERC20PeriodMintLimitStorage().period;
         uint256 _currentBlock = block.number;
         unchecked {
-            _block = _currentBlock - (_currentBlock % $.period);
+            return _currentBlock - (_currentBlock % period);
         }
-        return _block;
     }
 
     function updateMintLimit(uint256 newLimit) external onlyOwner {

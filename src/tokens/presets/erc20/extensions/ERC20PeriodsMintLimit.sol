@@ -50,7 +50,7 @@ abstract contract ERC20PeriodsMintLimit is ERC20Capable {
                 revert ERC20PeriodsMintLimit__InvalidLimitData(i);
             }
 
-            (minPeriod, minLimit) = (periods[i], limits[i]);
+            (minPeriod, minLimit) = (period, limit);
             unchecked {
                 ++i;
             }
@@ -164,6 +164,7 @@ abstract contract ERC20PeriodsMintLimit is ERC20Capable {
             if (newLimit <= minLimit) {
                 revert ERC20PeriodsMintLimit__InvalidLimitData(i);
             }
+            minLimit = newLimit;
             unchecked {
                 ++i;
             }

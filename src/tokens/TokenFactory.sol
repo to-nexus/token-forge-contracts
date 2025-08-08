@@ -5,7 +5,6 @@ import {AccessControlUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.
 import {UUPSUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/proxy/utils/UUPSUpgradeable.sol";
 import {EnumerableSet} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableSet.sol";
 import {Create2} from "@openzeppelin-contracts-5.3.0/utils/Create2.sol";
-import {ShortString, ShortStrings} from "@openzeppelin-contracts-5.3.0/utils/ShortStrings.sol";
 import {ERC1967Proxy} from "@openzeppelin-contracts-5.3.0/proxy/ERC1967/ERC1967Proxy.sol";
 
 import {IERC165} from "@openzeppelin-contracts-5.3.0/interfaces/IERC165.sol";
