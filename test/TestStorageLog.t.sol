@@ -47,6 +47,16 @@ contract TestStorageLog is Test {
         }
     }
 
+    function test_storage_token_erc20_capable() external pure {
+        bytes32 location;
+        {
+            location = keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20.ERC20Capable")) - 1))
+                & ~bytes32(uint256(0xff));
+            console.log("\nERC20 ERC20Capable");
+            console.logBytes32(location);
+        }
+    }
+
     function test_storage_token_erc20_period_mint_limit() external pure {
         bytes32 location;
         {

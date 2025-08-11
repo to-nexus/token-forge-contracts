@@ -462,7 +462,9 @@ contract TestTokenPresets is Test {
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
         vm.prank(ACCOUNT.addr);
-        vm.expectRevert(abi.encodeWithSignature("ERC20ExceededCap(uint256,uint256)", 1500e18 + excessAmount, 2000e18));
+        vm.expectRevert(
+            abi.encodeWithSignature("ERC20Capable__ERC20ExceededCap(uint256,uint256)", 1500e18 + excessAmount, 2000e18)
+        );
         ForgeV1(FORGE).mintERC20(address(erc20), excessAmount, address(0), 0, deadline, abi.encodePacked(r, s, v));
     }
 
@@ -512,7 +514,9 @@ contract TestTokenPresets is Test {
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
         vm.prank(ACCOUNT.addr);
-        vm.expectRevert(abi.encodeWithSignature("ERC20ExceededCap(uint256,uint256)", 2000e18 + 1, 2000e18));
+        vm.expectRevert(
+            abi.encodeWithSignature("ERC20Capable__ERC20ExceededCap(uint256,uint256)", 2000e18 + 1, 2000e18)
+        );
         ForgeV1(FORGE).mintERC20(address(erc20), 1, address(0), 0, deadline, abi.encodePacked(r, s, v));
     }
 

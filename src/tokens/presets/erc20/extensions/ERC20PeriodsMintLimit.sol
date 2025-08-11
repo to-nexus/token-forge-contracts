@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.28;
 
-import {ERC20Base, ERC20Capable} from "./ERC20Capable.sol";
+import {ERC20Base} from "../ERC20Base.sol";
 
-abstract contract ERC20PeriodsMintLimit is ERC20Capable {
+abstract contract ERC20PeriodsMintLimit is ERC20Base {
     error ERC20PeriodsMintLimit__InvalidLength();
     error ERC20PeriodsMintLimit__InvalidLimitData(uint256 index);
     error ERC20PeriodsMintLimit__ExceedsPeriodLimit(uint256 period, uint256 requested, uint256 available);
@@ -97,7 +97,7 @@ abstract contract ERC20PeriodsMintLimit is ERC20Capable {
         }
 
         // Mint the tokens
-        ERC20Base.mint(to, amount);
+        super.mint(to, amount);
     }
 
     function periodBlocks() external view returns (uint256[] memory) {

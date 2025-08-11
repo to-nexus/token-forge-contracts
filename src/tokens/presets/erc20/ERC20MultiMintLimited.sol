@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.28;
 
-import {ERC20Base, ERC20Capable, ERC20PeriodsMintLimit} from "./extensions/ERC20PeriodsMintLimit.sol";
+import {ERC20Base} from "./ERC20Base.sol";
+import {ERC20Capable} from "./extensions/ERC20Capable.sol";
+import {ERC20PeriodsMintLimit} from "./extensions/ERC20PeriodsMintLimit.sol";
 
-contract ERC20MultiMintLimited is ERC20PeriodsMintLimit {
+contract ERC20MultiMintLimited is ERC20Base, ERC20Capable, ERC20PeriodsMintLimit {
     error ERC20MultiMintLimited__InvalidInitialData();
     error ERC20MultiMintLimited__CapTooLow(uint256 cap, uint256 initialSupply);
 
@@ -27,5 +29,13 @@ contract ERC20MultiMintLimited is ERC20PeriodsMintLimit {
         __ERC20PeriodsMintLimit_init(periods, limits);
         __ERC20Capable_init(_cap);
         __ERC20Base_init(_owner, _name, _symbol, _decimals, _initialSupply);
+    }
+
+    function mint(address to, uint256 amount) public virtual override(ERC20Base, ERC20PeriodsMintLimit) {
+        ERC20PeriodsMintLimit.mint(to, amount);
+    }
+
+    function _update(address from, address to, uint256 value) internal virtual override(ERC20Base, ERC20Capable) {
+        ERC20Capable._update(from, to, value);
     }
 }
