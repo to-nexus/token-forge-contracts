@@ -27,6 +27,7 @@ import "./mock/StructHash.sol";
 
 contract TestException is Test {
     address public constant OWNER = address(bytes20("OWNER"));
+    address public constant MANAGER = address(bytes20("MANAGER"));
     address public constant SERVICE_OWNER = address(bytes20("SERVICE_OWNER"));
 
     bytes32 public constant SERVICE_NAME = bytes32("TestService");

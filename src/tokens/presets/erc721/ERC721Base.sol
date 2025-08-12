@@ -22,17 +22,23 @@ abstract contract ERC721Base is
 
     function initialize(
         address owner,
+        address manager,
         string memory name,
         string memory symbol,
         string memory baseTokenURI,
-        bytes memory
-    ) external virtual;
+        bytes memory data
+    ) external virtual override initializer {
+        __ERC721Base_init(owner, manager, name, symbol, baseTokenURI);
+    }
 
-    function __ERC721Base_init(address owner, string memory name, string memory symbol, string memory baseTokenURI)
-        internal
-        onlyInitializing
-    {
-        __TokenBase_init(owner);
+    function __ERC721Base_init(
+        address owner,
+        address manager,
+        string memory name,
+        string memory symbol,
+        string memory baseTokenURI
+    ) internal onlyInitializing {
+        __TokenBase_init(owner, manager);
         __ERC721Base_init_unchained(name, symbol, baseTokenURI);
 
         __ERC721_init(name, symbol);

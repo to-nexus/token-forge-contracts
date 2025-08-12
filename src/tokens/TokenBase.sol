@@ -3,11 +3,13 @@ pragma solidity 0.8.28;
 
 import {UUPSUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/access/OwnableUpgradeable.sol";
-import {ERC165Upgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/introspection/ERC165Upgradeable.sol";
 import {EnumerableSet} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableSet.sol";
+import {AccessControlUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/access/AccessControlUpgradeable.sol";
 
-abstract contract TokenBase is UUPSUpgradeable, OwnableUpgradeable, ERC165Upgradeable {
+abstract contract TokenBase is UUPSUpgradeable, AccessControlUpgradeable {
     using EnumerableSet for EnumerableSet.AddressSet;
+
+    bytes32 public constant MANAGER_ROLE = keccak256("MANAGER");
 
     error TokenBase__NullInput(bytes32 field);
     error TokenBase__OnlyForge(address caller);
@@ -25,10 +27,16 @@ abstract contract TokenBase is UUPSUpgradeable, OwnableUpgradeable, ERC165Upgrad
         }
     }
 
-    function __TokenBase_init(address _owner) internal onlyInitializing {
-        __Ownable_init(_owner);
+    function __TokenBase_init(address _owner, address _manager) internal onlyInitializing {
+        __AccessControl_init();
         __UUPSUpgradeable_init();
         __ERC165_init();
+        _grantRole(DEFAULT_ADMIN_ROLE, _owner);
+        _grantRole(MANAGER_ROLE, _owner);
+        if (_manager != address(0) && _manager != _owner) {
+            _grantRole(MANAGER_ROLE, _manager);
+        }
+        _setRoleAdmin(MANAGER_ROLE, DEFAULT_ADMIN_ROLE);
     }
 
     modifier onlyForge() {
@@ -52,7 +60,7 @@ abstract contract TokenBase is UUPSUpgradeable, OwnableUpgradeable, ERC165Upgrad
         return _getForgesStorage().contains(forge);
     }
 
-    function setForges(address[] calldata _forges, bool add) external onlyOwner {
+    function setForges(address[] calldata _forges, bool add) external onlyRole(MANAGER_ROLE) {
         function (EnumerableSet.AddressSet storage, address) fn = add ? _addForge : _removeForge;
 
         EnumerableSet.AddressSet storage $ = _getForgesStorage();
@@ -78,8 +86,8 @@ abstract contract TokenBase is UUPSUpgradeable, OwnableUpgradeable, ERC165Upgrad
     }
 
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
-        return ERC165Upgradeable.supportsInterface(interfaceId);
+        return AccessControlUpgradeable.supportsInterface(interfaceId);
     }
 
-    function _authorizeUpgrade(address) internal override onlyOwner {}
+    function _authorizeUpgrade(address) internal override onlyRole(DEFAULT_ADMIN_ROLE) {}
 }
