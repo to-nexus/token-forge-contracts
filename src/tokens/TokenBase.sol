@@ -30,12 +30,15 @@ abstract contract TokenBase is UUPSUpgradeable, AccessControlUpgradeable {
     function __TokenBase_init(address _owner, address _manager) internal onlyInitializing {
         __AccessControl_init();
         __UUPSUpgradeable_init();
-        __ERC165_init();
+
+        if (_owner == address(0)) revert TokenBase__NullInput("owner");
         _grantRole(DEFAULT_ADMIN_ROLE, _owner);
         _grantRole(MANAGER_ROLE, _owner);
+
         if (_manager != address(0) && _manager != _owner) {
             _grantRole(MANAGER_ROLE, _manager);
         }
+
         _setRoleAdmin(MANAGER_ROLE, DEFAULT_ADMIN_ROLE);
     }
 

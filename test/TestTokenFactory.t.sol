@@ -305,4 +305,50 @@ contract TestTokenFactory is Test {
 
         vm.stopPrank();
     }
+
+    function test_setForges_by_manager() external {
+        address MANAGER = address(bytes20("MANAGER"));
+        address[] memory erc20Impls = new address[](1);
+        erc20Impls[0] = mockERC20Impl;
+        address[] memory erc721Impls = new address[](1);
+        erc721Impls[0] = mockERC721Impl;
+        address[] memory erc1155Impls = new address[](1);
+        erc1155Impls[0] = mockERC1155Impl;
+        address tokenFactoryImpl = address(new TokenFactory());
+        address tokenFactoryProxy = address(
+            new ERC1967Proxy(
+                tokenFactoryImpl,
+                abi.encodeCall(TokenFactory.initialize, (OWNER, erc20Impls, erc721Impls, erc1155Impls))
+            )
+        );
+        TokenFactory tf = TokenFactory(tokenFactoryProxy);
+        vm.startPrank(OWNER);
+        // ERC20 배포
+        address erc20 = tf.deployERC20(OWNER, MANAGER, "Test20", "T20", 18, 1000 ether, "", mockERC20Impl);
+        // ERC721 배포
+        address erc721 = tf.deployERC721(OWNER, MANAGER, "Test721", "T721", "https://uri/", "", mockERC721Impl);
+        // ERC1155 배포
+        address erc1155 = tf.deployERC1155(OWNER, MANAGER, "https://uri/", "", mockERC1155Impl);
+        vm.stopPrank();
+
+        // MANAGER 권한으로 setForges 호출
+        address[] memory forges = new address[](1);
+        forges[0] = address(0x1234);
+        vm.startPrank(MANAGER);
+        MockERC20(erc20).setForges(forges, true);
+        assertTrue(MockERC20(erc20).isForge(address(0x1234)));
+        MockERC721(erc721).setForges(forges, true);
+        assertTrue(MockERC721(erc721).isForge(address(0x1234)));
+        MockERC1155(erc1155).setForges(forges, true);
+        assertTrue(MockERC1155(erc1155).isForge(address(0x1234)));
+
+        MockERC20(erc20).setForges(forges, false);
+        assertFalse(MockERC20(erc20).isForge(address(0x1234)));
+        MockERC721(erc721).setForges(forges, false);
+        assertFalse(MockERC721(erc721).isForge(address(0x1234)));
+        MockERC1155(erc1155).setForges(forges, false);
+        assertFalse(MockERC1155(erc1155).isForge(address(0x1234)));
+
+        vm.stopPrank();
+    }
 }
