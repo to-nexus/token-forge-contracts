@@ -148,7 +148,7 @@ abstract contract ERC20PeriodsMintLimit is ERC20Base {
         return startBlocks;
     }
 
-    function updateMintLimits(uint256[] calldata newLimits) external onlyOwner {
+    function updateMintLimits(uint256[] calldata newLimits) external onlyRole(DEFAULT_ADMIN_ROLE) {
         // Validate new limit
         uint256 length = newLimits.length;
         if (length == 0) revert TokenBase__NullInput("newLimits");

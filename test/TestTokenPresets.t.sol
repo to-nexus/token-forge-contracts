@@ -595,7 +595,7 @@ contract TestTokenPresets is Test {
         vm.prank(OWNER);
         ERC20MultiMintLimited erc20 = ERC20MultiMintLimited(
             tokenFactory.deployERC20(
-                SERVICE_OWNER, "ERC20MultiMintLimited", "ERC20MM", 18, initialSupply, limitData, address(logic)
+                SERVICE_OWNER, MANAGER, "ERC20MultiMintLimited", "ERC20MM", 18, initialSupply, limitData, address(logic)
             )
         );
 
@@ -766,7 +766,7 @@ contract TestTokenPresets is Test {
         vm.prank(OWNER);
         ERC20MultiMintLimited erc20 = ERC20MultiMintLimited(
             tokenFactory.deployERC20(
-                SERVICE_OWNER, "ERC20MultiMintLimited", "ERC20MM", 18, initialSupply, limitData, address(logic)
+                SERVICE_OWNER, MANAGER, "ERC20MultiMintLimited", "ERC20MM", 18, initialSupply, limitData, address(logic)
             )
         );
 
@@ -796,7 +796,14 @@ contract TestTokenPresets is Test {
         vm.prank(OWNER);
         ERC20SingleMintLimited erc20 = ERC20SingleMintLimited(
             tokenFactory.deployERC20(
-                SERVICE_OWNER, "ERC20SingleMintLimited", "ERC20SM", 18, initialSupply, limitData, address(logic)
+                SERVICE_OWNER,
+                MANAGER,
+                "ERC20SingleMintLimited",
+                "ERC20SM",
+                18,
+                initialSupply,
+                limitData,
+                address(logic)
             )
         );
 

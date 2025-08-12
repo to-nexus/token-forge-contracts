@@ -76,4 +76,16 @@ abstract contract ERC20Base is TokenBase, IERC20Forge, ERC20Upgradeable, ERC20Pe
     function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
         return interfaceId == type(IERC20Forge).interfaceId || super.supportsInterface(interfaceId);
     }
+
+    function _update(address from, address to, uint256 value) internal virtual override {
+        ERC20Upgradeable._update(from, to, value);
+    }
+
+    function transfer(address to, uint256 value) public virtual override returns (bool) {
+        return ERC20Upgradeable.transfer(to, value);
+    }
+
+    function transferFrom(address from, address to, uint256 value) public virtual override returns (bool) {
+        return ERC20Upgradeable.transferFrom(from, to, value);
+    }
 }

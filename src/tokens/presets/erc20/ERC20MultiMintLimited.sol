@@ -11,6 +11,7 @@ contract ERC20MultiMintLimited is ERC20Base, ERC20Capable, ERC20PeriodsMintLimit
 
     function initialize(
         address _owner,
+        address _manager,
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
@@ -28,7 +29,7 @@ contract ERC20MultiMintLimited is ERC20Base, ERC20Capable, ERC20PeriodsMintLimit
         // Initialize parent contracts
         __ERC20PeriodsMintLimit_init(periods, limits);
         __ERC20Capable_init(_cap);
-        __ERC20Base_init(_owner, _name, _symbol, _decimals, _initialSupply);
+        __ERC20Base_init(_owner, _manager, _name, _symbol, _decimals, _initialSupply);
     }
 
     function mint(address to, uint256 amount) public virtual override(ERC20Base, ERC20PeriodsMintLimit) {
