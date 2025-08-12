@@ -47,22 +47,42 @@ contract TestStorageLog is Test {
         }
     }
 
+    function test_storage_token_erc20_capable() external pure {
+        bytes32 location;
+        {
+            location = keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20.ERC20Capable")) - 1))
+                & ~bytes32(uint256(0xff));
+            console.log("\nERC20 ERC20Capable");
+            console.logBytes32(location);
+        }
+    }
+
+    function test_storage_token_erc20_period_mint_limit() external pure {
+        bytes32 location;
+        {
+            location = keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20.ERC20PeriodMintLimit")) - 1))
+                & ~bytes32(uint256(0xff));
+            console.log("\nERC20 ERC20PeriodMintLimit");
+            console.logBytes32(location);
+        }
+    }
+
+    function test_storage_token_erc20_periods_mint_limit() external pure {
+        bytes32 location;
+        {
+            location = keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20.ERC20PeriodsMintLimit")) - 1))
+                & ~bytes32(uint256(0xff));
+            console.log("\nERC20 ERC20PeriodsMintLimit");
+            console.logBytes32(location);
+        }
+    }
+
     function test_storage_token_erc721() external pure {
         bytes32 location;
         {
             location = keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc721.baseURI")) - 1))
                 & ~bytes32(uint256(0xff));
             console.log("\nERC721 BaseURI");
-            console.logBytes32(location);
-        }
-    }
-
-    function test_storage_token_erc20_mintingfee() external pure {
-        bytes32 location;
-        {
-            location =
-                keccak256(abi.encode(uint256(keccak256("cross.storage.forge.erc20.fee")) - 1)) & ~bytes32(uint256(0xff));
-            console.log("\nERC20Fee");
             console.logBytes32(location);
         }
     }

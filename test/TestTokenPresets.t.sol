@@ -26,6 +26,8 @@ import "./mock/StructHash.sol";
 import {ERC20Mintable} from "../src/tokens/presets/erc20/ERC20Mintable.sol";
 import {ERC20Fixed} from "../src/tokens/presets/erc20/ERC20Fixed.sol";
 import {ERC20Capped} from "../src/tokens/presets/erc20/ERC20Capped.sol";
+import {ERC20MultiMintLimited} from "../src/tokens/presets/erc20/ERC20MultiMintLimited.sol";
+import {ERC20SingleMintLimited} from "../src/tokens/presets/erc20/ERC20SingleMintLimited.sol";
 
 contract TestTokenPresets is Test {
     address public constant OWNER = address(bytes20("OWNER"));
@@ -405,7 +407,6 @@ contract TestTokenPresets is Test {
         assertEq(erc20.balanceOf(SERVICE_OWNER), initialSupply, "Initial supply should match");
         assertEq(erc20.cap(), cap, "Cap should match");
         assertEq(erc20.remainingSupply(), cap - initialSupply, "Remaining supply should match");
-        assertEq(erc20.isCapReached(), false, "Cap should not be reached initially");
 
         {
             address[] memory forges = new address[](1);
@@ -461,7 +462,9 @@ contract TestTokenPresets is Test {
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
         vm.prank(ACCOUNT.addr);
-        vm.expectRevert(abi.encodeWithSignature("ERC20ExceededCap(uint256,uint256)", 1500e18 + excessAmount, 2000e18));
+        vm.expectRevert(
+            abi.encodeWithSignature("ERC20Capable__ERC20ExceededCap(uint256,uint256)", 1500e18 + excessAmount, 2000e18)
+        );
         ForgeV1(FORGE).mintERC20(address(erc20), excessAmount, address(0), 0, deadline, abi.encodePacked(r, s, v));
     }
 
@@ -491,7 +494,6 @@ contract TestTokenPresets is Test {
 
         assertEq(erc20.totalSupply(), 2000e18, "Total supply should equal cap");
         assertEq(erc20.remainingSupply(), 0, "Remaining supply should be 0");
-        assertEq(erc20.isCapReached(), true, "Cap should be reached");
     }
 
     function test_erc20_capped_mint_when_cap_reached() external {
@@ -512,7 +514,9 @@ contract TestTokenPresets is Test {
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
         vm.prank(ACCOUNT.addr);
-        vm.expectRevert(abi.encodeWithSignature("ERC20ExceededCap(uint256,uint256)", 2000e18 + 1, 2000e18));
+        vm.expectRevert(
+            abi.encodeWithSignature("ERC20Capable__ERC20ExceededCap(uint256,uint256)", 2000e18 + 1, 2000e18)
+        );
         ForgeV1(FORGE).mintERC20(address(erc20), 1, address(0), 0, deadline, abi.encodePacked(r, s, v));
     }
 
@@ -558,5 +562,275 @@ contract TestTokenPresets is Test {
 
     function _calcUUID(uint256 nonce) internal view returns (uint256) {
         return uint256(keccak256(abi.encode(FORGE, ACCOUNT.addr, nonce)));
+    }
+
+    function test_erc20_multi_mint_limited_case1() external {
+        vm.roll(1000); // Set block number to 1000 for predictable time
+
+        ERC20MultiMintLimited logic = new ERC20MultiMintLimited();
+        address[] memory erc20Impls = new address[](1);
+        erc20Impls[0] = address(logic);
+
+        vm.prank(OWNER);
+        tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC20, erc20Impls, true);
+
+        uint256 initialSupply = 0;
+        uint256 cap = 50000e18; // Total cap for the token
+        uint256[] memory periods = new uint256[](2);
+        uint256[] memory limits = new uint256[](2);
+        periods[0] = 30; // 30 seconds
+        periods[1] = 60; // 60 seconds
+        limits[0] = 300e18; // 300 tokens in first period
+        limits[1] = 500e18; // 500 tokens in second period
+        bytes memory limitData = abi.encode(cap, periods, limits);
+
+        vm.prank(OWNER);
+        ERC20MultiMintLimited erc20 = ERC20MultiMintLimited(
+            tokenFactory.deployERC20(
+                SERVICE_OWNER, "ERC20MultiMintLimited", "ERC20MM", 18, initialSupply, limitData, address(logic)
+            )
+        );
+
+        assertEq(erc20.balanceOf(SERVICE_OWNER), initialSupply, "Initial supply should match");
+
+        {
+            address[] memory forges = new address[](1);
+            forges[0] = FORGE;
+            vm.prank(SERVICE_OWNER);
+            erc20.setForges(forges, true);
+        }
+
+        bytes memory er;
+
+        // Test successful mint within limit
+        uint256 mintAmount = 100e18;
+        _mintMultiMintLimited(erc20, mintAmount, er);
+        assertEq(erc20.balanceOf(ACCOUNT.addr), mintAmount, "First mint should succeed");
+
+        // Test second mint within limit
+        uint256 secondMintAmount = 200e18;
+        _mintMultiMintLimited(erc20, secondMintAmount, er);
+        assertEq(erc20.balanceOf(ACCOUNT.addr), mintAmount + secondMintAmount, "Second mint should succeed");
+    }
+
+    function test_erc20_multi_mint_limited_exceed_limit_case1() external {
+        ERC20MultiMintLimited erc20 = _setupMultiMintLimited();
+
+        // Try to mint amount exceeding limit
+        uint256 excessAmount = 600e18; // Exceeds 500e18 limit
+        uint256 deadline = block.timestamp + 30;
+        uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+
+        bytes32 structHash = keccak256(
+            abi.encode(
+                ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, address(erc20), excessAmount, address(0), 0, nonce, deadline
+            )
+        );
+        bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        vm.prank(ACCOUNT.addr);
+        vm.expectRevert(
+            abi.encodeWithSignature(
+                "ERC20PeriodsMintLimit__ExceedsPeriodLimit(uint256,uint256,uint256)", 30, excessAmount, 300e18
+            )
+        );
+        ForgeV1(FORGE).mintERC20(address(erc20), excessAmount, address(0), 0, deadline, abi.encodePacked(r, s, v));
+    }
+
+    function test_erc20_multi_mint_limited_case2() external {
+        ERC20MultiMintLimited erc20 = _setupMultiMintLimited();
+
+        bytes memory er;
+        // Mint exact limit amount
+        _mintMultiMintLimited(erc20, 300e18, er);
+        assertEq(erc20.balanceOf(ACCOUNT.addr), 300e18, "Should mint exact limit amount");
+
+        vm.roll(block.number + 30);
+        _mintMultiMintLimited(erc20, 200e18, er);
+        assertEq(erc20.balanceOf(ACCOUNT.addr), 300e18 + 200e18, "Should mint exact limit amount");
+    }
+
+    function test_erc20_multi_mint_limited_exceed_limit_case2() external {
+        ERC20MultiMintLimited erc20 = _setupMultiMintLimited();
+
+        bytes memory er;
+        // Mint exact limit amount
+        _mintMultiMintLimited(erc20, 300e18, er);
+        assertEq(erc20.balanceOf(ACCOUNT.addr), 300e18, "Should mint exact limit amount");
+
+        vm.roll(400);
+
+        assertTrue(erc20.availableMintCapacities()[1] < 300e18);
+        er = abi.encodeWithSignature(
+            "ERC20PeriodsMintLimit__ExceedsPeriodLimit(uint256,uint256,uint256)", 180, 300e18, 500e18 - 300e18
+        );
+        _mintMultiMintLimited(erc20, 300e18, er);
+    }
+
+    function test_erc20_single_mint_limited() external {
+        ERC20SingleMintLimited erc20 = _setupSingleMintLimited();
+
+        bytes memory er;
+        // Test successful single mint
+        uint256 mintAmount = 300e18;
+        _mintSingleMintLimited(erc20, mintAmount, er);
+        assertEq(erc20.balanceOf(ACCOUNT.addr), mintAmount, "Single mint should succeed");
+    }
+
+    function test_erc20_single_mint_limited_second_mint_fails() external {
+        ERC20SingleMintLimited erc20 = _setupSingleMintLimited();
+
+        bytes memory er;
+        // First mint succeeds
+        _mintSingleMintLimited(erc20, 100e18, er);
+
+        // Second mint should fail
+        er = abi.encodeWithSignature("ERC20PeriodMintLimit__ExceedsPeriodLimit(uint256,uint256)", 300e18, 200e18);
+        _mintSingleMintLimited(erc20, 300e18, er);
+    }
+
+    function test_erc20_single_mint_limited_exceed_limit() external {
+        ERC20SingleMintLimited erc20 = _setupSingleMintLimited();
+
+        bytes memory er =
+            abi.encodeWithSignature("ERC20PeriodMintLimit__ExceedsPeriodLimit(uint256,uint256)", 500e18, 300e18);
+        _mintSingleMintLimited(erc20, 500e18, er);
+    }
+
+    function test_erc20_single_mint_limited_exact_limit() external {
+        ERC20SingleMintLimited erc20 = _setupSingleMintLimited();
+
+        bytes memory er;
+        // Mint exact limit amount
+        uint256 limitAmount = 300e18;
+        _mintSingleMintLimited(erc20, limitAmount, er);
+        assertEq(erc20.balanceOf(ACCOUNT.addr), limitAmount, "Should mint exact limit amount");
+    }
+
+    function test_erc20_single_mint_limited_different_users() external {
+        ERC20SingleMintLimited erc20 = _setupSingleMintLimited();
+
+        bytes memory er;
+        // First user mints
+        _mintSingleMintLimited(erc20, 100e18, er);
+
+        // Second user should be able to mint
+        Vm.Wallet memory secondAccount = vm.createWallet("SecondAccount");
+        uint256 deadline = block.timestamp + 30;
+        uint256 nonce = NoncesUpgradeable(FORGE).nonces(secondAccount.addr);
+        uint256 mintAmount = 100e18;
+
+        bytes32 structHash = keccak256(
+            abi.encode(
+                ERC20_MINT_TYPE_HASH_V1, secondAccount.addr, address(erc20), mintAmount, address(0), 0, nonce, deadline
+            )
+        );
+        bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        vm.prank(secondAccount.addr);
+        ForgeV1(FORGE).mintERC20(address(erc20), mintAmount, address(0), 0, deadline, abi.encodePacked(r, s, v));
+
+        assertEq(erc20.balanceOf(secondAccount.addr), mintAmount, "Second user should mint successfully");
+    }
+
+    // Helper functions for mint limited tokens
+    function _setupMultiMintLimited() internal returns (ERC20MultiMintLimited) {
+        vm.roll(360); // Set block number to 360 for predictable time
+        ERC20MultiMintLimited logic = new ERC20MultiMintLimited();
+        address[] memory erc20Impls = new address[](1);
+        erc20Impls[0] = address(logic);
+
+        vm.prank(OWNER);
+        tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC20, erc20Impls, true);
+
+        uint256 initialSupply = 0;
+        uint256 cap = 50000e18; // Total cap for the token
+        uint256[] memory periods = new uint256[](2);
+        uint256[] memory limits = new uint256[](2);
+        periods[0] = 30; // 30 blocks
+        periods[1] = 180; // 180 blocks
+        limits[0] = 300e18; // 300 tokens in first period
+        limits[1] = 500e18; // 500 tokens in second period
+        bytes memory limitData = abi.encode(cap, periods, limits);
+
+        vm.prank(OWNER);
+        ERC20MultiMintLimited erc20 = ERC20MultiMintLimited(
+            tokenFactory.deployERC20(
+                SERVICE_OWNER, "ERC20MultiMintLimited", "ERC20MM", 18, initialSupply, limitData, address(logic)
+            )
+        );
+
+        address[] memory forges = new address[](1);
+        forges[0] = FORGE;
+        vm.prank(SERVICE_OWNER);
+        erc20.setForges(forges, true);
+
+        return erc20;
+    }
+
+    function _setupSingleMintLimited() internal returns (ERC20SingleMintLimited) {
+        vm.roll(301); // Set block number to 301 for predictable time
+        ERC20SingleMintLimited logic = new ERC20SingleMintLimited();
+        address[] memory erc20Impls = new address[](1);
+        erc20Impls[0] = address(logic);
+
+        vm.prank(OWNER);
+        tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC20, erc20Impls, true);
+
+        uint256 initialSupply = 1000e18;
+        uint256 cap = 50000e18; // Total cap for the token
+        uint256 period = 30; // 30 seconds
+        uint256 limit = 300e18; // 500 tokens limit
+        bytes memory limitData = abi.encode(cap, period, limit);
+
+        vm.prank(OWNER);
+        ERC20SingleMintLimited erc20 = ERC20SingleMintLimited(
+            tokenFactory.deployERC20(
+                SERVICE_OWNER, "ERC20SingleMintLimited", "ERC20SM", 18, initialSupply, limitData, address(logic)
+            )
+        );
+
+        address[] memory forges = new address[](1);
+        forges[0] = FORGE;
+        vm.prank(SERVICE_OWNER);
+        erc20.setForges(forges, true);
+
+        return erc20;
+    }
+
+    function _mintMultiMintLimited(ERC20MultiMintLimited erc20, uint256 amount, bytes memory er) internal {
+        uint256 deadline = block.timestamp + 30;
+        uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+
+        bytes32 structHash = keccak256(
+            abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, address(erc20), amount, address(0), 0, nonce, deadline)
+        );
+        bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        vm.prank(ACCOUNT.addr);
+        if (er.length != 0) {
+            vm.expectRevert(er);
+        }
+        ForgeV1(FORGE).mintERC20(address(erc20), amount, address(0), 0, deadline, abi.encodePacked(r, s, v));
+    }
+
+    function _mintSingleMintLimited(ERC20SingleMintLimited erc20, uint256 amount, bytes memory er) internal {
+        uint256 deadline = block.timestamp + 30;
+        uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+
+        bytes32 structHash = keccak256(
+            abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, address(erc20), amount, address(0), 0, nonce, deadline)
+        );
+        bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
+
+        vm.prank(ACCOUNT.addr);
+        if (er.length != 0) {
+            vm.expectRevert(er);
+        }
+        ForgeV1(FORGE).mintERC20(address(erc20), amount, address(0), 0, deadline, abi.encodePacked(r, s, v));
     }
 }
