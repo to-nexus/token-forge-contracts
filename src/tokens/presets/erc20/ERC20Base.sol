@@ -19,7 +19,7 @@ abstract contract ERC20Base is TokenBase, IERC20Forge, ERC20Upgradeable, ERC20Pe
         string memory _symbol,
         uint8 _decimals,
         uint256 _initialSupply,
-        bytes memory data
+        bytes memory
     ) external virtual override initializer {
         __ERC20Base_init(_owner, _manager, _name, _symbol, _decimals, _initialSupply);
     }

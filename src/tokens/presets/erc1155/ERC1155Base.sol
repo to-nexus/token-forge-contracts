@@ -8,7 +8,7 @@ import {IERC1155Forge} from "../../../interfaces/IERC1155Forge.sol";
 import {TokenBase} from "../../TokenBase.sol";
 
 abstract contract ERC1155Base is TokenBase, IERC1155Forge, ERC1155Upgradeable, ERC1155HolderUpgradeable {
-    function initialize(address owner, address manager, string memory baseTokenURI, bytes memory data)
+    function initialize(address owner, address manager, string memory baseTokenURI, bytes memory)
         external
         virtual
         override
