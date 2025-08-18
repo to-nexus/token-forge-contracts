@@ -27,6 +27,7 @@ import "./mock/StructHash.sol";
 
 contract TestException is Test {
     address public constant OWNER = address(bytes20("OWNER"));
+    address public constant MANAGER = address(bytes20("MANAGER"));
     address public constant SERVICE_OWNER = address(bytes20("SERVICE_OWNER"));
 
     bytes32 public constant SERVICE_NAME = bytes32("TestService");
@@ -170,11 +171,12 @@ contract TestException is Test {
             );
             tokenFactory = TokenFactory(tokenFactoryProxy);
         }
-        mockERC20 = MockERC20(tokenFactory.deployERC20(OWNER, "MockERC20", "M20", 18, 0, "", mockERC20Impl));
+        mockERC20 = MockERC20(tokenFactory.deployERC20(OWNER, MANAGER, "MockERC20", "M20", 18, 0, "", mockERC20Impl));
         mockERC721 = MockERC721(
-            tokenFactory.deployERC721(OWNER, "MockERC721", "M721", "https://xxx.yyy.zzz/", "", mockERC721Impl)
+            tokenFactory.deployERC721(OWNER, MANAGER, "MockERC721", "M721", "https://xxx.yyy.zzz/", "", mockERC721Impl)
         );
-        mockERC1155 = MockERC1155(tokenFactory.deployERC1155(OWNER, "https://xxx.yyy.zzz/", "", mockERC1155Impl));
+        mockERC1155 =
+            MockERC1155(tokenFactory.deployERC1155(OWNER, MANAGER, "https://xxx.yyy.zzz/", "", mockERC1155Impl));
 
         address[] memory forges = new address[](1);
         forges[0] = FORGE;

@@ -14,21 +14,25 @@ abstract contract ERC20Base is TokenBase, IERC20Forge, ERC20Upgradeable, ERC20Pe
 
     function initialize(
         address _owner,
+        address _manager,
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
         uint256 _initialSupply,
         bytes memory
-    ) external virtual;
+    ) external virtual override initializer {
+        __ERC20Base_init(_owner, _manager, _name, _symbol, _decimals, _initialSupply);
+    }
 
     function __ERC20Base_init(
         address _owner,
+        address _manager,
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
         uint256 _initialSupply
     ) internal onlyInitializing {
-        __TokenBase_init(_owner);
+        __TokenBase_init(_owner, _manager);
         __ERC20Base_init_unchained(_owner, _name, _symbol, _decimals, _initialSupply);
 
         __ERC20_init(_name, _symbol);
@@ -73,15 +77,15 @@ abstract contract ERC20Base is TokenBase, IERC20Forge, ERC20Upgradeable, ERC20Pe
         return interfaceId == type(IERC20Forge).interfaceId || super.supportsInterface(interfaceId);
     }
 
+    function _update(address from, address to, uint256 value) internal virtual override {
+        ERC20Upgradeable._update(from, to, value);
+    }
+
     function transfer(address to, uint256 value) public virtual override returns (bool) {
         return ERC20Upgradeable.transfer(to, value);
     }
 
     function transferFrom(address from, address to, uint256 value) public virtual override returns (bool) {
         return ERC20Upgradeable.transferFrom(from, to, value);
-    }
-
-    function _update(address from, address to, uint256 value) internal virtual override {
-        return ERC20Upgradeable._update(from, to, value);
     }
 }

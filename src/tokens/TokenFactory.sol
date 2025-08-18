@@ -83,6 +83,7 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
 
     function deployERC20(
         address owner,
+        address manager,
         string memory name,
         string memory symbol,
         uint8 decimals,
@@ -97,7 +98,10 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
             }
             token = address(
                 new ERC1967Proxy(
-                    logic, abi.encodeCall(IERC20Forge.initialize, (owner, name, symbol, decimals, initialSupply, data))
+                    logic,
+                    abi.encodeCall(
+                        IERC20Forge.initialize, (owner, manager, name, symbol, decimals, initialSupply, data)
+                    )
                 )
             );
         }
@@ -108,6 +112,7 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
 
     function deployERC721(
         address owner,
+        address manager,
         string memory name,
         string memory symbol,
         string memory baseTokenURI,
@@ -121,7 +126,7 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
             }
             token = address(
                 new ERC1967Proxy(
-                    logic, abi.encodeCall(IERC721Forge.initialize, (owner, name, symbol, baseTokenURI, data))
+                    logic, abi.encodeCall(IERC721Forge.initialize, (owner, manager, name, symbol, baseTokenURI, data))
                 )
             );
         }
@@ -130,7 +135,7 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
         emit TokenDeployed(owner, TokenType.ERC721, token, logic);
     }
 
-    function deployERC1155(address owner, string memory uri, bytes memory data, address logic)
+    function deployERC1155(address owner, address manager, string memory uri, bytes memory data, address logic)
         external
         onlyRole(MANAGER_ROLE)
         returns (address token)
@@ -140,7 +145,8 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
             if (!$.erc1155Impls.contains(logic)) {
                 revert TokenFactory__InvalidLogic(TokenType.ERC1155, logic);
             }
-            token = address(new ERC1967Proxy(logic, abi.encodeCall(IERC1155Forge.initialize, (owner, uri, data))));
+            token =
+                address(new ERC1967Proxy(logic, abi.encodeCall(IERC1155Forge.initialize, (owner, manager, uri, data))));
         }
         if (token == address(0)) revert TokenFactory__DeployFailed(TokenType.ERC1155, logic);
 

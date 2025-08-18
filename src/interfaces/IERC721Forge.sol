@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 interface IERC721Forge {
     function initialize(
         address owner,
+        address manager,
         string calldata name,
         string calldata symbol,
         string calldata baseTokenURI,

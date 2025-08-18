@@ -93,7 +93,7 @@ abstract contract ERC20PeriodMintLimit is ERC20Base {
         }
     }
 
-    function updateMintLimit(uint256 newLimit) external onlyOwner {
+    function updateMintLimit(uint256 newLimit) external onlyRole(DEFAULT_ADMIN_ROLE) {
         if (newLimit == 0) revert TokenBase__NullInput("newLimit");
 
         ERC20PeriodMintLimitStorage storage $ = _getERC20PeriodMintLimitStorage();
