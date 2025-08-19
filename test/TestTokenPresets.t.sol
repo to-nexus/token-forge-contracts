@@ -680,7 +680,7 @@ contract TestTokenPresets is Test {
         _mintMultiMintLimited(erc20, 300e18, er);
         assertEq(erc20.balanceOf(ACCOUNT.addr), 300e18, "Should mint exact limit amount");
 
-        vm.warp(block.number + 30);
+        vm.warp(block.timestamp + 30);
         _mintMultiMintLimited(erc20, 200e18, er);
         assertEq(erc20.balanceOf(ACCOUNT.addr), 300e18 + 200e18, "Should mint exact limit amount");
     }
@@ -693,13 +693,18 @@ contract TestTokenPresets is Test {
         _mintMultiMintLimited(erc20, 300e18, er);
         assertEq(erc20.balanceOf(ACCOUNT.addr), 300e18, "Should mint exact limit amount");
 
-        vm.warp(400);
+        vm.warp(block.timestamp + 30);
 
         assertTrue(erc20.availableMintCapacities()[1] < 300e18);
         er = abi.encodeWithSignature(
             "ERC20PeriodsMintLimit__ExceedsPeriodLimit(uint256,uint256,uint256)", 180, 300e18, 500e18 - 300e18
         );
         _mintMultiMintLimited(erc20, 300e18, er);
+
+        er = new bytes(0);
+        vm.warp(block.timestamp + 180);
+        _mintMultiMintLimited(erc20, 300e18, er);
+        assertEq(erc20.balanceOf(ACCOUNT.addr), 2 * 300e18, "Should mint exact limit amount");
     }
 
     function test_erc20_single_mint_limited() external {
@@ -740,6 +745,10 @@ contract TestTokenPresets is Test {
         uint256 limitAmount = 300e18;
         _mintSingleMintLimited(erc20, limitAmount, er);
         assertEq(erc20.balanceOf(ACCOUNT.addr), limitAmount, "Should mint exact limit amount");
+
+        vm.warp(block.timestamp + 30); // Warp to next period
+        _mintSingleMintLimited(erc20, limitAmount, er);
+        assertEq(erc20.balanceOf(ACCOUNT.addr), limitAmount * 2, "Should mint exact limit amount");
     }
 
     function test_erc20_single_mint_limited_different_users() external {
