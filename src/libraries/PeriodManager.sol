@@ -7,6 +7,7 @@ pragma solidity ^0.8.20;
  */
 library PeriodManager {
     error PeriodManager__InvalidDuration();
+    error PeriodManager__InvalidOffset(uint256 timestamp, int256 offsetSeconds);
 
     struct PeriodConfig {
         uint128 duration; // 주기 길이 (초 단위)
@@ -32,7 +33,7 @@ library PeriodManager {
             uint256 offset = uint256(-int256($.offsetSeconds));
             // Ensure timestamp does not underflow
             if (timestamp < offset) {
-                return 0; // Underflow, return 0 or handle as needed
+                revert PeriodManager__InvalidOffset(timestamp, $.offsetSeconds);
             }
             return timestamp - offset;
         }
