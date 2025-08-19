@@ -22,7 +22,7 @@ contract ERC20MultiMintLimited is ERC20Base, ERC20Capable, ERC20PeriodsMintLimit
         __ERC20Base_init(owner, manager, name, symbol, decimals, initialSupply, initialRecipient);
 
         // Decode cap from _data
-        if (data.length <= 32 * 3) revert ERC20MultiMintLimited__InvalidInitialData();
+        if (data.length <= 32 * 4) revert ERC20MultiMintLimited__InvalidInitialData();
         (uint256 _cap, uint256[] memory durations, int256[] memory offsetSeconds, uint256[] memory limits) =
             abi.decode(data, (uint256, uint256[], int256[], uint256[]));
 

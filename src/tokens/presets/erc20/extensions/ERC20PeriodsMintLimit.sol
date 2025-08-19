@@ -32,7 +32,6 @@ abstract contract ERC20PeriodsMintLimit is ERC20Base {
         assembly {
             $.slot := ERC20PeriodsMintLimitStorageLocation
         }
-        return $;
     }
 
     function __ERC20PeriodsMintLimit_init(
