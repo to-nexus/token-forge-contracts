@@ -12,7 +12,7 @@ abstract contract ERC20PeriodsMintLimit is ERC20Base {
     error ERC20PeriodsMintLimit__InvalidLimitData(uint256 index);
     error ERC20PeriodsMintLimit__ExceedsPeriodLimit(uint256 period, uint256 requested, uint256 available);
 
-    event PeriodStarted(uint256 indexed periodStartBlock, uint256 availableCapacity);
+    event PeriodStarted(uint256 indexed periodStart, uint256 availableCapacity);
     event MintLimitUpdated(uint256[] oldLimits, uint256[] newLimits);
 
     /// @custom:storage-location erc7201:cross.storage.forge.erc20.ERC20PeriodsMintLimit
@@ -74,25 +74,25 @@ abstract contract ERC20PeriodsMintLimit is ERC20Base {
     function mint(address to, uint256 amount) public virtual override {
         ERC20PeriodsMintLimitStorage storage $ = _getERC20PeriodsMintLimitStorage();
 
-        uint256[] storage _periodStartBlocks = $.periodStartTimes;
+        uint256[] storage _periodStartTimes = $.periodStartTimes;
         uint256[] storage _periodCapacities = $.periodCapacities;
-        uint256[] memory currentPeriodStartBlocks = periodStartTimes();
+        uint256[] memory currentPeriodStartTimes = periodStartTimes();
 
         uint256 length = $.length;
 
         unchecked {
             for (uint256 i = 0; i < length; ++i) {
-                (uint256 periodCapacity, uint256 periodStartBlock, uint256 currentPeriodStartBlock) =
-                    (_periodCapacities[i], _periodStartBlocks[i], currentPeriodStartBlocks[i]);
+                (uint256 periodCapacity, uint256 periodStartTime, uint256 currentPeriodStartTime) =
+                    (_periodCapacities[i], _periodStartTimes[i], currentPeriodStartTimes[i]);
 
                 // Check if the period has started
-                if (periodStartBlock != currentPeriodStartBlock) {
-                    // Initialize the period start block if not set
+                if (periodStartTime != currentPeriodStartTime) {
+                    // Initialize the period start time if not set
                     uint256 limit = $.limits[i];
-                    _periodStartBlocks[i] = currentPeriodStartBlock;
+                    _periodStartTimes[i] = currentPeriodStartTime;
                     periodCapacity = limit;
 
-                    emit PeriodStarted(currentPeriodStartBlock, limit);
+                    emit PeriodStarted(currentPeriodStartTime, limit);
                 }
 
                 if (periodCapacity == type(uint256).max) {
@@ -135,14 +135,14 @@ abstract contract ERC20PeriodsMintLimit is ERC20Base {
 
     function availableMintCapacities() external view returns (uint256[] memory) {
         ERC20PeriodsMintLimitStorage storage $ = _getERC20PeriodsMintLimitStorage();
-        uint256[] memory _currentPeriodStartBlock = periodStartTimes();
-        uint256[] memory _periodStartBlock = $.periodStartTimes;
+        uint256[] memory _currentPeriodStartTimes = periodStartTimes();
+        uint256[] memory _periodStartTimes = $.periodStartTimes;
 
         uint256 length = $.length;
         uint256[] memory capacities = new uint256[](length);
         for (uint256 i = 0; i < length;) {
-            uint256 _periodStart = _periodStartBlock[i];
-            if (_periodStart == _currentPeriodStartBlock[i]) {
+            uint256 _periodStart = _periodStartTimes[i];
+            if (_periodStart == _currentPeriodStartTimes[i]) {
                 capacities[i] = $.periodCapacities[i];
             } else {
                 capacities[i] = $.limits[i];
@@ -159,14 +159,14 @@ abstract contract ERC20PeriodsMintLimit is ERC20Base {
         PeriodManager.PeriodConfig[] storage _periods = $.periods;
 
         uint256 length = _periods.length;
-        uint256[] memory startBlocks = new uint256[](length);
+        uint256[] memory startTimes = new uint256[](length);
         for (uint256 i = 0; i < length;) {
-            startBlocks[i] = _periods[i].getCurrentPeriodStart();
+            startTimes[i] = _periods[i].getCurrentPeriodStart();
             unchecked {
                 ++i;
             }
         }
-        return startBlocks;
+        return startTimes;
     }
 
     function updateMintLimits(uint256[] calldata newLimits) external onlyRole(DEFAULT_ADMIN_ROLE) {

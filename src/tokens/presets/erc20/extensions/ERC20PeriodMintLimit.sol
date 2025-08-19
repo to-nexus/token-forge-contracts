@@ -13,13 +13,13 @@ abstract contract ERC20PeriodMintLimit is ERC20Base {
     error ERC20PeriodMintLimit__InvalidLimitData();
     error ERC20PeriodMintLimit__ExceedsPeriodLimit(uint256 requested, uint256 available);
 
-    event PeriodStarted(uint256 indexed periodStartBlock, uint256 availableCapacity);
+    event PeriodStarted(uint256 indexed periodStart, uint256 availableCapacity);
     event MintLimitUpdated(uint256 oldLimits, uint256 newLimits);
 
     /// @custom:storage-location erc7201:cross.storage.forge.erc20.ERC20PeriodMintLimit
     struct ERC20PeriodMintLimitStorage {
         PeriodManager.PeriodConfig period;
-        uint256 periodStartBlock; // The block number when the current period started
+        uint256 periodStartTime; // The block.timestamp when the current period started
         uint256 limit; // The maximum amount that can be minted in a period
         uint256 periodCapacity; // The remaining capacity for the current period
     }
@@ -53,14 +53,14 @@ abstract contract ERC20PeriodMintLimit is ERC20Base {
 
         uint256 periodCapacity = $.periodCapacity;
         {
-            uint256 currentPeriodStartBlock = $.period.getCurrentPeriodStart();
+            uint256 currentPeriodStart = $.period.getCurrentPeriodStart();
             // Check if the period has started
-            if (currentPeriodStartBlock != $.periodStartBlock) {
-                // Initialize the period start block if not set
-                $.periodStartBlock = currentPeriodStartBlock;
+            if (currentPeriodStart != $.periodStartTime) {
+                // Initialize the period start time if not set
+                $.periodStartTime = currentPeriodStart;
                 periodCapacity = $.limit;
 
-                emit PeriodStarted(currentPeriodStartBlock, periodCapacity);
+                emit PeriodStarted(currentPeriodStart, periodCapacity);
             }
         }
 
@@ -88,10 +88,10 @@ abstract contract ERC20PeriodMintLimit is ERC20Base {
 
     function availableMintCapacity() external view returns (uint256) {
         ERC20PeriodMintLimitStorage storage $ = _getERC20PeriodMintLimitStorage();
-        return $.period.isNewPeriod($.periodStartBlock) ? $.limit : $.periodCapacity;
+        return $.period.isNewPeriod($.periodStartTime) ? $.limit : $.periodCapacity;
     }
 
-    function periodStartBlock() public view returns (uint256) {
+    function periodStartTime() public view returns (uint256) {
         return _getERC20PeriodMintLimitStorage().period.getCurrentPeriodStart();
     }
 
