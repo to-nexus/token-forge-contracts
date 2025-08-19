@@ -5,14 +5,15 @@ import {ERC20Base} from "./ERC20Base.sol";
 
 contract ERC20Mintable is ERC20Base {
     function initialize(
-        address _owner,
-        address _manager,
-        string memory _name,
-        string memory _symbol,
-        uint8 _decimals,
-        uint256 _initialSupply,
+        address owner,
+        address manager,
+        string memory name,
+        string memory symbol,
+        uint8 decimals,
+        uint256 initialSupply,
+        address initialRecipient,
         bytes memory
     ) external override initializer {
-        __ERC20Base_init(_owner, _manager, _name, _symbol, _decimals, _initialSupply);
+        __ERC20Base_init(owner, manager, name, symbol, decimals, initialSupply, initialRecipient);
     }
 }

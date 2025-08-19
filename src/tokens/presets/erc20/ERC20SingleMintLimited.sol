@@ -11,25 +11,28 @@ contract ERC20SingleMintLimited is ERC20Base, ERC20Capable, ERC20PeriodMintLimit
     error ERC20SingleMintLimited__CapTooLow(uint256 cap, uint256 initialSupply);
 
     function initialize(
-        address _owner,
-        address _manager,
-        string memory _name,
-        string memory _symbol,
-        uint8 _decimals,
-        uint256 _initialSupply,
-        bytes memory _data
+        address owner,
+        address manager,
+        string memory name,
+        string memory symbol,
+        uint8 decimals,
+        uint256 initialSupply,
+        address initialRecipient,
+        bytes memory data
     ) external override initializer {
+        __ERC20Base_init(owner, manager, name, symbol, decimals, initialSupply, initialRecipient);
+
         // Decode cap from _data
-        if (_data.length != 32 * 3) revert ERC20SingleMintLimited__InvalidInitialData();
-        (uint256 _cap, uint256 period, uint256 limit) = abi.decode(_data, (uint256, uint256, uint256));
+        if (data.length != 32 * 4) revert ERC20SingleMintLimited__InvalidInitialData();
+        (uint256 _cap, uint256 duration, int256 offsetSeconds, uint256 limit) =
+            abi.decode(data, (uint256, uint256, int256, uint256));
 
         // Validate cap
-        if (_cap < _initialSupply) revert ERC20SingleMintLimited__CapTooLow(_cap, _initialSupply);
+        if (_cap < initialSupply) revert ERC20SingleMintLimited__CapTooLow(_cap, initialSupply);
 
         // Initialize parent contracts
-        __ERC20PeriodMintLimit_init(period, limit);
+        __ERC20PeriodMintLimit_init(duration, offsetSeconds, limit);
         __ERC20Capable_init(_cap);
-        __ERC20Base_init(_owner, _manager, _name, _symbol, _decimals, _initialSupply);
     }
 
     function mint(address to, uint256 amount) public virtual override(ERC20Base, ERC20PeriodMintLimit) {

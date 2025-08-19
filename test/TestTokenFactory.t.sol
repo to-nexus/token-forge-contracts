@@ -324,7 +324,7 @@ contract TestTokenFactory is Test {
         TokenFactory tf = TokenFactory(tokenFactoryProxy);
         vm.startPrank(OWNER);
         // ERC20 배포
-        address erc20 = tf.deployERC20(OWNER, MANAGER, "Test20", "T20", 18, 1000 ether, "", mockERC20Impl);
+        address erc20 = tf.deployERC20(OWNER, MANAGER, "Test20", "T20", 18, 1000 ether, OWNER, "", mockERC20Impl);
         // ERC721 배포
         address erc721 = tf.deployERC721(OWNER, MANAGER, "Test721", "T721", "https://uri/", "", mockERC721Impl);
         // ERC1155 배포

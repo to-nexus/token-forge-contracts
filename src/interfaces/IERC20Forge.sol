@@ -9,6 +9,7 @@ interface IERC20Forge {
         string calldata symbol,
         uint8 decimals,
         uint256 initialSupply,
+        address initialRecipient,
         bytes calldata data
     ) external;
 

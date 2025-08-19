@@ -18,6 +18,7 @@ interface ITokenFactory {
      * @param symbol 토큰 심볼
      * @param decimals 토큰 소수점 자리수
      * @param initialSupply 초기 공급량 (optional, 0이면 민팅 안함)
+     * @param initialRecipient 초기 공급량을 받을 주소 (optional, initialSupply가 0이 아닐 때 필수)
      * @param logic 사용할 로직 컨트랙트 주소 (optional, 0이면 기본 프리셋 사용)
      * @return tokenAddress 배포된 토큰 프록시 주소
      */
@@ -28,6 +29,7 @@ interface ITokenFactory {
         string memory symbol,
         uint8 decimals,
         uint256 initialSupply,
+        address initialRecipient,
         bytes memory data,
         address logic
     ) external returns (address tokenAddress);

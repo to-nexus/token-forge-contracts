@@ -8,16 +8,17 @@ contract ERC20Fixed is ERC20Base {
     error ERC20Fixed__BurningNotAllowed();
 
     function initialize(
-        address _owner,
-        address _manager,
-        string memory _name,
-        string memory _symbol,
-        uint8 _decimals,
-        uint256 _initialSupply,
+        address owner,
+        address manager,
+        string memory name,
+        string memory symbol,
+        uint8 decimals,
+        uint256 initialSupply,
+        address initialRecipient,
         bytes memory
     ) external override initializer {
-        if (_initialSupply == 0) revert TokenBase__NullInput("initialSupply");
-        ERC20Base.__ERC20Base_init(_owner, _manager, _name, _symbol, _decimals, _initialSupply);
+        if (initialSupply == 0) revert TokenBase__NullInput("initialSupply");
+        ERC20Base.__ERC20Base_init(owner, manager, name, symbol, decimals, initialSupply, initialRecipient);
     }
 
     function mint(address, uint256) public pure override {

@@ -171,7 +171,9 @@ contract TestTokenPresets is Test {
         tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC20, erc20Impls, true);
         vm.prank(OWNER);
         ERC20Mintable erc20 = ERC20Mintable(
-            tokenFactory.deployERC20(SERVICE_OWNER, MANAGER, "ERC20Mintable", "ERC20M", 18, 0, "", address(logic))
+            tokenFactory.deployERC20(
+                SERVICE_OWNER, MANAGER, "ERC20Mintable", "ERC20M", 18, 0, OWNER, "", address(logic)
+            )
         );
         assertEq(erc20.balanceOf(SERVICE_OWNER), 0, "Initial supply should be 0");
 
@@ -292,12 +294,16 @@ contract TestTokenPresets is Test {
         vm.expectRevert(abi.encodeWithSignature("TokenBase__NullInput(bytes32)", bytes32("initialSupply")));
         vm.prank(OWNER);
         ERC20Fixed erc20 = ERC20Fixed(
-            tokenFactory.deployERC20(SERVICE_OWNER, MANAGER, "ERC20Fixed", "ERC20F", 18, 0, "", address(logic))
+            tokenFactory.deployERC20(
+                SERVICE_OWNER, MANAGER, "ERC20Fixed", "ERC20F", 18, 0, address(0), "", address(logic)
+            )
         );
 
         vm.prank(OWNER);
         erc20 = ERC20Fixed(
-            tokenFactory.deployERC20(SERVICE_OWNER, MANAGER, "ERC20Fixed", "ERC20F", 18, 1000e18, "", address(logic))
+            tokenFactory.deployERC20(
+                SERVICE_OWNER, MANAGER, "ERC20Fixed", "ERC20F", 18, 1000e18, SERVICE_OWNER, "", address(logic)
+            )
         );
         assertEq(erc20.balanceOf(SERVICE_OWNER), 1000e18, "Initial supply should be 1000e18");
 
@@ -406,10 +412,19 @@ contract TestTokenPresets is Test {
         vm.prank(OWNER);
         ERC20Capped erc20 = ERC20Capped(
             tokenFactory.deployERC20(
-                SERVICE_OWNER, MANAGER, "ERC20Capped", "ERC20C", 18, initialSupply, capData, address(logic)
+                SERVICE_OWNER,
+                MANAGER,
+                "ERC20Capped",
+                "ERC20C",
+                18,
+                initialSupply,
+                SERVICE_OWNER,
+                capData,
+                address(logic)
             )
         );
 
+        console.log("name", erc20.name());
         assertEq(erc20.balanceOf(SERVICE_OWNER), initialSupply, "Initial supply should match");
         assertEq(erc20.cap(), cap, "Cap should match");
         assertEq(erc20.remainingSupply(), cap - initialSupply, "Remaining supply should match");
@@ -542,7 +557,7 @@ contract TestTokenPresets is Test {
         vm.prank(OWNER);
         return ERC20Capped(
             tokenFactory.deployERC20(
-                SERVICE_OWNER, MANAGER, "ERC20Capped", "ERC20C", 18, initialSupply, capData, address(logic)
+                SERVICE_OWNER, MANAGER, "ERC20Capped", "ERC20C", 18, initialSupply, OWNER, capData, address(logic)
             )
         );
     }
@@ -573,7 +588,7 @@ contract TestTokenPresets is Test {
     }
 
     function test_erc20_multi_mint_limited_case1() external {
-        vm.roll(1000); // Set block number to 1000 for predictable time
+        vm.warp(1000); // Set block number to 1000 for predictable time
 
         ERC20MultiMintLimited logic = new ERC20MultiMintLimited();
         address[] memory erc20Impls = new address[](1);
@@ -585,17 +600,28 @@ contract TestTokenPresets is Test {
         uint256 initialSupply = 0;
         uint256 cap = 50000e18; // Total cap for the token
         uint256[] memory periods = new uint256[](2);
+        int256[] memory offsetPeriods = new int256[](2);
         uint256[] memory limits = new uint256[](2);
         periods[0] = 30; // 30 seconds
         periods[1] = 60; // 60 seconds
+        offsetPeriods[0] = -1;
+        offsetPeriods[1] = 2;
         limits[0] = 300e18; // 300 tokens in first period
         limits[1] = 500e18; // 500 tokens in second period
-        bytes memory limitData = abi.encode(cap, periods, limits);
+        bytes memory limitData = abi.encode(cap, periods, offsetPeriods, limits);
 
         vm.prank(OWNER);
         ERC20MultiMintLimited erc20 = ERC20MultiMintLimited(
             tokenFactory.deployERC20(
-                SERVICE_OWNER, MANAGER, "ERC20MultiMintLimited", "ERC20MM", 18, initialSupply, limitData, address(logic)
+                SERVICE_OWNER,
+                MANAGER,
+                "ERC20MultiMintLimited",
+                "ERC20MM",
+                18,
+                initialSupply,
+                OWNER,
+                limitData,
+                erc20Impls[0]
             )
         );
 
@@ -654,7 +680,7 @@ contract TestTokenPresets is Test {
         _mintMultiMintLimited(erc20, 300e18, er);
         assertEq(erc20.balanceOf(ACCOUNT.addr), 300e18, "Should mint exact limit amount");
 
-        vm.roll(block.number + 30);
+        vm.warp(block.number + 30);
         _mintMultiMintLimited(erc20, 200e18, er);
         assertEq(erc20.balanceOf(ACCOUNT.addr), 300e18 + 200e18, "Should mint exact limit amount");
     }
@@ -667,7 +693,7 @@ contract TestTokenPresets is Test {
         _mintMultiMintLimited(erc20, 300e18, er);
         assertEq(erc20.balanceOf(ACCOUNT.addr), 300e18, "Should mint exact limit amount");
 
-        vm.roll(400);
+        vm.warp(400);
 
         assertTrue(erc20.availableMintCapacities()[1] < 300e18);
         er = abi.encodeWithSignature(
@@ -745,7 +771,7 @@ contract TestTokenPresets is Test {
 
     // Helper functions for mint limited tokens
     function _setupMultiMintLimited() internal returns (ERC20MultiMintLimited) {
-        vm.roll(360); // Set block number to 360 for predictable time
+        vm.warp(360); // Set block number to 360 for predictable time
         ERC20MultiMintLimited logic = new ERC20MultiMintLimited();
         address[] memory erc20Impls = new address[](1);
         erc20Impls[0] = address(logic);
@@ -756,17 +782,26 @@ contract TestTokenPresets is Test {
         uint256 initialSupply = 0;
         uint256 cap = 50000e18; // Total cap for the token
         uint256[] memory periods = new uint256[](2);
+        int256[] memory offsetPeriods = new int256[](2);
         uint256[] memory limits = new uint256[](2);
         periods[0] = 30; // 30 blocks
         periods[1] = 180; // 180 blocks
         limits[0] = 300e18; // 300 tokens in first period
         limits[1] = 500e18; // 500 tokens in second period
-        bytes memory limitData = abi.encode(cap, periods, limits);
+        bytes memory limitData = abi.encode(cap, periods, offsetPeriods, limits);
 
         vm.prank(OWNER);
         ERC20MultiMintLimited erc20 = ERC20MultiMintLimited(
             tokenFactory.deployERC20(
-                SERVICE_OWNER, MANAGER, "ERC20MultiMintLimited", "ERC20MM", 18, initialSupply, limitData, address(logic)
+                SERVICE_OWNER,
+                MANAGER,
+                "ERC20MultiMintLimited",
+                "ERC20MM",
+                18,
+                initialSupply,
+                OWNER,
+                limitData,
+                erc20Impls[0]
             )
         );
 
@@ -779,7 +814,7 @@ contract TestTokenPresets is Test {
     }
 
     function _setupSingleMintLimited() internal returns (ERC20SingleMintLimited) {
-        vm.roll(301); // Set block number to 301 for predictable time
+        vm.warp(301); // Set block number to 301 for predictable time
         ERC20SingleMintLimited logic = new ERC20SingleMintLimited();
         address[] memory erc20Impls = new address[](1);
         erc20Impls[0] = address(logic);
@@ -790,8 +825,9 @@ contract TestTokenPresets is Test {
         uint256 initialSupply = 1000e18;
         uint256 cap = 50000e18; // Total cap for the token
         uint256 period = 30; // 30 seconds
+        int256 offsetSeconds = 0; // No offset
         uint256 limit = 300e18; // 500 tokens limit
-        bytes memory limitData = abi.encode(cap, period, limit);
+        bytes memory limitData = abi.encode(cap, period, offsetSeconds, limit);
 
         vm.prank(OWNER);
         ERC20SingleMintLimited erc20 = ERC20SingleMintLimited(
@@ -802,8 +838,9 @@ contract TestTokenPresets is Test {
                 "ERC20SM",
                 18,
                 initialSupply,
+                OWNER,
                 limitData,
-                address(logic)
+                erc20Impls[0]
             )
         );
 

@@ -13,46 +13,47 @@ abstract contract ERC20Base is TokenBase, IERC20Forge, ERC20Upgradeable, ERC20Pe
         0x7c3cec2c3c3d573fa006ae6cf08c04c65698a48d9586626c622c1a81a45caf00;
 
     function initialize(
-        address _owner,
-        address _manager,
-        string memory _name,
-        string memory _symbol,
+        address owner,
+        address manager,
+        string memory name,
+        string memory symbol,
         uint8 _decimals,
-        uint256 _initialSupply,
+        uint256 initialSupply,
+        address initialRecipient,
         bytes memory
     ) external virtual override initializer {
-        __ERC20Base_init(_owner, _manager, _name, _symbol, _decimals, _initialSupply);
+        __ERC20Base_init(owner, manager, name, symbol, _decimals, initialSupply, initialRecipient);
     }
 
     function __ERC20Base_init(
-        address _owner,
-        address _manager,
-        string memory _name,
-        string memory _symbol,
+        address owner,
+        address manager,
+        string memory name,
+        string memory symbol,
         uint8 _decimals,
-        uint256 _initialSupply
+        uint256 initialSupply,
+        address initialRecipient
     ) internal onlyInitializing {
-        __TokenBase_init(_owner, _manager);
-        __ERC20Base_init_unchained(_owner, _name, _symbol, _decimals, _initialSupply);
+        if (bytes(name).length == 0) revert TokenBase__NullInput("name");
+        if (bytes(symbol).length == 0) revert TokenBase__NullInput("symbol");
 
-        __ERC20_init(_name, _symbol);
-        __ERC20Permit_init(_name);
+        __TokenBase_init(owner, manager);
+
+        __ERC20_init(name, symbol);
+        __ERC20Permit_init(name);
+        __ERC20Base_init_unchained(_decimals, initialSupply, initialRecipient);
     }
 
-    function __ERC20Base_init_unchained(
-        address _owner,
-        string memory _name,
-        string memory _symbol,
-        uint8 _decimals,
-        uint256 _initialSupply
-    ) private onlyInitializing {
-        if (bytes(_name).length == 0) revert TokenBase__NullInput("name");
-        if (bytes(_symbol).length == 0) revert TokenBase__NullInput("symbol");
+    function __ERC20Base_init_unchained(uint8 _decimals, uint256 initialSupply, address initialRecipient)
+        private
+        onlyInitializing
+    {
         assembly {
             sstore(ERC20DecimalsStorageLocation, _decimals)
         }
-        if (_initialSupply != 0) {
-            _mint(_owner, _initialSupply);
+        if (initialSupply != 0) {
+            if (initialRecipient == address(0)) revert TokenBase__NullInput("initialRecipient");
+            ERC20Upgradeable._update(address(0), initialRecipient, initialSupply);
         }
     }
 

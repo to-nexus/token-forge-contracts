@@ -9,23 +9,25 @@ contract ERC20Capped is ERC20Capable {
 
     function initialize(
         address _owner,
-        address _manager,
-        string memory _name,
-        string memory _symbol,
-        uint8 _decimals,
-        uint256 _initialSupply,
-        bytes memory _data
+        address manager,
+        string memory name,
+        string memory symbol,
+        uint8 decimals,
+        uint256 initialSupply,
+        address initialRecipient,
+        bytes memory data
     ) external override initializer {
+        __ERC20Base_init(_owner, manager, name, symbol, decimals, initialSupply, initialRecipient);
+
         // Decode cap from _data
-        if (_data.length != 32) revert ERC20Capped__InvalidCapData();
-        uint256 cap_ = abi.decode(_data, (uint256));
+        if (data.length != 32) revert ERC20Capped__InvalidCapData();
+        uint256 cap_ = abi.decode(data, (uint256));
 
         // Validate cap
         if (cap_ == 0) revert TokenBase__NullInput("cap");
-        if (cap_ < _initialSupply) revert ERC20Capped__CapTooLow(cap_, _initialSupply);
+        if (cap_ < initialSupply) revert ERC20Capped__CapTooLow(cap_, initialSupply);
 
         // Initialize parent contracts
         __ERC20Capable_init(cap_);
-        __ERC20Base_init(_owner, _manager, _name, _symbol, _decimals, _initialSupply);
     }
 }

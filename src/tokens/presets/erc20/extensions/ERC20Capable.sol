@@ -31,11 +31,11 @@ abstract contract ERC20Capable is ERC20Base {
     }
 
     function cap() public view returns (uint256) {
-        uint256 _cap;
+        uint256 cap_;
         assembly {
-            _cap := sload(ERC20CapableStorageLocation)
+            cap_ := sload(ERC20CapableStorageLocation)
         }
-        return _cap;
+        return cap_;
     }
 
     function _update(address from, address to, uint256 value) internal virtual override {
