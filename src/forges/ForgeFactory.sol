@@ -136,7 +136,6 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
         $._diamondImpl = _diamondImpl;
         $._baseImpl = _baseImpl;
 
-        _setRoleAdmin(MANAGER_ROLE, DEFAULT_ADMIN_ROLE);
         _grantRole(DEFAULT_ADMIN_ROLE, _owner);
         _grantRole(MANAGER_ROLE, _owner);
     }
