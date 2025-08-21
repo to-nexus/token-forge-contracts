@@ -46,6 +46,7 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
     }
 
     function __BaseForge_init(bytes32 service_, address validator_) internal onlyInitializing {
+        __Context_init();
         __EIP712_init(string(abi.encodePacked(service_)), "1");
         __Nonces_init();
         __BaseForge_init_unchained(validator_);
