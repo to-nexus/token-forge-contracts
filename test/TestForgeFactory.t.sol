@@ -85,7 +85,7 @@ contract TestForgeFactory is Test {
                 (diamond3Facet.defaultDiamondFacetCut(), faucets[0]);
             assertEq(cut.facetAddress, facet.facetAddress, "Facet address mismatch for Diamond3Facet");
             uint256 length = cut.functionSelectors.length;
-            assertEq(length, 6, "Expected 6 function selectors for Diamond3Facet");
+            assertEq(length, 7, "Expected 7 function selectors for Diamond3Facet");
             assertEq(length, facet.functionSelectors.length, "Function selectors length mismatch for Diamond3Facet");
             for (uint256 i = 0; i < length; i++) {
                 assertEq(
