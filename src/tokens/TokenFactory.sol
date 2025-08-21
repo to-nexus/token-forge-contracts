@@ -42,6 +42,11 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
         }
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(
         address owner,
         address[] calldata erc20Impls,

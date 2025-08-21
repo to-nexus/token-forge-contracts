@@ -99,6 +99,11 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
         }
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _owner, address _forgeProxyCode, address _diamondImpl, address _baseImpl)
         external
         initializer
