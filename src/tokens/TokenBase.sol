@@ -25,6 +25,11 @@ abstract contract TokenBase is UUPSUpgradeable, OwnableUpgradeable, ERC165Upgrad
         }
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function __TokenBase_init(address _owner) internal onlyInitializing {
         __Ownable_init(_owner);
         __UUPSUpgradeable_init();

@@ -42,6 +42,11 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
         }
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(
         address owner,
         address[] calldata erc20Impls,
@@ -61,7 +66,6 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
     ) private onlyInitializing {
         if (owner == address(0)) revert TokenFactory__ZeroAddress("owner");
 
-        _setRoleAdmin(MANAGER_ROLE, DEFAULT_ADMIN_ROLE);
         _grantRole(MANAGER_ROLE, owner);
         _grantRole(DEFAULT_ADMIN_ROLE, owner);
 

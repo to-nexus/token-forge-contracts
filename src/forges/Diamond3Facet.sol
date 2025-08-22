@@ -18,6 +18,7 @@ contract Diamond3Facet is IDefaultDiamondCut, DiamondCutFacet, DiamondLoupeFacet
             DiamondLoupeFacet.facetFunctionSelectors.selector,
             DiamondLoupeFacet.facetAddresses.selector,
             DiamondLoupeFacet.facetAddress.selector,
+            DiamondLoupeFacet.supportsInterface.selector,
             // OwnershipFacet.transferOwnership.selector,
             OwnershipFacet.owner.selector
         ];

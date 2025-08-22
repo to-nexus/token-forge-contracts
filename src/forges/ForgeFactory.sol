@@ -99,6 +99,11 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
         }
     }
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _owner, address _forgeProxyCode, address _diamondImpl, address _baseImpl)
         external
         initializer
@@ -136,7 +141,6 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
         $._diamondImpl = _diamondImpl;
         $._baseImpl = _baseImpl;
 
-        _setRoleAdmin(MANAGER_ROLE, DEFAULT_ADMIN_ROLE);
         _grantRole(DEFAULT_ADMIN_ROLE, _owner);
         _grantRole(MANAGER_ROLE, _owner);
     }
