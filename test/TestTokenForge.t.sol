@@ -101,7 +101,7 @@ contract TestTokenForgeFactory is Test {
 
     function _deployERC20() internal returns (address) {
         vm.prank(OWNER);
-        address token = tokenFactory.deployERC20(OWNER, OWNER, "MockERC20", "M20", 18, 0, "", mockERC20Impl);
+        address token = tokenFactory.deployERC20(OWNER, OWNER, "MockERC20", "M20", 18, 0, OWNER, "", mockERC20Impl);
         address[] memory forges = new address[](1);
         forges[0] = FORGE;
         vm.prank(OWNER);

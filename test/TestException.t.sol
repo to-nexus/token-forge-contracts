@@ -170,7 +170,8 @@ contract TestException is Test {
             );
             tokenFactory = TokenFactory(tokenFactoryProxy);
         }
-        mockERC20 = MockERC20(tokenFactory.deployERC20(OWNER, OWNER, "MockERC20", "M20", 18, 0, "", mockERC20Impl));
+        mockERC20 =
+            MockERC20(tokenFactory.deployERC20(OWNER, OWNER, "MockERC20", "M20", 18, 0, OWNER, "", mockERC20Impl));
         mockERC721 = MockERC721(
             tokenFactory.deployERC721(OWNER, OWNER, "MockERC721", "M721", "https://xxx.yyy.zzz/", "", mockERC721Impl)
         );

@@ -93,6 +93,7 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
         string memory symbol,
         uint8 decimals,
         uint256 initialSupply,
+        address initialRecipient,
         bytes memory data,
         address logic
     ) external onlyRole(MANAGER_ROLE) returns (address token) {
@@ -105,7 +106,8 @@ contract TokenFactory is ITokenFactory, AccessControlUpgradeable, UUPSUpgradeabl
                 new ERC1967Proxy(
                     logic,
                     abi.encodeCall(
-                        IERC20Forge.initialize, (owner, manager, name, symbol, decimals, initialSupply, data)
+                        IERC20Forge.initialize,
+                        (owner, manager, name, symbol, decimals, initialSupply, initialRecipient, data)
                     )
                 )
             );

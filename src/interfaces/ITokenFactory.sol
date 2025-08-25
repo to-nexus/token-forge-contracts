@@ -28,6 +28,7 @@ interface ITokenFactory {
         string memory symbol,
         uint8 decimals,
         uint256 initialSupply,
+        address initialRecipient,
         bytes memory data,
         address logic
     ) external returns (address tokenAddress);

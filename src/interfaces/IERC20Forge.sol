@@ -5,11 +5,12 @@ interface IERC20Forge {
     function initialize(
         address owner,
         address manager,
-        string calldata name,
-        string calldata symbol,
+        string memory name,
+        string memory symbol,
         uint8 decimals,
         uint256 initialSupply,
-        bytes calldata data
+        address initialRecipient,
+        bytes memory data
     ) external;
 
     function mint(address to, uint256 amount) external;
