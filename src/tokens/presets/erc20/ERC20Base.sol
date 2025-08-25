@@ -14,6 +14,7 @@ abstract contract ERC20Base is TokenBase, IERC20Forge, ERC20Upgradeable, ERC20Pe
 
     function initialize(
         address _owner,
+        address _manager,
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
@@ -23,12 +24,13 @@ abstract contract ERC20Base is TokenBase, IERC20Forge, ERC20Upgradeable, ERC20Pe
 
     function __ERC20Base_init(
         address _owner,
+        address _manager,
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
         uint256 _initialSupply
     ) internal onlyInitializing {
-        __TokenBase_init(_owner);
+        __TokenBase_init(_owner, _manager);
         __ERC20Base_init_unchained(_owner, _name, _symbol, _decimals, _initialSupply);
 
         __ERC20_init(_name, _symbol);

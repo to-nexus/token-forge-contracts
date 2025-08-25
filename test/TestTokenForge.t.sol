@@ -101,7 +101,7 @@ contract TestTokenForgeFactory is Test {
 
     function _deployERC20() internal returns (address) {
         vm.prank(OWNER);
-        address token = tokenFactory.deployERC20(OWNER, "MockERC20", "M20", 18, 0, "", mockERC20Impl);
+        address token = tokenFactory.deployERC20(OWNER, OWNER, "MockERC20", "M20", 18, 0, "", mockERC20Impl);
         address[] memory forges = new address[](1);
         forges[0] = FORGE;
         vm.prank(OWNER);
@@ -112,7 +112,7 @@ contract TestTokenForgeFactory is Test {
     function _deployERC721() internal returns (address) {
         vm.prank(OWNER);
         address token =
-            tokenFactory.deployERC721(OWNER, "MockERC721", "M721", "https://xxx.yyy.zzz", "", mockERC721Impl);
+            tokenFactory.deployERC721(OWNER, OWNER, "MockERC721", "M721", "https://xxx.yyy.zzz", "", mockERC721Impl);
         address[] memory forges = new address[](1);
         forges[0] = FORGE;
         vm.prank(OWNER);
@@ -122,7 +122,7 @@ contract TestTokenForgeFactory is Test {
 
     function _deployERC1155() internal returns (address) {
         vm.prank(OWNER);
-        address token = tokenFactory.deployERC1155(OWNER, "https://xxx.yyy.zzz", "", mockERC1155Impl);
+        address token = tokenFactory.deployERC1155(OWNER, OWNER, "https://xxx.yyy.zzz", "", mockERC1155Impl);
         address[] memory forges = new address[](1);
         forges[0] = FORGE;
         vm.prank(OWNER);

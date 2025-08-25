@@ -167,8 +167,9 @@ contract TestTokenPresets is Test {
         vm.prank(OWNER);
         tokenFactory.setPresetLogics(ITokenFactory.TokenType.ERC20, erc20Impls, true);
         vm.prank(OWNER);
-        ERC20Mintable erc20 =
-            ERC20Mintable(tokenFactory.deployERC20(SERVICE_OWNER, "ERC20Mintable", "ERC20M", 18, 0, "", address(logic)));
+        ERC20Mintable erc20 = ERC20Mintable(
+            tokenFactory.deployERC20(SERVICE_OWNER, SERVICE_OWNER, "ERC20Mintable", "ERC20M", 18, 0, "", address(logic))
+        );
         assertEq(erc20.balanceOf(SERVICE_OWNER), 0, "Initial supply should be 0");
 
         {
@@ -287,12 +288,16 @@ contract TestTokenPresets is Test {
         // initialSupply cannot be 0
         vm.expectRevert(abi.encodeWithSignature("TokenBase__NullInput(bytes32)", bytes32("initialSupply")));
         vm.prank(OWNER);
-        ERC20Fixed erc20 =
-            ERC20Fixed(tokenFactory.deployERC20(SERVICE_OWNER, "ERC20Fixed", "ERC20F", 18, 0, "", address(logic)));
+        ERC20Fixed erc20 = ERC20Fixed(
+            tokenFactory.deployERC20(SERVICE_OWNER, SERVICE_OWNER, "ERC20Fixed", "ERC20F", 18, 0, "", address(logic))
+        );
 
         vm.prank(OWNER);
-        erc20 =
-            ERC20Fixed(tokenFactory.deployERC20(SERVICE_OWNER, "ERC20Fixed", "ERC20F", 18, 1000e18, "", address(logic)));
+        erc20 = ERC20Fixed(
+            tokenFactory.deployERC20(
+                SERVICE_OWNER, SERVICE_OWNER, "ERC20Fixed", "ERC20F", 18, 1000e18, "", address(logic)
+            )
+        );
         assertEq(erc20.balanceOf(SERVICE_OWNER), 1000e18, "Initial supply should be 1000e18");
 
         address[] memory forges = new address[](1);
@@ -399,7 +404,9 @@ contract TestTokenPresets is Test {
 
         vm.prank(OWNER);
         ERC20Capped erc20 = ERC20Capped(
-            tokenFactory.deployERC20(SERVICE_OWNER, "ERC20Capped", "ERC20C", 18, initialSupply, capData, address(logic))
+            tokenFactory.deployERC20(
+                SERVICE_OWNER, SERVICE_OWNER, "ERC20Capped", "ERC20C", 18, initialSupply, capData, address(logic)
+            )
         );
 
         assertEq(erc20.balanceOf(SERVICE_OWNER), initialSupply, "Initial supply should match");
@@ -531,7 +538,9 @@ contract TestTokenPresets is Test {
 
         vm.prank(OWNER);
         return ERC20Capped(
-            tokenFactory.deployERC20(SERVICE_OWNER, "ERC20Capped", "ERC20C", 18, initialSupply, capData, address(logic))
+            tokenFactory.deployERC20(
+                SERVICE_OWNER, SERVICE_OWNER, "ERC20Capped", "ERC20C", 18, initialSupply, capData, address(logic)
+            )
         );
     }
 

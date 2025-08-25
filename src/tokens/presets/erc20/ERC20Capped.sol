@@ -13,6 +13,7 @@ contract ERC20Capped is ERC20Upgradeable, ERC20Base, ERC20CappedUpgradeable {
 
     function initialize(
         address _owner,
+        address _manager,
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
@@ -29,7 +30,7 @@ contract ERC20Capped is ERC20Upgradeable, ERC20Base, ERC20CappedUpgradeable {
 
         // Initialize parent contracts
         __ERC20Capped_init(cap_);
-        __ERC20Base_init(_owner, _name, _symbol, _decimals, _initialSupply);
+        __ERC20Base_init(_owner, _manager, _name, _symbol, _decimals, _initialSupply);
     }
 
     function remainingSupply() external view returns (uint256) {

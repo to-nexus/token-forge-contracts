@@ -170,11 +170,11 @@ contract TestException is Test {
             );
             tokenFactory = TokenFactory(tokenFactoryProxy);
         }
-        mockERC20 = MockERC20(tokenFactory.deployERC20(OWNER, "MockERC20", "M20", 18, 0, "", mockERC20Impl));
+        mockERC20 = MockERC20(tokenFactory.deployERC20(OWNER, OWNER, "MockERC20", "M20", 18, 0, "", mockERC20Impl));
         mockERC721 = MockERC721(
-            tokenFactory.deployERC721(OWNER, "MockERC721", "M721", "https://xxx.yyy.zzz/", "", mockERC721Impl)
+            tokenFactory.deployERC721(OWNER, OWNER, "MockERC721", "M721", "https://xxx.yyy.zzz/", "", mockERC721Impl)
         );
-        mockERC1155 = MockERC1155(tokenFactory.deployERC1155(OWNER, "https://xxx.yyy.zzz/", "", mockERC1155Impl));
+        mockERC1155 = MockERC1155(tokenFactory.deployERC1155(OWNER, OWNER, "https://xxx.yyy.zzz/", "", mockERC1155Impl));
 
         address[] memory forges = new address[](1);
         forges[0] = FORGE;
