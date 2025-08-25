@@ -41,7 +41,7 @@ abstract contract ERC721Base is
     }
 
     function __ERC721Base_init_unchained(string memory name, string memory symbol, string memory baseTokenURI)
-        private
+        internal
         onlyInitializing
     {
         if (bytes(name).length == 0) revert TokenBase__NullInput("name");

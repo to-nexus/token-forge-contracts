@@ -18,7 +18,7 @@ abstract contract ERC1155Base is TokenBase, IERC1155Forge, ERC1155Upgradeable, E
         __ERC1155Holder_init();
     }
 
-    function __ERC1155Base_init_unchained(string memory baseTokenURI) private view onlyInitializing {
+    function __ERC1155Base_init_unchained(string memory baseTokenURI) internal onlyInitializing {
         if (bytes(baseTokenURI).length == 0) revert TokenBase__NullInput("baseTokenURI");
     }
 

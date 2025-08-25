@@ -41,7 +41,7 @@ abstract contract ERC20Base is TokenBase, IERC20Forge, ERC20Upgradeable, ERC20Pe
         string memory _symbol,
         uint8 _decimals,
         uint256 _initialSupply
-    ) private onlyInitializing {
+    ) internal onlyInitializing {
         if (bytes(_name).length == 0) revert TokenBase__NullInput("name");
         if (bytes(_symbol).length == 0) revert TokenBase__NullInput("symbol");
         assembly {
