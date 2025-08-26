@@ -11,6 +11,6 @@ interface IERC721Forge {
         bytes calldata data
     ) external;
 
-    function mint(address to, uint256 tokenID) external returns (uint256);
+    function mint(address to, uint256 tokenID, bytes memory data) external returns (uint256);
     function burnFrom(address from, uint256 tokenID) external;
 }

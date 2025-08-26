@@ -15,7 +15,7 @@ contract MockERC721 is ERC721Base {
         ERC721Base.__ERC721Base_init(owner, manager, name, symbol, baseTokenURI);
     }
 
-    function forceMint(address to, uint256 tokenID) external onlyRole(MANAGER_ROLE) {
+    function forceMint(address to, uint256 tokenID, bytes memory) external onlyRole(MANAGER_ROLE) {
         _safeMint(to, tokenID);
     }
 }

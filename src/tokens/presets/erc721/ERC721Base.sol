@@ -56,7 +56,7 @@ abstract contract ERC721Base is
         }
     }
 
-    function mint(address to, uint256 tokenID) public virtual override onlyForge returns (uint256) {
+    function mint(address to, uint256 tokenID, bytes memory) public virtual override onlyForge returns (uint256) {
         _mint(to, tokenID);
         return tokenID;
     }

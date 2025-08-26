@@ -17,7 +17,7 @@ bytes32 constant ERC20_BURN_TYPE_HASH_V1 = keccak256(
 );
 // ERC721
 bytes32 constant ERC721_MINT_TYPE_HASH_V1 =
-    keccak256("ERC721Mint(address recipient,address token,uint256 tokenID,uint256 nonce,uint256 deadline)");
+    keccak256("ERC721Mint(address recipient,address token,uint256 tokenID,uint256 nonce,uint256 deadline,bytes data)");
 bytes32 constant ERC721_TRANSFER_TYPE_HASH_V1 = keccak256(
     "ERC721Transfer(address recipient,address token,uint256 tokenID,uint256 nonce,uint256 deadline,bytes data)"
 );
@@ -69,7 +69,7 @@ bytes32 constant ERC20_VALIDATOR_BURN_TYPE_HASH_V2 = keccak256("ValidatorERC20Bu
 
 // ERC721
 bytes32 constant ERC721_MINT_TYPE_HASH_V2 =
-    keccak256("ERC721Mint(address token,uint256 tokenID,uint256 nonce,uint256 deadline)");
+    keccak256("ERC721Mint(address token,uint256 tokenID,uint256 nonce,uint256 deadline,bytes data)");
 bytes32 constant ERC721_VALIDATOR_MINT_TYPE_HASH_V2 =
     keccak256("ValidatorERC721Mint(address recipient,bytes recipientSig)");
 

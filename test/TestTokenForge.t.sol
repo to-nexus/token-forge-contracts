@@ -198,9 +198,11 @@ contract TestTokenForgeFactory is Test {
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
         uint256 uuid = _calcUUID(nonce);
+        bytes memory data = "test_mint_erc721_v1";
 
-        bytes32 structHash =
-            keccak256(abi.encode(ERC721_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
+        bytes32 structHash = keccak256(
+            abi.encode(ERC721_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline, keccak256(data))
+        );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -212,7 +214,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV1(FORGE).mintERC721(token, tokenID, deadline, abi.encodePacked(r, s, v));
+        ForgeV1(FORGE).mintERC721(token, tokenID, deadline, abi.encodePacked(r, s, v), data);
         assertEq(ACCOUNT.addr, MockERC721(token).ownerOf(tokenID), "Minted tokenID mismatch");
     }
 
@@ -405,7 +407,7 @@ contract TestTokenForgeFactory is Test {
 
         // charge token to forge
         vm.prank(OWNER);
-        MockERC721(token).forceMint(FORGE, tokenID);
+        MockERC721(token).forceMint(FORGE, tokenID, "");
 
         bytes32 structHash = keccak256(
             abi.encode(ERC721_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline, keccak256(data))
@@ -627,7 +629,7 @@ contract TestTokenForgeFactory is Test {
 
         // charge token to account
         vm.prank(OWNER);
-        MockERC721(token).forceMint(ACCOUNT.addr, tokenID);
+        MockERC721(token).forceMint(ACCOUNT.addr, tokenID, "");
         // approve to forge
         vm.prank(ACCOUNT.addr);
         MockERC721(token).approve(FORGE, tokenID);
@@ -849,12 +851,13 @@ contract TestTokenForgeFactory is Test {
         uint256 tokenID = 1;
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+        bytes memory data = "test_mint_erc721_v2";
 
         bytes memory recipientSig;
 
         {
             bytes32 recipientStructHash =
-                keccak256(abi.encode(ERC721_MINT_TYPE_HASH_V2, token, tokenID, nonce, deadline));
+                keccak256(abi.encode(ERC721_MINT_TYPE_HASH_V2, token, tokenID, nonce, deadline, keccak256(data)));
             bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
             recipientSig = abi.encodePacked(r, s, v);
@@ -876,7 +879,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).mintERC721(ACCOUNT.addr, token, tokenID, deadline, recipientSig, validatorSig);
+        ForgeV2(FORGE).mintERC721(ACCOUNT.addr, token, tokenID, deadline, recipientSig, validatorSig, data);
         assertEq(ACCOUNT.addr, MockERC721(token).ownerOf(tokenID), "Minted tokenID mismatch");
     }
 
@@ -1103,7 +1106,7 @@ contract TestTokenForgeFactory is Test {
 
         // charge token to forge
         vm.prank(OWNER);
-        MockERC721(token).forceMint(FORGE, tokenID);
+        MockERC721(token).forceMint(FORGE, tokenID, "");
 
         bytes memory recipientSig;
 
@@ -1374,7 +1377,7 @@ contract TestTokenForgeFactory is Test {
 
         // charge token to account
         vm.prank(OWNER);
-        MockERC721(token).forceMint(ACCOUNT.addr, tokenID);
+        MockERC721(token).forceMint(ACCOUNT.addr, tokenID, "");
         // approve to forge
         vm.prank(ACCOUNT.addr);
         MockERC721(token).approve(FORGE, tokenID);
@@ -1619,8 +1622,10 @@ contract TestTokenForgeFactory is Test {
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
         uint256 uuid = _calcUUID(nonce);
-        bytes32 structHash =
-            keccak256(abi.encode(ERC721_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
+        bytes memory data = "test_mint_erc721_v3";
+        bytes32 structHash = keccak256(
+            abi.encode(ERC721_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline, keccak256(data))
+        );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -1631,7 +1636,7 @@ contract TestTokenForgeFactory is Test {
         emit ForgeFactory.ERC721Minted(SERVICE_NAME, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
-        ForgeV3(FORGE).mintERC721(ACCOUNT.addr, token, tokenID, deadline, abi.encodePacked(r, s, v));
+        ForgeV3(FORGE).mintERC721(ACCOUNT.addr, token, tokenID, deadline, abi.encodePacked(r, s, v), data);
         assertEq(ACCOUNT.addr, MockERC721(token).ownerOf(tokenID), "Minted tokenID mismatch");
     }
 
@@ -1824,7 +1829,7 @@ contract TestTokenForgeFactory is Test {
 
         // charge token to forge
         vm.prank(OWNER);
-        MockERC721(token).forceMint(FORGE, tokenID);
+        MockERC721(token).forceMint(FORGE, tokenID, "");
 
         bytes32 structHash = keccak256(
             abi.encode(ERC721_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline, keccak256(data))

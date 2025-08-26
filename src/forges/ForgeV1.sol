@@ -204,26 +204,31 @@ abstract contract ERC721ForgeV1 is BaseForge, ERC721HolderUpgradeable {
 
     error ERC721MintForge__InvalidRecipientSignature(address recipient);
 
-    bytes32 private constant ERC721_MINT_TYPE_HASH =
-        keccak256("ERC721Mint(address recipient,address token,uint256 tokenID,uint256 nonce,uint256 deadline)");
+    bytes32 private constant ERC721_MINT_TYPE_HASH = keccak256(
+        "ERC721Mint(address recipient,address token,uint256 tokenID,uint256 nonce,uint256 deadline,bytes data)"
+    );
     bytes32 private constant ERC721_TRANSFER_TYPE_HASH = keccak256(
         "ERC721Transfer(address recipient,address token,uint256 tokenID,uint256 nonce,uint256 deadline,bytes data)"
     );
     bytes32 private constant ERC721_BURN_TYPE_HASH =
         keccak256("ERC721Burn(address from,address token,uint256 tokenID,uint256 nonce,uint256 deadline)");
 
-    function mintERC721(address token, uint256 tokenID, uint256 deadline, bytes calldata validatorSig)
-        external
-        checkDeadline(deadline)
-    {
+    function mintERC721(
+        address token,
+        uint256 tokenID,
+        uint256 deadline,
+        bytes calldata validatorSig,
+        bytes calldata data
+    ) external checkDeadline(deadline) {
         address recipient = _msgSender();
         uint256 nonce = _useNonce(recipient);
-        bytes32 structHash = keccak256(abi.encode(ERC721_MINT_TYPE_HASH, recipient, token, tokenID, nonce, deadline));
+        bytes32 structHash =
+            keccak256(abi.encode(ERC721_MINT_TYPE_HASH, recipient, token, tokenID, nonce, deadline, keccak256(data)));
 
         bytes32 hash = _hashTypedDataV4(structHash);
         _verifyValidatorSignature(hash, validatorSig);
 
-        IERC721Forge(token).mint(recipient, tokenID);
+        IERC721Forge(token).mint(recipient, tokenID, data);
         _alertMintToFactory(TokenType.ERC721, _calcUUID(recipient, nonce), token, abi.encode(recipient, tokenID));
     }
 
