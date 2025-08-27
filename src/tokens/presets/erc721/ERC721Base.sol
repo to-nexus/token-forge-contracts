@@ -22,17 +22,21 @@ abstract contract ERC721Base is
 
     function initialize(
         address owner,
+        address manager,
         string memory name,
         string memory symbol,
         string memory baseTokenURI,
         bytes memory
     ) external virtual override;
 
-    function __ERC721Base_init(address owner, string memory name, string memory symbol, string memory baseTokenURI)
-        internal
-        onlyInitializing
-    {
-        __TokenBase_init(owner);
+    function __ERC721Base_init(
+        address owner,
+        address manager,
+        string memory name,
+        string memory symbol,
+        string memory baseTokenURI
+    ) internal onlyInitializing {
+        __TokenBase_init(owner, manager);
         __ERC721Base_init_unchained(name, symbol, baseTokenURI);
 
         __ERC721_init(name, symbol);
@@ -41,7 +45,7 @@ abstract contract ERC721Base is
     }
 
     function __ERC721Base_init_unchained(string memory name, string memory symbol, string memory baseTokenURI)
-        private
+        internal
         onlyInitializing
     {
         if (bytes(name).length == 0) revert TokenBase__NullInput("name");
@@ -52,7 +56,7 @@ abstract contract ERC721Base is
         }
     }
 
-    function mint(address to, uint256 tokenID) public virtual override onlyForge returns (uint256) {
+    function mint(address to, uint256 tokenID, bytes memory) public virtual override onlyForge returns (uint256) {
         _mint(to, tokenID);
         return tokenID;
     }

@@ -13,6 +13,7 @@ interface ITokenFactory {
     /**
      * @dev ERC20 토큰 배포
      * @param owner 새 토큰의 소유자 EOA
+     * @param manager 토큰 매니저 EOA
      * @param name 토큰 이름
      * @param symbol 토큰 심볼
      * @param decimals 토큰 소수점 자리수
@@ -22,10 +23,12 @@ interface ITokenFactory {
      */
     function deployERC20(
         address owner,
+        address manager,
         string memory name,
         string memory symbol,
         uint8 decimals,
         uint256 initialSupply,
+        address initialRecipient,
         bytes memory data,
         address logic
     ) external returns (address tokenAddress);
@@ -33,6 +36,7 @@ interface ITokenFactory {
     /**
      * @dev ERC721 토큰 배포
      * @param owner 새 토큰의 소유자 EOA
+     * @param manager 토큰 매니저 EOA
      * @param name 토큰 이름
      * @param symbol 토큰 심볼
      * @param baseTokenURI 기본 토큰 URI
@@ -41,6 +45,7 @@ interface ITokenFactory {
      */
     function deployERC721(
         address owner,
+        address manager,
         string memory name,
         string memory symbol,
         string memory baseTokenURI,
@@ -51,11 +56,12 @@ interface ITokenFactory {
     /**
      * @dev ERC1155 토큰 배포
      * @param owner 새 토큰의 소유자 EOA
+     * @param manager 토큰 매니저 EOA
      * @param uri 토큰 URI 템플릿
      * @param logic 사용할 로직 컨트랙트 주소 (optional, 0이면 기본 프리셋 사용)
      * @return tokenAddress 배포된 토큰 프록시 주소
      */
-    function deployERC1155(address owner, string memory uri, bytes memory data, address logic)
+    function deployERC1155(address owner, address manager, string memory uri, bytes memory data, address logic)
         external
         returns (address tokenAddress);
     //

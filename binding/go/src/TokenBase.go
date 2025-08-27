@@ -26,7 +26,7 @@ var (
 
 // TokenBaseMetaData contains all meta data concerning the TokenBase contract.
 var TokenBaseMetaData = bind.MetaData{
-	ABI: "[{\"inputs\":[],\"name\":\"UPGRADE_INTERFACE_VERSION\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"forgeByIndex\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"forgeCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"forges\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"forge\",\"type\":\"address\"}],\"name\":\"isForge\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"proxiableUUID\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"_forges\",\"type\":\"address[]\"},{\"internalType\":\"bool\",\"name\":\"add\",\"type\":\"bool\"}],\"name\":\"setForges\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newImplementation\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"upgradeToAndCall\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"forge\",\"type\":\"address\"}],\"name\":\"ForgeAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"forge\",\"type\":\"address\"}],\"name\":\"ForgeRemoved\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"version\",\"type\":\"uint64\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"Upgraded\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"}],\"name\":\"AddressEmptyCode\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"ERC1967InvalidImplementation\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ERC1967NonPayable\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"FailedCall\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidInitialization\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotInitializing\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"OwnableInvalidOwner\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"OwnableUnauthorizedAccount\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"field\",\"type\":\"bytes32\"}],\"name\":\"TokenBase__NullInput\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"caller\",\"type\":\"address\"}],\"name\":\"TokenBase__OnlyForge\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"UUPSUnauthorizedCallContext\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"slot\",\"type\":\"bytes32\"}],\"name\":\"UUPSUnsupportedProxiableUUID\",\"type\":\"error\"}]",
+	ABI: "[{\"inputs\":[],\"name\":\"DEFAULT_ADMIN_ROLE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"MANAGER_ROLE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"UPGRADE_INTERFACE_VERSION\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"forgeByIndex\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"forgeCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"forges\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"}],\"name\":\"getRoleAdmin\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"grantRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"hasRole\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"forge\",\"type\":\"address\"}],\"name\":\"isForge\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"proxiableUUID\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"callerConfirmation\",\"type\":\"address\"}],\"name\":\"renounceRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"revokeRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"_forges\",\"type\":\"address[]\"},{\"internalType\":\"bool\",\"name\":\"add\",\"type\":\"bool\"}],\"name\":\"setForges\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newImplementation\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"upgradeToAndCall\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"forge\",\"type\":\"address\"}],\"name\":\"ForgeAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"forge\",\"type\":\"address\"}],\"name\":\"ForgeRemoved\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"version\",\"type\":\"uint64\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"previousAdminRole\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"newAdminRole\",\"type\":\"bytes32\"}],\"name\":\"RoleAdminChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleGranted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleRevoked\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"Upgraded\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"AccessControlBadConfirmation\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"neededRole\",\"type\":\"bytes32\"}],\"name\":\"AccessControlUnauthorizedAccount\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"}],\"name\":\"AddressEmptyCode\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"ERC1967InvalidImplementation\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ERC1967NonPayable\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"FailedCall\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidInitialization\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotInitializing\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"field\",\"type\":\"bytes32\"}],\"name\":\"TokenBase__NullInput\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"caller\",\"type\":\"address\"}],\"name\":\"TokenBase__OnlyForge\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"UUPSUnauthorizedCallContext\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"slot\",\"type\":\"bytes32\"}],\"name\":\"UUPSUnsupportedProxiableUUID\",\"type\":\"error\"}]",
 	ID:  "TokenBase",
 }
 
@@ -48,6 +48,56 @@ func NewTokenBase() *TokenBase {
 // Use this to create the instance object passed to abigen v2 library functions Call, Transact, etc.
 func (c *TokenBase) Instance(backend bind.ContractBackend, addr common.Address) *bind.BoundContract {
 	return bind.NewBoundContract(addr, c.abi, backend, backend, backend)
+}
+
+// PackDEFAULTADMINROLE is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xa217fddf.
+//
+// Solidity: function DEFAULT_ADMIN_ROLE() view returns(bytes32)
+func (tokenBase *TokenBase) PackDEFAULTADMINROLE() []byte {
+	enc, err := tokenBase.abi.Pack("DEFAULT_ADMIN_ROLE")
+	if err != nil {
+		panic(err)
+	}
+	return enc
+}
+
+// UnpackDEFAULTADMINROLE is the Go binding that unpacks the parameters returned
+// from invoking the contract method with ID 0xa217fddf.
+//
+// Solidity: function DEFAULT_ADMIN_ROLE() view returns(bytes32)
+func (tokenBase *TokenBase) UnpackDEFAULTADMINROLE(data []byte) ([32]byte, error) {
+	out, err := tokenBase.abi.Unpack("DEFAULT_ADMIN_ROLE", data)
+	if err != nil {
+		return *new([32]byte), err
+	}
+	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
+	return out0, err
+}
+
+// PackMANAGERROLE is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xec87621c.
+//
+// Solidity: function MANAGER_ROLE() view returns(bytes32)
+func (tokenBase *TokenBase) PackMANAGERROLE() []byte {
+	enc, err := tokenBase.abi.Pack("MANAGER_ROLE")
+	if err != nil {
+		panic(err)
+	}
+	return enc
+}
+
+// UnpackMANAGERROLE is the Go binding that unpacks the parameters returned
+// from invoking the contract method with ID 0xec87621c.
+//
+// Solidity: function MANAGER_ROLE() view returns(bytes32)
+func (tokenBase *TokenBase) UnpackMANAGERROLE(data []byte) ([32]byte, error) {
+	out, err := tokenBase.abi.Unpack("MANAGER_ROLE", data)
+	if err != nil {
+		return *new([32]byte), err
+	}
+	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
+	return out0, err
 }
 
 // PackUPGRADEINTERFACEVERSION is the Go binding used to pack the parameters required for calling
@@ -150,6 +200,68 @@ func (tokenBase *TokenBase) UnpackForges(data []byte) ([]common.Address, error) 
 	return out0, err
 }
 
+// PackGetRoleAdmin is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x248a9ca3.
+//
+// Solidity: function getRoleAdmin(bytes32 role) view returns(bytes32)
+func (tokenBase *TokenBase) PackGetRoleAdmin(role [32]byte) []byte {
+	enc, err := tokenBase.abi.Pack("getRoleAdmin", role)
+	if err != nil {
+		panic(err)
+	}
+	return enc
+}
+
+// UnpackGetRoleAdmin is the Go binding that unpacks the parameters returned
+// from invoking the contract method with ID 0x248a9ca3.
+//
+// Solidity: function getRoleAdmin(bytes32 role) view returns(bytes32)
+func (tokenBase *TokenBase) UnpackGetRoleAdmin(data []byte) ([32]byte, error) {
+	out, err := tokenBase.abi.Unpack("getRoleAdmin", data)
+	if err != nil {
+		return *new([32]byte), err
+	}
+	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
+	return out0, err
+}
+
+// PackGrantRole is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x2f2ff15d.
+//
+// Solidity: function grantRole(bytes32 role, address account) returns()
+func (tokenBase *TokenBase) PackGrantRole(role [32]byte, account common.Address) []byte {
+	enc, err := tokenBase.abi.Pack("grantRole", role, account)
+	if err != nil {
+		panic(err)
+	}
+	return enc
+}
+
+// PackHasRole is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x91d14854.
+//
+// Solidity: function hasRole(bytes32 role, address account) view returns(bool)
+func (tokenBase *TokenBase) PackHasRole(role [32]byte, account common.Address) []byte {
+	enc, err := tokenBase.abi.Pack("hasRole", role, account)
+	if err != nil {
+		panic(err)
+	}
+	return enc
+}
+
+// UnpackHasRole is the Go binding that unpacks the parameters returned
+// from invoking the contract method with ID 0x91d14854.
+//
+// Solidity: function hasRole(bytes32 role, address account) view returns(bool)
+func (tokenBase *TokenBase) UnpackHasRole(data []byte) (bool, error) {
+	out, err := tokenBase.abi.Unpack("hasRole", data)
+	if err != nil {
+		return *new(bool), err
+	}
+	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+	return out0, err
+}
+
 // PackIsForge is the Go binding used to pack the parameters required for calling
 // the contract method with ID 0x87f45353.
 //
@@ -172,31 +284,6 @@ func (tokenBase *TokenBase) UnpackIsForge(data []byte) (bool, error) {
 		return *new(bool), err
 	}
 	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-	return out0, err
-}
-
-// PackOwner is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x8da5cb5b.
-//
-// Solidity: function owner() view returns(address)
-func (tokenBase *TokenBase) PackOwner() []byte {
-	enc, err := tokenBase.abi.Pack("owner")
-	if err != nil {
-		panic(err)
-	}
-	return enc
-}
-
-// UnpackOwner is the Go binding that unpacks the parameters returned
-// from invoking the contract method with ID 0x8da5cb5b.
-//
-// Solidity: function owner() view returns(address)
-func (tokenBase *TokenBase) UnpackOwner(data []byte) (common.Address, error) {
-	out, err := tokenBase.abi.Unpack("owner", data)
-	if err != nil {
-		return *new(common.Address), err
-	}
-	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
 	return out0, err
 }
 
@@ -225,12 +312,24 @@ func (tokenBase *TokenBase) UnpackProxiableUUID(data []byte) ([32]byte, error) {
 	return out0, err
 }
 
-// PackRenounceOwnership is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x715018a6.
+// PackRenounceRole is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x36568abe.
 //
-// Solidity: function renounceOwnership() returns()
-func (tokenBase *TokenBase) PackRenounceOwnership() []byte {
-	enc, err := tokenBase.abi.Pack("renounceOwnership")
+// Solidity: function renounceRole(bytes32 role, address callerConfirmation) returns()
+func (tokenBase *TokenBase) PackRenounceRole(role [32]byte, callerConfirmation common.Address) []byte {
+	enc, err := tokenBase.abi.Pack("renounceRole", role, callerConfirmation)
+	if err != nil {
+		panic(err)
+	}
+	return enc
+}
+
+// PackRevokeRole is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xd547741f.
+//
+// Solidity: function revokeRole(bytes32 role, address account) returns()
+func (tokenBase *TokenBase) PackRevokeRole(role [32]byte, account common.Address) []byte {
+	enc, err := tokenBase.abi.Pack("revokeRole", role, account)
 	if err != nil {
 		panic(err)
 	}
@@ -272,18 +371,6 @@ func (tokenBase *TokenBase) UnpackSupportsInterface(data []byte) (bool, error) {
 	}
 	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
 	return out0, err
-}
-
-// PackTransferOwnership is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xf2fde38b.
-//
-// Solidity: function transferOwnership(address newOwner) returns()
-func (tokenBase *TokenBase) PackTransferOwnership(newOwner common.Address) []byte {
-	enc, err := tokenBase.abi.Pack("transferOwnership", newOwner)
-	if err != nil {
-		panic(err)
-	}
-	return enc
 }
 
 // PackUpgradeToAndCall is the Go binding used to pack the parameters required for calling
@@ -421,30 +508,117 @@ func (tokenBase *TokenBase) UnpackInitializedEvent(log *types.Log) (*TokenBaseIn
 	return out, nil
 }
 
-// TokenBaseOwnershipTransferred represents a OwnershipTransferred event raised by the TokenBase contract.
-type TokenBaseOwnershipTransferred struct {
-	PreviousOwner common.Address
-	NewOwner      common.Address
-	Raw           *types.Log // Blockchain specific contextual infos
+// TokenBaseRoleAdminChanged represents a RoleAdminChanged event raised by the TokenBase contract.
+type TokenBaseRoleAdminChanged struct {
+	Role              [32]byte
+	PreviousAdminRole [32]byte
+	NewAdminRole      [32]byte
+	Raw               *types.Log // Blockchain specific contextual infos
 }
 
-const TokenBaseOwnershipTransferredEventName = "OwnershipTransferred"
+const TokenBaseRoleAdminChangedEventName = "RoleAdminChanged"
 
 // ContractEventName returns the user-defined event name.
-func (TokenBaseOwnershipTransferred) ContractEventName() string {
-	return TokenBaseOwnershipTransferredEventName
+func (TokenBaseRoleAdminChanged) ContractEventName() string {
+	return TokenBaseRoleAdminChangedEventName
 }
 
-// UnpackOwnershipTransferredEvent is the Go binding that unpacks the event data emitted
+// UnpackRoleAdminChangedEvent is the Go binding that unpacks the event data emitted
 // by contract.
 //
-// Solidity: event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)
-func (tokenBase *TokenBase) UnpackOwnershipTransferredEvent(log *types.Log) (*TokenBaseOwnershipTransferred, error) {
-	event := "OwnershipTransferred"
+// Solidity: event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole)
+func (tokenBase *TokenBase) UnpackRoleAdminChangedEvent(log *types.Log) (*TokenBaseRoleAdminChanged, error) {
+	event := "RoleAdminChanged"
 	if log.Topics[0] != tokenBase.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
-	out := new(TokenBaseOwnershipTransferred)
+	out := new(TokenBaseRoleAdminChanged)
+	if len(log.Data) > 0 {
+		if err := tokenBase.abi.UnpackIntoInterface(out, event, log.Data); err != nil {
+			return nil, err
+		}
+	}
+	var indexed abi.Arguments
+	for _, arg := range tokenBase.abi.Events[event].Inputs {
+		if arg.Indexed {
+			indexed = append(indexed, arg)
+		}
+	}
+	if err := abi.ParseTopics(out, indexed, log.Topics[1:]); err != nil {
+		return nil, err
+	}
+	out.Raw = log
+	return out, nil
+}
+
+// TokenBaseRoleGranted represents a RoleGranted event raised by the TokenBase contract.
+type TokenBaseRoleGranted struct {
+	Role    [32]byte
+	Account common.Address
+	Sender  common.Address
+	Raw     *types.Log // Blockchain specific contextual infos
+}
+
+const TokenBaseRoleGrantedEventName = "RoleGranted"
+
+// ContractEventName returns the user-defined event name.
+func (TokenBaseRoleGranted) ContractEventName() string {
+	return TokenBaseRoleGrantedEventName
+}
+
+// UnpackRoleGrantedEvent is the Go binding that unpacks the event data emitted
+// by contract.
+//
+// Solidity: event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender)
+func (tokenBase *TokenBase) UnpackRoleGrantedEvent(log *types.Log) (*TokenBaseRoleGranted, error) {
+	event := "RoleGranted"
+	if log.Topics[0] != tokenBase.abi.Events[event].ID {
+		return nil, errors.New("event signature mismatch")
+	}
+	out := new(TokenBaseRoleGranted)
+	if len(log.Data) > 0 {
+		if err := tokenBase.abi.UnpackIntoInterface(out, event, log.Data); err != nil {
+			return nil, err
+		}
+	}
+	var indexed abi.Arguments
+	for _, arg := range tokenBase.abi.Events[event].Inputs {
+		if arg.Indexed {
+			indexed = append(indexed, arg)
+		}
+	}
+	if err := abi.ParseTopics(out, indexed, log.Topics[1:]); err != nil {
+		return nil, err
+	}
+	out.Raw = log
+	return out, nil
+}
+
+// TokenBaseRoleRevoked represents a RoleRevoked event raised by the TokenBase contract.
+type TokenBaseRoleRevoked struct {
+	Role    [32]byte
+	Account common.Address
+	Sender  common.Address
+	Raw     *types.Log // Blockchain specific contextual infos
+}
+
+const TokenBaseRoleRevokedEventName = "RoleRevoked"
+
+// ContractEventName returns the user-defined event name.
+func (TokenBaseRoleRevoked) ContractEventName() string {
+	return TokenBaseRoleRevokedEventName
+}
+
+// UnpackRoleRevokedEvent is the Go binding that unpacks the event data emitted
+// by contract.
+//
+// Solidity: event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender)
+func (tokenBase *TokenBase) UnpackRoleRevokedEvent(log *types.Log) (*TokenBaseRoleRevoked, error) {
+	event := "RoleRevoked"
+	if log.Topics[0] != tokenBase.abi.Events[event].ID {
+		return nil, errors.New("event signature mismatch")
+	}
+	out := new(TokenBaseRoleRevoked)
 	if len(log.Data) > 0 {
 		if err := tokenBase.abi.UnpackIntoInterface(out, event, log.Data); err != nil {
 			return nil, err
@@ -507,6 +681,12 @@ func (tokenBase *TokenBase) UnpackUpgradedEvent(log *types.Log) (*TokenBaseUpgra
 // UnpackError attempts to decode the provided error data using user-defined
 // error definitions.
 func (tokenBase *TokenBase) UnpackError(raw []byte) (any, error) {
+	if bytes.Equal(raw[:4], tokenBase.abi.Errors["AccessControlBadConfirmation"].ID.Bytes()[:4]) {
+		return tokenBase.UnpackAccessControlBadConfirmationError(raw[4:])
+	}
+	if bytes.Equal(raw[:4], tokenBase.abi.Errors["AccessControlUnauthorizedAccount"].ID.Bytes()[:4]) {
+		return tokenBase.UnpackAccessControlUnauthorizedAccountError(raw[4:])
+	}
 	if bytes.Equal(raw[:4], tokenBase.abi.Errors["AddressEmptyCode"].ID.Bytes()[:4]) {
 		return tokenBase.UnpackAddressEmptyCodeError(raw[4:])
 	}
@@ -525,12 +705,6 @@ func (tokenBase *TokenBase) UnpackError(raw []byte) (any, error) {
 	if bytes.Equal(raw[:4], tokenBase.abi.Errors["NotInitializing"].ID.Bytes()[:4]) {
 		return tokenBase.UnpackNotInitializingError(raw[4:])
 	}
-	if bytes.Equal(raw[:4], tokenBase.abi.Errors["OwnableInvalidOwner"].ID.Bytes()[:4]) {
-		return tokenBase.UnpackOwnableInvalidOwnerError(raw[4:])
-	}
-	if bytes.Equal(raw[:4], tokenBase.abi.Errors["OwnableUnauthorizedAccount"].ID.Bytes()[:4]) {
-		return tokenBase.UnpackOwnableUnauthorizedAccountError(raw[4:])
-	}
 	if bytes.Equal(raw[:4], tokenBase.abi.Errors["TokenBaseNullInput"].ID.Bytes()[:4]) {
 		return tokenBase.UnpackTokenBaseNullInputError(raw[4:])
 	}
@@ -544,6 +718,54 @@ func (tokenBase *TokenBase) UnpackError(raw []byte) (any, error) {
 		return tokenBase.UnpackUUPSUnsupportedProxiableUUIDError(raw[4:])
 	}
 	return nil, errors.New("Unknown error")
+}
+
+// TokenBaseAccessControlBadConfirmation represents a AccessControlBadConfirmation error raised by the TokenBase contract.
+type TokenBaseAccessControlBadConfirmation struct {
+}
+
+// ErrorID returns the hash of canonical representation of the error's signature.
+//
+// Solidity: error AccessControlBadConfirmation()
+func TokenBaseAccessControlBadConfirmationErrorID() common.Hash {
+	return common.HexToHash("0x6697b23232a647058342c0724fe7c415cab25915b54e5dbc03f233173d37b41c")
+}
+
+// UnpackAccessControlBadConfirmationError is the Go binding used to decode the provided
+// error data into the corresponding Go error struct.
+//
+// Solidity: error AccessControlBadConfirmation()
+func (tokenBase *TokenBase) UnpackAccessControlBadConfirmationError(raw []byte) (*TokenBaseAccessControlBadConfirmation, error) {
+	out := new(TokenBaseAccessControlBadConfirmation)
+	if err := tokenBase.abi.UnpackIntoInterface(out, "AccessControlBadConfirmation", raw); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// TokenBaseAccessControlUnauthorizedAccount represents a AccessControlUnauthorizedAccount error raised by the TokenBase contract.
+type TokenBaseAccessControlUnauthorizedAccount struct {
+	Account    common.Address
+	NeededRole [32]byte
+}
+
+// ErrorID returns the hash of canonical representation of the error's signature.
+//
+// Solidity: error AccessControlUnauthorizedAccount(address account, bytes32 neededRole)
+func TokenBaseAccessControlUnauthorizedAccountErrorID() common.Hash {
+	return common.HexToHash("0xe2517d3fbfae6f8515ef5ff1ccedc3933ab0cbbda0b492c06eb54ad10ef03b3e")
+}
+
+// UnpackAccessControlUnauthorizedAccountError is the Go binding used to decode the provided
+// error data into the corresponding Go error struct.
+//
+// Solidity: error AccessControlUnauthorizedAccount(address account, bytes32 neededRole)
+func (tokenBase *TokenBase) UnpackAccessControlUnauthorizedAccountError(raw []byte) (*TokenBaseAccessControlUnauthorizedAccount, error) {
+	out := new(TokenBaseAccessControlUnauthorizedAccount)
+	if err := tokenBase.abi.UnpackIntoInterface(out, "AccessControlUnauthorizedAccount", raw); err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 // TokenBaseAddressEmptyCode represents a AddressEmptyCode error raised by the TokenBase contract.
@@ -681,54 +903,6 @@ func TokenBaseNotInitializingErrorID() common.Hash {
 func (tokenBase *TokenBase) UnpackNotInitializingError(raw []byte) (*TokenBaseNotInitializing, error) {
 	out := new(TokenBaseNotInitializing)
 	if err := tokenBase.abi.UnpackIntoInterface(out, "NotInitializing", raw); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// TokenBaseOwnableInvalidOwner represents a OwnableInvalidOwner error raised by the TokenBase contract.
-type TokenBaseOwnableInvalidOwner struct {
-	Owner common.Address
-}
-
-// ErrorID returns the hash of canonical representation of the error's signature.
-//
-// Solidity: error OwnableInvalidOwner(address owner)
-func TokenBaseOwnableInvalidOwnerErrorID() common.Hash {
-	return common.HexToHash("0x1e4fbdf7f3ef8bcaa855599e3abf48b232380f183f08f6f813d9ffa5bd585188")
-}
-
-// UnpackOwnableInvalidOwnerError is the Go binding used to decode the provided
-// error data into the corresponding Go error struct.
-//
-// Solidity: error OwnableInvalidOwner(address owner)
-func (tokenBase *TokenBase) UnpackOwnableInvalidOwnerError(raw []byte) (*TokenBaseOwnableInvalidOwner, error) {
-	out := new(TokenBaseOwnableInvalidOwner)
-	if err := tokenBase.abi.UnpackIntoInterface(out, "OwnableInvalidOwner", raw); err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// TokenBaseOwnableUnauthorizedAccount represents a OwnableUnauthorizedAccount error raised by the TokenBase contract.
-type TokenBaseOwnableUnauthorizedAccount struct {
-	Account common.Address
-}
-
-// ErrorID returns the hash of canonical representation of the error's signature.
-//
-// Solidity: error OwnableUnauthorizedAccount(address account)
-func TokenBaseOwnableUnauthorizedAccountErrorID() common.Hash {
-	return common.HexToHash("0x118cdaa7a341953d1887a2245fd6665d741c67c8c50581daa59e1d03373fa188")
-}
-
-// UnpackOwnableUnauthorizedAccountError is the Go binding used to decode the provided
-// error data into the corresponding Go error struct.
-//
-// Solidity: error OwnableUnauthorizedAccount(address account)
-func (tokenBase *TokenBase) UnpackOwnableUnauthorizedAccountError(raw []byte) (*TokenBaseOwnableUnauthorizedAccount, error) {
-	out := new(TokenBaseOwnableUnauthorizedAccount)
-	if err := tokenBase.abi.UnpackIntoInterface(out, "OwnableUnauthorizedAccount", raw); err != nil {
 		return nil, err
 	}
 	return out, nil

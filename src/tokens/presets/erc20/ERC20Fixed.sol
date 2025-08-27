@@ -9,14 +9,16 @@ contract ERC20Fixed is ERC20Base {
 
     function initialize(
         address _owner,
+        address _manager,
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
         uint256 _initialSupply,
+        address _initialRecipient,
         bytes memory
     ) external override initializer {
         if (_initialSupply == 0) revert TokenBase__NullInput("initialSupply");
-        ERC20Base.__ERC20Base_init(_owner, _name, _symbol, _decimals, _initialSupply);
+        ERC20Base.__ERC20Base_init(_owner, _manager, _name, _symbol, _decimals, _initialSupply, _initialRecipient);
     }
 
     function mint(address, uint256) public pure override {

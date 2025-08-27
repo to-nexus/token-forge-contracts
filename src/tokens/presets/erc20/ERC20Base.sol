@@ -14,22 +14,26 @@ abstract contract ERC20Base is TokenBase, IERC20Forge, ERC20Upgradeable, ERC20Pe
 
     function initialize(
         address _owner,
+        address _manager,
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
         uint256 _initialSupply,
+        address _initialRecipient,
         bytes memory
     ) external virtual override;
 
     function __ERC20Base_init(
         address _owner,
+        address _manager,
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
-        uint256 _initialSupply
+        uint256 _initialSupply,
+        address _initialRecipient
     ) internal onlyInitializing {
-        __TokenBase_init(_owner);
-        __ERC20Base_init_unchained(_owner, _name, _symbol, _decimals, _initialSupply);
+        __TokenBase_init(_owner, _manager);
+        __ERC20Base_init_unchained(_owner, _name, _symbol, _decimals, _initialSupply, _initialRecipient);
 
         __ERC20_init(_name, _symbol);
         __ERC20Permit_init(_name);
@@ -40,15 +44,17 @@ abstract contract ERC20Base is TokenBase, IERC20Forge, ERC20Upgradeable, ERC20Pe
         string memory _name,
         string memory _symbol,
         uint8 _decimals,
-        uint256 _initialSupply
-    ) private onlyInitializing {
+        uint256 _initialSupply,
+        address _initialRecipient
+    ) internal onlyInitializing {
         if (bytes(_name).length == 0) revert TokenBase__NullInput("name");
         if (bytes(_symbol).length == 0) revert TokenBase__NullInput("symbol");
         assembly {
             sstore(ERC20DecimalsStorageLocation, _decimals)
         }
         if (_initialSupply != 0) {
-            _mint(_owner, _initialSupply);
+            if (_initialRecipient == address(0)) revert TokenBase__NullInput("initialRecipient");
+            _mint(_initialRecipient, _initialSupply);
         }
     }
 

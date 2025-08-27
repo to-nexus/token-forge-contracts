@@ -101,7 +101,7 @@ contract TestTokenForgeFactory is Test {
 
     function _deployERC20() internal returns (address) {
         vm.prank(OWNER);
-        address token = tokenFactory.deployERC20(OWNER, "MockERC20", "M20", 18, 0, "", mockERC20Impl);
+        address token = tokenFactory.deployERC20(OWNER, OWNER, "MockERC20", "M20", 18, 0, OWNER, "", mockERC20Impl);
         address[] memory forges = new address[](1);
         forges[0] = FORGE;
         vm.prank(OWNER);
@@ -112,7 +112,7 @@ contract TestTokenForgeFactory is Test {
     function _deployERC721() internal returns (address) {
         vm.prank(OWNER);
         address token =
-            tokenFactory.deployERC721(OWNER, "MockERC721", "M721", "https://xxx.yyy.zzz", "", mockERC721Impl);
+            tokenFactory.deployERC721(OWNER, OWNER, "MockERC721", "M721", "https://xxx.yyy.zzz", "", mockERC721Impl);
         address[] memory forges = new address[](1);
         forges[0] = FORGE;
         vm.prank(OWNER);
@@ -122,7 +122,7 @@ contract TestTokenForgeFactory is Test {
 
     function _deployERC1155() internal returns (address) {
         vm.prank(OWNER);
-        address token = tokenFactory.deployERC1155(OWNER, "https://xxx.yyy.zzz", "", mockERC1155Impl);
+        address token = tokenFactory.deployERC1155(OWNER, OWNER, "https://xxx.yyy.zzz", "", mockERC1155Impl);
         address[] memory forges = new address[](1);
         forges[0] = FORGE;
         vm.prank(OWNER);
@@ -198,9 +198,11 @@ contract TestTokenForgeFactory is Test {
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
         uint256 uuid = _calcUUID(nonce);
+        bytes memory data = "test_mint_erc721_v1";
 
-        bytes32 structHash =
-            keccak256(abi.encode(ERC721_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
+        bytes32 structHash = keccak256(
+            abi.encode(ERC721_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, keccak256(data), nonce, deadline)
+        );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -212,7 +214,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV1(FORGE).mintERC721(token, tokenID, deadline, abi.encodePacked(r, s, v));
+        ForgeV1(FORGE).mintERC721(token, tokenID, data, deadline, abi.encodePacked(r, s, v));
         assertEq(ACCOUNT.addr, MockERC721(token).ownerOf(tokenID), "Minted tokenID mismatch");
     }
 
@@ -244,8 +246,11 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
         bytes memory data = "Minting ERC1155 token";
 
-        bytes32 structHash =
-            keccak256(abi.encode(ERC1155_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, nonce, deadline));
+        bytes32 structHash = keccak256(
+            abi.encode(
+                ERC1155_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, keccak256(data), nonce, deadline
+            )
+        );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -257,7 +262,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV1(FORGE).mintERC1155(token, tokenID, amount, deadline, abi.encodePacked(r, s, v), data);
+        ForgeV1(FORGE).mintERC1155(token, tokenID, amount, data, deadline, abi.encodePacked(r, s, v));
         assertEq(amount, MockERC1155(token).balanceOf(ACCOUNT.addr, tokenID), "Minted tokenID mismatch");
     }
 
@@ -300,6 +305,7 @@ contract TestTokenForgeFactory is Test {
                 token,
                 keccak256(abi.encodePacked(tokenIDs)),
                 keccak256(abi.encodePacked(amounts)),
+                keccak256(data),
                 nonce,
                 deadline
             )
@@ -317,7 +323,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV1(FORGE).mintERC1155Batch(token, tokenIDs, amounts, deadline, abi.encodePacked(r, s, v), data);
+        ForgeV1(FORGE).mintERC1155Batch(token, tokenIDs, amounts, data, deadline, abi.encodePacked(r, s, v));
         assertEq(amounts[0], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[0]), "Minted tokenID mismatch");
         assertEq(amounts[1], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[1]), "Minted tokenID mismatch");
     }
@@ -401,10 +407,11 @@ contract TestTokenForgeFactory is Test {
 
         // charge token to forge
         vm.prank(OWNER);
-        MockERC721(token).forceMint(FORGE, tokenID);
+        MockERC721(token).forceMint(FORGE, tokenID, "");
 
-        bytes32 structHash =
-            keccak256(abi.encode(ERC721_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
+        bytes32 structHash = keccak256(
+            abi.encode(ERC721_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, keccak256(data), nonce, deadline)
+        );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -416,7 +423,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV1(FORGE).transferERC721(token, tokenID, deadline, abi.encodePacked(r, s, v), data);
+        ForgeV1(FORGE).transferERC721(token, tokenID, data, deadline, abi.encodePacked(r, s, v));
         assertEq(ACCOUNT.addr, MockERC721(token).ownerOf(tokenID), "Transfered tokenID mismatch");
     }
 
@@ -454,8 +461,11 @@ contract TestTokenForgeFactory is Test {
         vm.prank(OWNER);
         MockERC1155(token).forceMint(FORGE, tokenID, amount);
 
-        bytes32 structHash =
-            keccak256(abi.encode(ERC1155_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, nonce, deadline));
+        bytes32 structHash = keccak256(
+            abi.encode(
+                ERC1155_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, keccak256(data), nonce, deadline
+            )
+        );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -467,7 +477,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV1(FORGE).transferERC1155(token, tokenID, amount, deadline, abi.encodePacked(r, s, v), data);
+        ForgeV1(FORGE).transferERC1155(token, tokenID, amount, data, deadline, abi.encodePacked(r, s, v));
         assertEq(amount, MockERC1155(token).balanceOf(ACCOUNT.addr, tokenID), "Transfered tokenID mismatch");
     }
 
@@ -516,6 +526,7 @@ contract TestTokenForgeFactory is Test {
                 token,
                 keccak256(abi.encodePacked(tokenIDs)),
                 keccak256(abi.encodePacked(amounts)),
+                keccak256(data),
                 nonce,
                 deadline
             )
@@ -533,7 +544,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV1(FORGE).transferERC1155Batch(token, tokenIDs, amounts, deadline, abi.encodePacked(r, s, v), data);
+        ForgeV1(FORGE).transferERC1155Batch(token, tokenIDs, amounts, data, deadline, abi.encodePacked(r, s, v));
 
         assertEq(amounts[0], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[0]), "Transfered tokenID mismatch");
         assertEq(amounts[1], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[1]), "Transfered tokenID mismatch");
@@ -618,7 +629,7 @@ contract TestTokenForgeFactory is Test {
 
         // charge token to account
         vm.prank(OWNER);
-        MockERC721(token).forceMint(ACCOUNT.addr, tokenID);
+        MockERC721(token).forceMint(ACCOUNT.addr, tokenID, "");
         // approve to forge
         vm.prank(ACCOUNT.addr);
         MockERC721(token).approve(FORGE, tokenID);
@@ -840,12 +851,13 @@ contract TestTokenForgeFactory is Test {
         uint256 tokenID = 1;
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
+        bytes memory data = "test_mint_erc721_v2";
 
         bytes memory recipientSig;
 
         {
             bytes32 recipientStructHash =
-                keccak256(abi.encode(ERC721_MINT_TYPE_HASH_V2, token, tokenID, nonce, deadline));
+                keccak256(abi.encode(ERC721_MINT_TYPE_HASH_V2, token, tokenID, keccak256(data), nonce, deadline));
             bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
             recipientSig = abi.encodePacked(r, s, v);
@@ -867,7 +879,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).mintERC721(ACCOUNT.addr, token, tokenID, deadline, recipientSig, validatorSig);
+        ForgeV2(FORGE).mintERC721(ACCOUNT.addr, token, tokenID, data, deadline, recipientSig, validatorSig);
         assertEq(ACCOUNT.addr, MockERC721(token).ownerOf(tokenID), "Minted tokenID mismatch");
     }
 
@@ -900,10 +912,10 @@ contract TestTokenForgeFactory is Test {
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
 
         bytes memory recipientSig;
-
         {
-            bytes32 recipientStructHash =
-                keccak256(abi.encode(ERC1155_MINT_TYPE_HASH_V2, token, tokenID, amount, nonce, deadline));
+            bytes32 recipientStructHash = keccak256(
+                abi.encode(ERC1155_MINT_TYPE_HASH_V2, token, tokenID, amount, keccak256(data), nonce, deadline)
+            );
             bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
             recipientSig = abi.encodePacked(r, s, v);
@@ -925,7 +937,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).mintERC1155(ACCOUNT.addr, token, tokenID, amount, deadline, recipientSig, validatorSig, data);
+        ForgeV2(FORGE).mintERC1155(ACCOUNT.addr, token, tokenID, amount, data, deadline, recipientSig, validatorSig);
         assertEq(amount, MockERC1155(token).balanceOf(ACCOUNT.addr, tokenID), "Minted tokenID mismatch");
     }
 
@@ -971,6 +983,7 @@ contract TestTokenForgeFactory is Test {
                     token,
                     keccak256(abi.encodePacked(tokenIDs)),
                     keccak256(abi.encodePacked(amounts)),
+                    keccak256(data),
                     nonce,
                     deadline
                 )
@@ -999,7 +1012,7 @@ contract TestTokenForgeFactory is Test {
         // send transaction
         vm.prank(ACCOUNT.addr);
         ForgeV2(FORGE).mintERC1155Batch(
-            ACCOUNT.addr, token, tokenIDs, amounts, deadline, recipientSig, validatorSig, data
+            ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, recipientSig, validatorSig
         );
         assertEq(amounts[0], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[0]), "Minted tokenID mismatch");
         assertEq(amounts[1], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[1]), "Minted tokenID mismatch");
@@ -1093,13 +1106,13 @@ contract TestTokenForgeFactory is Test {
 
         // charge token to forge
         vm.prank(OWNER);
-        MockERC721(token).forceMint(FORGE, tokenID);
+        MockERC721(token).forceMint(FORGE, tokenID, "");
 
         bytes memory recipientSig;
 
         {
             bytes32 recipientStructHash =
-                keccak256(abi.encode(ERC721_TRANSFER_TYPE_HASH_V2, token, tokenID, nonce, deadline));
+                keccak256(abi.encode(ERC721_TRANSFER_TYPE_HASH_V2, token, tokenID, keccak256(data), nonce, deadline));
             bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
             recipientSig = abi.encodePacked(r, s, v);
@@ -1121,7 +1134,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).transferERC721(ACCOUNT.addr, token, tokenID, deadline, recipientSig, validatorSig, data);
+        ForgeV2(FORGE).transferERC721(ACCOUNT.addr, token, tokenID, data, deadline, recipientSig, validatorSig);
         assertEq(ACCOUNT.addr, MockERC721(token).ownerOf(tokenID), "Transferred tokenID mismatch");
     }
 
@@ -1162,8 +1175,9 @@ contract TestTokenForgeFactory is Test {
         bytes memory recipientSig;
 
         {
-            bytes32 recipientStructHash =
-                keccak256(abi.encode(ERC1155_TRANSFER_TYPE_HASH_V2, token, tokenID, amount, nonce, deadline));
+            bytes32 recipientStructHash = keccak256(
+                abi.encode(ERC1155_TRANSFER_TYPE_HASH_V2, token, tokenID, amount, keccak256(data), nonce, deadline)
+            );
             bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
             recipientSig = abi.encodePacked(r, s, v);
@@ -1185,7 +1199,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).transferERC1155(ACCOUNT.addr, token, tokenID, amount, deadline, recipientSig, validatorSig, data);
+        ForgeV2(FORGE).transferERC1155(ACCOUNT.addr, token, tokenID, amount, data, deadline, recipientSig, validatorSig);
         assertEq(amount, MockERC1155(token).balanceOf(ACCOUNT.addr, tokenID), "Transfered tokenID mismatch");
     }
 
@@ -1237,6 +1251,7 @@ contract TestTokenForgeFactory is Test {
                     token,
                     keccak256(abi.encodePacked(tokenIDs)),
                     keccak256(abi.encodePacked(amounts)),
+                    keccak256(data),
                     nonce,
                     deadline
                 )
@@ -1266,7 +1281,7 @@ contract TestTokenForgeFactory is Test {
         // send transaction
         vm.prank(ACCOUNT.addr);
         ForgeV2(FORGE).transferERC1155Batch(
-            ACCOUNT.addr, token, tokenIDs, amounts, deadline, recipientSig, validatorSig, data
+            ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, recipientSig, validatorSig
         );
         assertEq(amounts[0], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[0]), "Transfered tokenID mismatch");
         assertEq(amounts[1], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[1]), "Transfered tokenID mismatch");
@@ -1362,7 +1377,7 @@ contract TestTokenForgeFactory is Test {
 
         // charge token to account
         vm.prank(OWNER);
-        MockERC721(token).forceMint(ACCOUNT.addr, tokenID);
+        MockERC721(token).forceMint(ACCOUNT.addr, tokenID, "");
         // approve to forge
         vm.prank(ACCOUNT.addr);
         MockERC721(token).approve(FORGE, tokenID);
@@ -1607,8 +1622,10 @@ contract TestTokenForgeFactory is Test {
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline
         uint256 nonce = NoncesUpgradeable(FORGE).nonces(ACCOUNT.addr);
         uint256 uuid = _calcUUID(nonce);
-        bytes32 structHash =
-            keccak256(abi.encode(ERC721_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
+        bytes memory data = "test_mint_erc721_v3";
+        bytes32 structHash = keccak256(
+            abi.encode(ERC721_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, keccak256(data), nonce, deadline)
+        );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -1619,7 +1636,7 @@ contract TestTokenForgeFactory is Test {
         emit ForgeFactory.ERC721Minted(SERVICE_NAME, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
-        ForgeV3(FORGE).mintERC721(ACCOUNT.addr, token, tokenID, deadline, abi.encodePacked(r, s, v));
+        ForgeV3(FORGE).mintERC721(ACCOUNT.addr, token, tokenID, data, deadline, abi.encodePacked(r, s, v));
         assertEq(ACCOUNT.addr, MockERC721(token).ownerOf(tokenID), "Minted tokenID mismatch");
     }
 
@@ -1652,8 +1669,11 @@ contract TestTokenForgeFactory is Test {
         uint256 uuid = _calcUUID(nonce);
         bytes memory data = "Minting ERC1155 token";
 
-        bytes32 structHash =
-            keccak256(abi.encode(ERC1155_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, nonce, deadline));
+        bytes32 structHash = keccak256(
+            abi.encode(
+                ERC1155_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, keccak256(data), nonce, deadline
+            )
+        );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -1664,7 +1684,7 @@ contract TestTokenForgeFactory is Test {
         emit ForgeFactory.ERC1155Minted(SERVICE_NAME, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
-        ForgeV3(FORGE).mintERC1155(ACCOUNT.addr, token, tokenID, amount, deadline, abi.encodePacked(r, s, v), data);
+        ForgeV3(FORGE).mintERC1155(ACCOUNT.addr, token, tokenID, amount, data, deadline, abi.encodePacked(r, s, v));
         assertEq(amount, MockERC1155(token).balanceOf(ACCOUNT.addr, tokenID), "Minted tokenID mismatch");
     }
 
@@ -1708,6 +1728,7 @@ contract TestTokenForgeFactory is Test {
                 token,
                 keccak256(abi.encodePacked(tokenIDs)),
                 keccak256(abi.encodePacked(amounts)),
+                keccak256(data),
                 nonce,
                 deadline
             )
@@ -1725,7 +1746,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         ForgeV3(FORGE).mintERC1155Batch(
-            ACCOUNT.addr, token, tokenIDs, amounts, deadline, abi.encodePacked(r, s, v), data
+            ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, abi.encodePacked(r, s, v)
         );
         assertEq(amounts[0], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[0]), "Minted tokenID mismatch");
         assertEq(amounts[1], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[1]), "Minted tokenID mismatch");
@@ -1808,10 +1829,11 @@ contract TestTokenForgeFactory is Test {
 
         // charge token to forge
         vm.prank(OWNER);
-        MockERC721(token).forceMint(FORGE, tokenID);
+        MockERC721(token).forceMint(FORGE, tokenID, "");
 
-        bytes32 structHash =
-            keccak256(abi.encode(ERC721_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
+        bytes32 structHash = keccak256(
+            abi.encode(ERC721_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, keccak256(data), nonce, deadline)
+        );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -1822,7 +1844,7 @@ contract TestTokenForgeFactory is Test {
         emit ForgeFactory.ERC721Transferred(SERVICE_NAME, uuid, ACCOUNT.addr, token, tokenID);
 
         // send transaction
-        ForgeV3(FORGE).transferERC721(ACCOUNT.addr, token, tokenID, deadline, abi.encodePacked(r, s, v), data);
+        ForgeV3(FORGE).transferERC721(ACCOUNT.addr, token, tokenID, data, deadline, abi.encodePacked(r, s, v));
         assertEq(ACCOUNT.addr, MockERC721(token).ownerOf(tokenID), "Transfered tokenID mismatch");
     }
 
@@ -1860,8 +1882,11 @@ contract TestTokenForgeFactory is Test {
         vm.prank(OWNER);
         MockERC1155(token).forceMint(FORGE, tokenID, amount);
 
-        bytes32 structHash =
-            keccak256(abi.encode(ERC1155_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, nonce, deadline));
+        bytes32 structHash = keccak256(
+            abi.encode(
+                ERC1155_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, keccak256(data), nonce, deadline
+            )
+        );
         bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
@@ -1872,7 +1897,7 @@ contract TestTokenForgeFactory is Test {
         emit ForgeFactory.ERC1155Transferred(SERVICE_NAME, uuid, ACCOUNT.addr, token, tokenID, amount);
 
         // send transaction
-        ForgeV3(FORGE).transferERC1155(ACCOUNT.addr, token, tokenID, amount, deadline, abi.encodePacked(r, s, v), data);
+        ForgeV3(FORGE).transferERC1155(ACCOUNT.addr, token, tokenID, amount, data, deadline, abi.encodePacked(r, s, v));
         assertEq(amount, MockERC1155(token).balanceOf(ACCOUNT.addr, tokenID), "Transfered tokenID mismatch");
     }
 
@@ -1921,6 +1946,7 @@ contract TestTokenForgeFactory is Test {
                 token,
                 keccak256(abi.encodePacked(tokenIDs)),
                 keccak256(abi.encodePacked(amounts)),
+                keccak256(data),
                 nonce,
                 deadline
             )
@@ -1938,7 +1964,7 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         ForgeV3(FORGE).transferERC1155Batch(
-            ACCOUNT.addr, token, tokenIDs, amounts, deadline, abi.encodePacked(r, s, v), data
+            ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, abi.encodePacked(r, s, v)
         );
         assertEq(amounts[0], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[0]), "Transfered tokenID mismatch");
         assertEq(amounts[1], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[1]), "Transfered tokenID mismatch");

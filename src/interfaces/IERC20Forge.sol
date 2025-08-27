@@ -4,10 +4,12 @@ pragma solidity ^0.8.20;
 interface IERC20Forge {
     function initialize(
         address owner,
+        address manager,
         string calldata name,
         string calldata symbol,
         uint8 decimals,
         uint256 initialSupply,
+        address initialRecipient,
         bytes calldata data
     ) external;
 

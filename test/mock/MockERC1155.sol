@@ -4,20 +4,23 @@ pragma solidity 0.8.28;
 import {ERC1155Base} from "../../src/tokens/presets/erc1155/ERC1155Base.sol";
 
 contract MockERC1155 is ERC1155Base {
-    function initialize(address owner, string memory baseTokenURI, bytes memory)
+    function initialize(address owner, address manager, string memory baseTokenURI, bytes memory)
         external
         virtual
         override
         initializer
     {
-        ERC1155Base.__ERC1155Base_init(owner, baseTokenURI);
+        ERC1155Base.__ERC1155Base_init(owner, manager, baseTokenURI);
     }
 
-    function forceMint(address to, uint256 tokenID, uint256 amount) external onlyOwner {
+    function forceMint(address to, uint256 tokenID, uint256 amount) external onlyRole(MANAGER_ROLE) {
         _mint(to, tokenID, amount, "");
     }
 
-    function forceMintBatch(address to, uint256[] memory tokenIDs, uint256[] memory amounts) external onlyOwner {
+    function forceMintBatch(address to, uint256[] memory tokenIDs, uint256[] memory amounts)
+        external
+        onlyRole(MANAGER_ROLE)
+    {
         _mintBatch(to, tokenIDs, amounts, "");
     }
 }
