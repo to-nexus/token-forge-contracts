@@ -159,7 +159,7 @@ import {IBaseForgeFacet} from "../interfaces/IBaseForgeFacet.sol";
 contract BaseForgeFacet is IDefaultDiamondCut, IBaseForgeFacet, BaseForge {
     bytes4[] public BASEFORGE_FACET_FUNCTIONS;
 
-    constructor() {
+    constructor() BaseForge() {
         BASEFORGE_FACET_FUNCTIONS = [
             EIP712Upgradeable.eip712Domain.selector,
             NoncesUpgradeable.nonces.selector,
@@ -167,7 +167,6 @@ contract BaseForgeFacet is IDefaultDiamondCut, IBaseForgeFacet, BaseForge {
             BaseForge.validator.selector
             // IBaseForgeFacet.setValidator.selector
         ];
-        _disableInitializers();
     }
 
     function initialize(bytes32 service_, address validator_) external override initializer {
