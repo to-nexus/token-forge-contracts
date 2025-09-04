@@ -8,7 +8,7 @@ import {NoncesUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils
 import {IERC20Permit} from "@openzeppelin-contracts-5.3.0/token/ERC20/extensions/IERC20Permit.sol";
 import {ECDSA} from "@openzeppelin-contracts-5.3.0/utils/cryptography/ECDSA.sol";
 
-import {TokenType, IForgeFactoryAlert} from "../interfaces/IForgeFactory.sol";
+import {TokenType, IForgeFactoryAlert} from "./interfaces/IForgeFactory.sol";
 
 abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradeable, NoncesUpgradeable {
     error BaseForge__ZeroAddress();
@@ -153,8 +153,8 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
 }
 
 import {IDiamondCut, LibDiamond} from "diamond-3-hardhat-1.0.0/libraries/LibDiamond.sol";
-import {IDefaultDiamondCut} from "../interfaces/IDefaultDiamondCut.sol";
-import {IBaseForgeFacet} from "../interfaces/IBaseForgeFacet.sol";
+import {IDefaultDiamondCut} from "./interfaces/IDefaultDiamondCut.sol";
+import {IBaseForgeFacet} from "./interfaces/IBaseForgeFacet.sol";
 
 contract BaseForgeFacet is IDefaultDiamondCut, IBaseForgeFacet, BaseForge {
     bytes4[] public BASEFORGE_FACET_FUNCTIONS;

@@ -13,10 +13,10 @@ import {IERC20, SafeERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/utils
 import {IERC721} from "@openzeppelin-contracts-5.3.0/token/ERC721/IERC721.sol";
 import {IERC1155} from "@openzeppelin-contracts-5.3.0/token/ERC1155/IERC1155.sol";
 
-import {IERC20Forge} from "../interfaces/IERC20Forge.sol";
-import {IERC721Forge} from "../interfaces/IERC721Forge.sol";
-import {IERC1155Forge} from "../interfaces/IERC1155Forge.sol";
-import {TokenType, IForgeFactoryAlert} from "../interfaces/IForgeFactory.sol";
+import {IERC20Forge} from "./interfaces/IERC20Forge.sol";
+import {IERC721Forge} from "./interfaces/IERC721Forge.sol";
+import {IERC1155Forge} from "./interfaces/IERC1155Forge.sol";
+import {TokenType, IForgeFactoryAlert} from "./interfaces/IForgeFactory.sol";
 import {BaseForge} from "./BaseForge.sol";
 
 abstract contract ERC20ForgeV2 is BaseForge {

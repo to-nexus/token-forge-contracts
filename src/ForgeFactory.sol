@@ -10,8 +10,8 @@ import {ECDSA} from "@openzeppelin-contracts-5.3.0/utils/cryptography/ECDSA.sol"
 import {EnumerableMap} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableMap.sol";
 import {Create2} from "@openzeppelin-contracts-5.3.0/utils/Create2.sol";
 
-import {TokenType, IForgeFactoryAlert} from "../interfaces/IForgeFactory.sol";
-import {IDefaultDiamondCut} from "../interfaces/IDefaultDiamondCut.sol";
+import {TokenType, IForgeFactoryAlert} from "./interfaces/IForgeFactory.sol";
+import {IDefaultDiamondCut} from "./interfaces/IDefaultDiamondCut.sol";
 import {ForgeProxyCode} from "./ForgeProxy.sol";
 
 contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgradeable {
