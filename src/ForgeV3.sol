@@ -8,7 +8,6 @@ import {ERC721HolderUpgradeable} from
 import {ERC1155HolderUpgradeable} from
     "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
 
-import {ECDSA} from "@openzeppelin-contracts-5.3.0/utils/cryptography/ECDSA.sol";
 import {IERC20, SafeERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/utils/SafeERC20.sol";
 import {IERC721} from "@openzeppelin-contracts-5.3.0/token/ERC721/IERC721.sol";
 import {IERC1155} from "@openzeppelin-contracts-5.3.0/token/ERC1155/IERC1155.sol";
@@ -21,7 +20,6 @@ import {BaseForge} from "./BaseForge.sol";
 
 abstract contract ERC20ForgeV3 is BaseForge {
     using EnumerableSet for EnumerableSet.AddressSet;
-    using ECDSA for bytes32;
     using SafeERC20 for IERC20;
 
     bytes32 private constant ERC20_MINT_TYPE_HASH = keccak256(
@@ -175,7 +173,6 @@ abstract contract ERC20ForgeV3 is BaseForge {
 
 abstract contract ERC721ForgeV3 is BaseForge, ERC721HolderUpgradeable {
     using EnumerableSet for EnumerableSet.AddressSet;
-    using ECDSA for bytes32;
 
     error ERC721MintForge__InvalidRecipientSignature(address recipient);
 
@@ -228,7 +225,6 @@ abstract contract ERC721ForgeV3 is BaseForge, ERC721HolderUpgradeable {
 
 abstract contract ERC1155ForgeV3 is BaseForge, ERC1155HolderUpgradeable {
     using EnumerableSet for EnumerableSet.AddressSet;
-    using ECDSA for bytes32;
 
     bytes32 private constant ERC1155_MINT_TYPE_HASH = keccak256(
         "ERC1155Mint(address recipient,address token,uint256 tokenID,uint256 amount,bytes data,uint256 nonce,uint256 deadline)"

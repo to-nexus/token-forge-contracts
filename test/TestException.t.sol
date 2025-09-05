@@ -178,7 +178,7 @@ contract TestException is Test {
                     abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
                 );
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV1(FORGE).mintERC20(token, amount, address(0), 0, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
@@ -193,7 +193,7 @@ contract TestException is Test {
                     abi.encode(ERC721_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, keccak256(data), nonce, deadline)
                 );
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV1(FORGE).mintERC721(token, tokenID, data, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
@@ -217,7 +217,7 @@ contract TestException is Test {
                     )
                 );
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV1(FORGE).mintERC1155(token, tokenID, amount, data, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
@@ -244,7 +244,7 @@ contract TestException is Test {
                     )
                 );
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV1(FORGE).mintERC1155Batch(token, tokenIDs, amounts, data, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
@@ -268,7 +268,7 @@ contract TestException is Test {
                     abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
                 );
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV1(FORGE).transferERC20(token, amount, address(0), 0, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
@@ -285,7 +285,7 @@ contract TestException is Test {
                     )
                 );
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV1(FORGE).transferERC721(token, tokenID, data, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
@@ -309,7 +309,7 @@ contract TestException is Test {
                     )
                 );
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV1(FORGE).transferERC1155(token, tokenID, amount, data, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
@@ -336,7 +336,7 @@ contract TestException is Test {
                     )
                 );
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV1(FORGE).transferERC1155Batch(token, tokenIDs, amounts, data, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
@@ -359,7 +359,7 @@ contract TestException is Test {
                     abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
                 );
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV1(FORGE).burnERC20(token, amount, address(0), 0, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
@@ -373,7 +373,7 @@ contract TestException is Test {
                 structHash =
                     keccak256(abi.encode(ERC721_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV1(FORGE).burnERC721(token, tokenID, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
@@ -388,7 +388,7 @@ contract TestException is Test {
                     abi.encode(ERC1155_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, nonce, deadline)
                 );
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV1(FORGE).burnERC1155(token, tokenID, amount, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
@@ -414,7 +414,7 @@ contract TestException is Test {
                     )
                 );
                 signature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV1(FORGE).burnERC1155Batch(token, tokenIDs, amounts, deadline, signature);
                 // check success
                 vm.prank(ACCOUNT.addr);
@@ -1415,7 +1415,7 @@ contract TestException is Test {
                     abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).mintERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
@@ -1428,7 +1428,7 @@ contract TestException is Test {
                     abi.encode(ERC721_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, keccak256(data), nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).mintERC721(token, tokenID, data, deadline, validatorSignature);
             }
@@ -1450,7 +1450,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).mintERC1155(token, tokenID, amount, data, deadline, validatorSignature);
 
@@ -1475,7 +1475,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).mintERC1155Batch(token, tokenIDs, amounts, data, deadline, validatorSignature);
             }
@@ -1491,7 +1491,7 @@ contract TestException is Test {
                     abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).transferERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
@@ -1506,7 +1506,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).transferERC721(token, tokenID, data, deadline, validatorSignature);
             }
@@ -1528,7 +1528,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).transferERC1155(token, tokenID, amount, data, deadline, validatorSignature);
 
@@ -1553,7 +1553,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).transferERC1155Batch(token, tokenIDs, amounts, data, deadline, validatorSignature);
             }
@@ -1569,7 +1569,7 @@ contract TestException is Test {
                     abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).burnERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
@@ -1581,7 +1581,7 @@ contract TestException is Test {
                 structHash =
                     keccak256(abi.encode(ERC721_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).burnERC721(token, tokenID, deadline, validatorSignature);
             }
@@ -1594,7 +1594,7 @@ contract TestException is Test {
                     abi.encode(ERC1155_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).burnERC1155(token, tokenID, amount, deadline, validatorSignature);
 
@@ -1618,7 +1618,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).burnERC1155Batch(token, tokenIDs, amounts, deadline, validatorSignature);
             }
@@ -1637,7 +1637,7 @@ contract TestException is Test {
                 structHash =
                     keccak256(abi.encode(ERC20_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature)));
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV2(FORGE).mintERC20(
                     ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
                 );
@@ -1653,7 +1653,7 @@ contract TestException is Test {
                 structHash =
                     keccak256(abi.encode(ERC721_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature)));
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV2(FORGE).mintERC721(
                     ACCOUNT.addr, token, tokenID, data, deadline, accountSignature, validatorSignature
                 );
@@ -1672,7 +1672,7 @@ contract TestException is Test {
                         abi.encode(ERC1155_VALIDATOR_MINT_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature))
                     );
                     validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                    vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                    vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                     ForgeV2(FORGE).mintERC1155(
                         ACCOUNT.addr, token, tokenID, amount, data, deadline, accountSignature, validatorSignature
                     );
@@ -1696,7 +1696,7 @@ contract TestException is Test {
                         abi.encode(ERC1155_VALIDATOR_MINT_BATCH_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature))
                     );
                     validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                    vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                    vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                     ForgeV2(FORGE).mintERC1155Batch(
                         ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, accountSignature, validatorSignature
                     );
@@ -1717,7 +1717,7 @@ contract TestException is Test {
                     abi.encode(ERC20_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature))
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV2(FORGE).transferERC20(
                     ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
                 );
@@ -1735,7 +1735,7 @@ contract TestException is Test {
                     abi.encode(ERC721_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature))
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV2(FORGE).transferERC721(
                     ACCOUNT.addr, token, tokenID, data, deadline, accountSignature, validatorSignature
                 );
@@ -1756,7 +1756,7 @@ contract TestException is Test {
                         abi.encode(ERC1155_VALIDATOR_TRANSFER_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature))
                     );
                     validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                    vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                    vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                     ForgeV2(FORGE).transferERC1155(
                         ACCOUNT.addr, token, tokenID, amount, data, deadline, accountSignature, validatorSignature
                     );
@@ -1782,7 +1782,7 @@ contract TestException is Test {
                         )
                     );
                     validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                    vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                    vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                     ForgeV2(FORGE).transferERC1155Batch(
                         ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, accountSignature, validatorSignature
                     );
@@ -1802,7 +1802,7 @@ contract TestException is Test {
                 structHash =
                     keccak256(abi.encode(ERC20_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature)));
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV2(FORGE).burnERC20(
                     ACCOUNT.addr, token, amount, address(0), 0, deadline, accountSignature, validatorSignature
                 );
@@ -1817,7 +1817,7 @@ contract TestException is Test {
                 structHash =
                     keccak256(abi.encode(ERC721_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature)));
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV2(FORGE).burnERC721(ACCOUNT.addr, token, tokenID, deadline, accountSignature, validatorSignature);
             }
             // erc1155
@@ -1833,7 +1833,7 @@ contract TestException is Test {
                         abi.encode(ERC1155_VALIDATOR_BURN_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature))
                     );
                     validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                    vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                    vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                     ForgeV2(FORGE).burnERC1155(
                         ACCOUNT.addr, token, tokenID, amount, deadline, accountSignature, validatorSignature
                     );
@@ -1856,7 +1856,7 @@ contract TestException is Test {
                         abi.encode(ERC1155_VALIDATOR_BURN_BATCH_TYPE_HASH_V2, ACCOUNT.addr, keccak256(accountSignature))
                     );
                     validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                    vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                    vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                     ForgeV2(FORGE).burnERC1155Batch(
                         ACCOUNT.addr, token, tokenIDs, amounts, deadline, accountSignature, validatorSignature
                     );
@@ -1875,7 +1875,7 @@ contract TestException is Test {
                     abi.encode(ERC20_MINT_TYPE_HASH_V3, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
@@ -1887,7 +1887,7 @@ contract TestException is Test {
                     abi.encode(ERC721_MINT_TYPE_HASH_V3, ACCOUNT.addr, token, tokenID, keccak256(data), nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).mintERC721(ACCOUNT.addr, token, tokenID, data, deadline, validatorSignature);
             }
             // erc1155
@@ -1908,7 +1908,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).mintERC1155(ACCOUNT.addr, token, tokenID, amount, data, deadline, validatorSignature);
 
                 // mint batch
@@ -1932,7 +1932,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).mintERC1155Batch(
                     ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, validatorSignature
                 );
@@ -1949,7 +1949,7 @@ contract TestException is Test {
                     abi.encode(ERC20_TRANSFER_TYPE_HASH_V3, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
@@ -1963,7 +1963,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).transferERC721(ACCOUNT.addr, token, tokenID, data, deadline, validatorSignature);
             }
             // erc1155
@@ -1984,7 +1984,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).transferERC1155(ACCOUNT.addr, token, tokenID, amount, data, deadline, validatorSignature);
 
                 // mint batch
@@ -2008,7 +2008,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).transferERC1155Batch(
                     ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, validatorSignature
                 );
@@ -2049,7 +2049,7 @@ contract TestException is Test {
                     abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).mintERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
@@ -2060,7 +2060,7 @@ contract TestException is Test {
                     abi.encode(ERC721_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, keccak256(data), nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).mintERC721(token, tokenID, data, deadline, validatorSignature);
             }
@@ -2080,7 +2080,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).mintERC1155(token, tokenID, amount, data, deadline, validatorSignature);
 
@@ -2103,7 +2103,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).mintERC1155Batch(token, tokenIDs, amounts, data, deadline, validatorSignature);
             }
@@ -2117,7 +2117,7 @@ contract TestException is Test {
                     abi.encode(ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).transferERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
@@ -2130,7 +2130,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).transferERC721(token, tokenID, data, deadline, validatorSignature);
             }
@@ -2150,7 +2150,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).transferERC1155(token, tokenID, amount, data, deadline, validatorSignature);
 
@@ -2173,7 +2173,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).transferERC1155Batch(token, tokenIDs, amounts, data, deadline, validatorSignature);
             }
@@ -2187,7 +2187,7 @@ contract TestException is Test {
                     abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).burnERC20(token, amount, address(0), 0, deadline, validatorSignature);
             }
@@ -2197,7 +2197,7 @@ contract TestException is Test {
                 structHash =
                     keccak256(abi.encode(ERC721_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, nonce, deadline));
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).burnERC721(token, tokenID, deadline, validatorSignature);
             }
@@ -2208,7 +2208,7 @@ contract TestException is Test {
                     abi.encode(ERC1155_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, tokenID, amount, nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).burnERC1155(token, tokenID, amount, deadline, validatorSignature);
 
@@ -2230,7 +2230,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 vm.prank(ACCOUNT.addr);
                 ForgeV1(FORGE).burnERC1155Batch(token, tokenIDs, amounts, deadline, validatorSignature);
             }
@@ -2473,7 +2473,7 @@ contract TestException is Test {
                     abi.encode(ERC20_MINT_TYPE_HASH_V3, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
@@ -2483,7 +2483,7 @@ contract TestException is Test {
                     abi.encode(ERC721_MINT_TYPE_HASH_V3, ACCOUNT.addr, token, tokenID, keccak256(data), nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).mintERC721(ACCOUNT.addr, token, tokenID, data, deadline, validatorSignature);
             }
             // erc1155
@@ -2502,7 +2502,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).mintERC1155(ACCOUNT.addr, token, tokenID, amount, data, deadline, validatorSignature);
 
                 // mint batch
@@ -2524,7 +2524,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).mintERC1155Batch(
                     ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, validatorSignature
                 );
@@ -2539,7 +2539,7 @@ contract TestException is Test {
                     abi.encode(ERC20_TRANSFER_TYPE_HASH_V3, ACCOUNT.addr, token, amount, address(0), 0, nonce, deadline)
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, address(0), 0, deadline, validatorSignature);
             }
             // erc721
@@ -2551,7 +2551,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).transferERC721(ACCOUNT.addr, token, tokenID, data, deadline, validatorSignature);
             }
             // erc1155
@@ -2570,7 +2570,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).transferERC1155(ACCOUNT.addr, token, tokenID, amount, data, deadline, validatorSignature);
 
                 // mint batch
@@ -2592,7 +2592,7 @@ contract TestException is Test {
                     )
                 );
                 validatorSignature = _sign_with_domain_separator(structHash, VALIDATOR);
-                vm.expectRevert(abi.encodeWithSignature("BaseForge__ECDSAInvalidValidatorSignature()"));
+                vm.expectRevert(abi.encodeWithSignature("BaseForge__InvalidValidatorSignature()"));
                 ForgeV3(FORGE).transferERC1155Batch(
                     ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, validatorSignature
                 );
