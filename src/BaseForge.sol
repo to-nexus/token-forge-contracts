@@ -6,14 +6,14 @@ import {ContextUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/util
 import {EIP712Upgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/cryptography/EIP712Upgradeable.sol";
 import {NoncesUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/NoncesUpgradeable.sol";
 import {IERC20Permit} from "@openzeppelin-contracts-5.3.0/token/ERC20/extensions/IERC20Permit.sol";
-import {ECDSA} from "@openzeppelin-contracts-5.3.0/utils/cryptography/ECDSA.sol";
+import {SignatureChecker} from "@openzeppelin-contracts-5.3.0/utils/cryptography/SignatureChecker.sol";
 
 import {TokenType, IForgeFactoryAlert} from "./interfaces/IForgeFactory.sol";
 
 abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradeable, NoncesUpgradeable {
     error BaseForge__ZeroAddress();
-    error BaseForge__ECDSAInvalidValidatorSignature();
-    error BaseForge__ECDSAInvalidPermitSignature();
+    error BaseForge__InvalidValidatorSignature();
+    error BaseForge__InvalidPermitSignatureLength();
     error BaseForge__ExpiredSignature(uint256 deadline);
     error BaseForge__InvalidFeeData(address feeRecipient, uint256 feeBPS);
 
@@ -76,9 +76,7 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
     function _verifyValidatorSignature(bytes32 hash, bytes memory sig) internal view {
         address _validator = validator();
         if (_validator == address(0)) revert BaseForge__ZeroAddress(); // not initialized
-
-        address recover = ECDSA.recover(hash, sig);
-        if (_validator != recover) revert BaseForge__ECDSAInvalidValidatorSignature();
+        if (!SignatureChecker.isValidSignatureNow(_validator, hash, sig)) revert BaseForge__InvalidValidatorSignature();
     }
 
     function _verifyDeadline(uint256 deadline) internal view {
@@ -121,7 +119,7 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
 
     function _erc20Permit(address token, address from, uint256 value, uint256 deadline, bytes memory sig) private {
         if (token == address(0)) revert BaseForge__ZeroAddress();
-        if (sig.length != 65) revert BaseForge__ECDSAInvalidPermitSignature();
+        if (sig.length != 65) revert BaseForge__InvalidPermitSignatureLength();
 
         bytes32 r;
         bytes32 s;

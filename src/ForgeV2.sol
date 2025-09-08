@@ -8,7 +8,7 @@ import {ERC721HolderUpgradeable} from
 import {ERC1155HolderUpgradeable} from
     "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
 
-import {ECDSA} from "@openzeppelin-contracts-5.3.0/utils/cryptography/ECDSA.sol";
+import {SignatureChecker} from "@openzeppelin-contracts-5.3.0/utils/cryptography/SignatureChecker.sol";
 import {IERC20, SafeERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/utils/SafeERC20.sol";
 import {IERC721} from "@openzeppelin-contracts-5.3.0/token/ERC721/IERC721.sol";
 import {IERC1155} from "@openzeppelin-contracts-5.3.0/token/ERC1155/IERC1155.sol";
@@ -21,7 +21,6 @@ import {BaseForge} from "./BaseForge.sol";
 
 abstract contract ERC20ForgeV2 is BaseForge {
     using EnumerableSet for EnumerableSet.AddressSet;
-    using ECDSA for bytes32;
     using SafeERC20 for IERC20;
 
     error ERC20ForgeV2__InvalidAccountSignature(address account);
@@ -65,8 +64,9 @@ abstract contract ERC20ForgeV2 is BaseForge {
             bytes32 recipientStructHash =
                 keccak256(abi.encode(ERC20_MINT_TYPE_HASH, token, amount, feeRecipient, feeBPS, nonce, deadline));
             bytes32 recipientHash = _hashTypedDataV4(recipientStructHash);
-            address recipientSigner = ECDSA.recover(recipientHash, recipientSig);
-            if (recipientSigner != recipient) revert ERC20ForgeV2__InvalidAccountSignature(recipient);
+            if (!SignatureChecker.isValidSignatureNow(recipient, recipientHash, recipientSig)) {
+                revert ERC20ForgeV2__InvalidAccountSignature(recipient);
+            }
         }
         {
             bytes32 validatorStructHash =
@@ -99,8 +99,9 @@ abstract contract ERC20ForgeV2 is BaseForge {
             bytes32 recipientStructHash =
                 keccak256(abi.encode(ERC20_TRANSFER_TYPE_HASH, token, amount, feeRecipient, feeBPS, nonce, deadline));
             bytes32 recipientHash = _hashTypedDataV4(recipientStructHash);
-            address recipientSigner = ECDSA.recover(recipientHash, recipientSig);
-            if (recipientSigner != recipient) revert ERC20ForgeV2__InvalidAccountSignature(recipient);
+            if (!SignatureChecker.isValidSignatureNow(recipient, recipientHash, recipientSig)) {
+                revert ERC20ForgeV2__InvalidAccountSignature(recipient);
+            }
         }
         {
             bytes32 validatorStructHash =
@@ -162,8 +163,9 @@ abstract contract ERC20ForgeV2 is BaseForge {
                 abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH, token, amount, feeRecipient, feeBPS, nonce, deadline)
             );
             bytes32 fromHash = _hashTypedDataV4(fromStructHash);
-            address fromSigner = ECDSA.recover(fromHash, fromSig);
-            if (fromSigner != from) revert ERC20ForgeV2__InvalidAccountSignature(from);
+            if (!SignatureChecker.isValidSignatureNow(from, fromHash, fromSig)) {
+                revert ERC20ForgeV2__InvalidAccountSignature(from);
+            }
         }
         {
             bytes32 validatorStructHash =
@@ -224,8 +226,9 @@ abstract contract ERC20ForgeV2 is BaseForge {
             bytes32 fromStructHash =
                 keccak256(abi.encode(ERC20_BURN_TYPE_HASH, token, amount, feeRecipient, feeBPS, nonce, deadline));
             bytes32 fromHash = _hashTypedDataV4(fromStructHash);
-            address fromSigner = ECDSA.recover(fromHash, fromSig);
-            if (fromSigner != from) revert ERC20ForgeV2__InvalidAccountSignature(from);
+            if (!SignatureChecker.isValidSignatureNow(from, fromHash, fromSig)) {
+                revert ERC20ForgeV2__InvalidAccountSignature(from);
+            }
         }
         {
             bytes32 validatorStructHash =
@@ -245,7 +248,6 @@ abstract contract ERC20ForgeV2 is BaseForge {
 
 abstract contract ERC721ForgeV2 is BaseForge, ERC721HolderUpgradeable {
     using EnumerableSet for EnumerableSet.AddressSet;
-    using ECDSA for bytes32;
 
     error ERC721ForgeV2__InvalidAccountSignature(address account);
 
@@ -278,8 +280,9 @@ abstract contract ERC721ForgeV2 is BaseForge, ERC721HolderUpgradeable {
             bytes32 recipientStructHash =
                 keccak256(abi.encode(ERC721_MINT_TYPE_HASH, token, tokenID, keccak256(data), nonce, deadline));
             bytes32 recipientHash = _hashTypedDataV4(recipientStructHash);
-            address recipientSigner = ECDSA.recover(recipientHash, recipientSig);
-            if (recipientSigner != recipient) revert ERC721ForgeV2__InvalidAccountSignature(recipient);
+            if (!SignatureChecker.isValidSignatureNow(recipient, recipientHash, recipientSig)) {
+                revert ERC721ForgeV2__InvalidAccountSignature(recipient);
+            }
         }
         {
             bytes32 validatorStructHash =
@@ -305,8 +308,9 @@ abstract contract ERC721ForgeV2 is BaseForge, ERC721HolderUpgradeable {
             bytes32 recipientStructHash =
                 keccak256(abi.encode(ERC721_TRANSFER_TYPE_HASH, token, tokenID, keccak256(data), nonce, deadline));
             bytes32 recipientHash = _hashTypedDataV4(recipientStructHash);
-            address recipientSigner = ECDSA.recover(recipientHash, recipientSig);
-            if (recipientSigner != recipient) revert ERC721ForgeV2__InvalidAccountSignature(recipient);
+            if (!SignatureChecker.isValidSignatureNow(recipient, recipientHash, recipientSig)) {
+                revert ERC721ForgeV2__InvalidAccountSignature(recipient);
+            }
         }
         {
             bytes32 validatorStructHash =
@@ -330,8 +334,9 @@ abstract contract ERC721ForgeV2 is BaseForge, ERC721HolderUpgradeable {
         {
             bytes32 fromStructHash = keccak256(abi.encode(ERC721_BURN_TYPE_HASH, token, tokenID, nonce, deadline));
             bytes32 fromHash = _hashTypedDataV4(fromStructHash);
-            address fromSigner = ECDSA.recover(fromHash, fromSig);
-            if (fromSigner != from) revert ERC721ForgeV2__InvalidAccountSignature(from);
+            if (!SignatureChecker.isValidSignatureNow(from, fromHash, fromSig)) {
+                revert ERC721ForgeV2__InvalidAccountSignature(from);
+            }
         }
         {
             bytes32 validatorStructHash =
@@ -346,7 +351,6 @@ abstract contract ERC721ForgeV2 is BaseForge, ERC721HolderUpgradeable {
 
 abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
     using EnumerableSet for EnumerableSet.AddressSet;
-    using ECDSA for bytes32;
 
     error ERC1155ForgeV2__InvalidAccountSignature(address account);
 
@@ -394,8 +398,9 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
             bytes32 recipientStructHash =
                 keccak256(abi.encode(ERC1155_MINT_TYPE_HASH, token, tokenID, amount, keccak256(data), nonce, deadline));
             bytes32 recipientHash = _hashTypedDataV4(recipientStructHash);
-            address recipientSigner = ECDSA.recover(recipientHash, recipientSig);
-            if (recipientSigner != recipient) revert ERC1155ForgeV2__InvalidAccountSignature(recipient);
+            if (!SignatureChecker.isValidSignatureNow(recipient, recipientHash, recipientSig)) {
+                revert ERC1155ForgeV2__InvalidAccountSignature(recipient);
+            }
         }
         {
             bytes32 validatorStructHash =
@@ -428,8 +433,9 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
                 abi.encode(ERC1155_TRANSFER_TYPE_HASH, token, tokenID, amount, keccak256(data), nonce, deadline)
             );
             bytes32 recipientHash = _hashTypedDataV4(recipientStructHash);
-            address recipientSigner = ECDSA.recover(recipientHash, recipientSig);
-            if (recipientSigner != recipient) revert ERC1155ForgeV2__InvalidAccountSignature(recipient);
+            if (!SignatureChecker.isValidSignatureNow(recipient, recipientHash, recipientSig)) {
+                revert ERC1155ForgeV2__InvalidAccountSignature(recipient);
+            }
         }
         {
             bytes32 validatorStructHash =
@@ -460,8 +466,9 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
             bytes32 fromStructHash =
                 keccak256(abi.encode(ERC1155_BURN_TYPE_HASH, token, tokenID, amount, nonce, deadline));
             bytes32 fromHash = _hashTypedDataV4(fromStructHash);
-            address fromSigner = ECDSA.recover(fromHash, fromSig);
-            if (fromSigner != from) revert ERC1155ForgeV2__InvalidAccountSignature(from);
+            if (!SignatureChecker.isValidSignatureNow(from, fromHash, fromSig)) {
+                revert ERC1155ForgeV2__InvalidAccountSignature(from);
+            }
         }
         {
             bytes32 validatorStructHash =
@@ -499,8 +506,9 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
                 )
             );
             bytes32 recipientHash = _hashTypedDataV4(recipientStructHash);
-            address recipientSigner = ECDSA.recover(recipientHash, recipientSig);
-            if (recipientSigner != recipient) revert ERC1155ForgeV2__InvalidAccountSignature(recipient);
+            if (!SignatureChecker.isValidSignatureNow(recipient, recipientHash, recipientSig)) {
+                revert ERC1155ForgeV2__InvalidAccountSignature(recipient);
+            }
         }
         {
             bytes32 validatorStructHash =
@@ -541,8 +549,9 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
                 )
             );
             bytes32 recipientHash = _hashTypedDataV4(recipientStructHash);
-            address recipientSigner = ECDSA.recover(recipientHash, recipientSig);
-            if (recipientSigner != recipient) revert ERC1155ForgeV2__InvalidAccountSignature(recipient);
+            if (!SignatureChecker.isValidSignatureNow(recipient, recipientHash, recipientSig)) {
+                revert ERC1155ForgeV2__InvalidAccountSignature(recipient);
+            }
         }
         {
             bytes32 validatorStructHash =
@@ -581,8 +590,9 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
                 )
             );
             bytes32 fromHash = _hashTypedDataV4(fromStructHash);
-            address fromSigner = ECDSA.recover(fromHash, fromSig);
-            if (fromSigner != from) revert ERC1155ForgeV2__InvalidAccountSignature(from);
+            if (!SignatureChecker.isValidSignatureNow(from, fromHash, fromSig)) {
+                revert ERC1155ForgeV2__InvalidAccountSignature(from);
+            }
         }
         {
             bytes32 validatorStructHash =

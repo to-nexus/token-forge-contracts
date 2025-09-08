@@ -6,7 +6,6 @@ import {Diamond} from "diamond-3-hardhat-1.0.0/Diamond.sol";
 import {AccessControlUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/access/AccessControlUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/proxy/utils/UUPSUpgradeable.sol";
 
-import {ECDSA} from "@openzeppelin-contracts-5.3.0/utils/cryptography/ECDSA.sol";
 import {EnumerableMap} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableMap.sol";
 import {Create2} from "@openzeppelin-contracts-5.3.0/utils/Create2.sol";
 
@@ -15,7 +14,6 @@ import {IDefaultDiamondCut} from "./interfaces/IDefaultDiamondCut.sol";
 import {ForgeProxyCode} from "./ForgeProxy.sol";
 
 contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgradeable {
-    using ECDSA for bytes32;
     using EnumerableMap for EnumerableMap.Bytes32ToAddressMap;
 
     error TokenForgeFactory__InvalidData(bytes32 field);
