@@ -85,7 +85,7 @@ contract TestForgeFactory is Test {
                 (diamond3Facet.defaultDiamondFacetCut(), faucets[0]);
             assertEq(cut.facetAddress, facet.facetAddress, "Facet address mismatch for Diamond3Facet");
             uint256 length = cut.functionSelectors.length;
-            assertEq(length, 7, "Expected 7 function selectors for Diamond3Facet");
+            assertEq(length, 8, "Expected 8 function selectors for Diamond3Facet");
             assertEq(length, facet.functionSelectors.length, "Function selectors length mismatch for Diamond3Facet");
             for (uint256 i = 0; i < length; i++) {
                 assertEq(
@@ -95,7 +95,7 @@ contract TestForgeFactory is Test {
             (cut, facet) = (baseForgeFacet.defaultDiamondFacetCut(), faucets[1]);
             assertEq(cut.facetAddress, facet.facetAddress, "Facet address mismatch for BaseForgeFacet");
             length = cut.functionSelectors.length;
-            assertEq(length, 4, "Expected 4 function selectors for BaseForgeFacet");
+            assertEq(length, 5, "Expected 5 function selectors for BaseForgeFacet");
             assertEq(length, facet.functionSelectors.length, "Function selectors length mismatch for BaseForgeFacet");
             for (uint256 i = 0; i < length; i++) {
                 assertEq(
@@ -134,23 +134,6 @@ contract TestForgeFactory is Test {
             assertEq(forgeProxy, forge, "Forge address mismatch by service");
             assertTrue(running, "Service should be running");
         }
-        addCuts = new IDiamondCut.FacetCut[](2);
-        bytes4[] memory transferOwnershipSelectors = new bytes4[](1);
-        transferOwnershipSelectors[0] = IERC173.transferOwnership.selector;
-        addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(diamond3Facet),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: transferOwnershipSelectors
-        });
-        bytes4[] memory setValidatorSelectors = new bytes4[](1);
-        setValidatorSelectors[0] = BaseForgeFacet.setValidator.selector;
-        addCuts[1] = IDiamondCut.FacetCut({
-            facetAddress: address(baseForgeFacet),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: setValidatorSelectors
-        });
-        vm.prank(serviceOwner);
-        IDiamondCut(forgeProxy).diamondCut(addCuts, address(0), "");
 
         // transfer ownership
         {
