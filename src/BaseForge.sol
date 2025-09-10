@@ -162,8 +162,8 @@ contract BaseForgeFacet is IDefaultDiamondCut, IBaseForgeFacet, BaseForge {
             EIP712Upgradeable.eip712Domain.selector,
             NoncesUpgradeable.nonces.selector,
             BaseForge.DOMAIN_SEPARATOR.selector,
-            BaseForge.validator.selector
-            // IBaseForgeFacet.setValidator.selector
+            BaseForge.validator.selector,
+            IBaseForgeFacet.setValidator.selector
         ];
     }
 
