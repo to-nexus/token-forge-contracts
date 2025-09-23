@@ -12,15 +12,12 @@ import "../src/ForgeProxy.sol";
 import "../src/ForgeV1.sol";
 import "../src/ForgeV2.sol";
 import "../src/ForgeV3.sol";
-import "../test/mock/MockERC20.sol";
-import "../test/mock/MockERC721.sol";
-import "../test/mock/MockERC1155.sol";
 
 contract DeployScript is Script {
     function setUp() public {}
+    // deployLogics
 
-    // deployForgeImpls
-    function deployForgeImpls() external {
+    function deployLogics() external {
         vm.startBroadcast();
         address forgeFactoryImpl = address(new ForgeFactory());
         address baseForgeFacetImpl = address(new BaseForgeFacet());
@@ -39,10 +36,10 @@ contract DeployScript is Script {
         console.log("address private forgeV3Impl= ", forgeV3Impl, ";");
     }
 
-    // initializeForgeImpls
-    function initializeForgeImpls(
-        address owner,
+    // initializeForgeFactory
+    function initializeForgeFactory(
         address forgeFactoryImpl,
+        address owner,
         address forgeProxyCode,
         address diamond3FacetImpl,
         address baseForgeFacetImpl
