@@ -88,8 +88,9 @@ bytes32 constant ERC1155_MINT_TYPE_HASH_V2 =
 bytes32 constant ERC1155_VALIDATOR_MINT_TYPE_HASH_V2 =
     keccak256("ValidatorERC1155Mint(address recipient,bytes recipientSig)");
 
-bytes32 constant ERC1155_TRANSFER_TYPE_HASH_V2 =
-    keccak256("ERC1155Transfer(address token,uint256 tokenID,uint256 amount,bytes data,uint256 nonce,uint256 deadline)");
+bytes32 constant ERC1155_TRANSFER_TYPE_HASH_V2 = keccak256(
+    "ERC1155Transfer(address token,uint256 tokenID,uint256 amount,bytes data,uint256 nonce,uint256 deadline)"
+);
 bytes32 constant ERC1155_VALIDATOR_TRANSFER_TYPE_HASH_V2 =
     keccak256("ValidatorERC1155Transfer(address recipient,bytes recipientSig)");
 

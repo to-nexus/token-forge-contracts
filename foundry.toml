@@ -1,9 +1,21 @@
 [profile.default]
-src = "src"
-out = "out"
+src = "src/v2"
+out = "out/v2"
 libs = ["lib", "dependencies"]
-optimizers = true
+optimizer = true
 optimizer_runs = 9999999
+via_ir = true
+remappings = [
+    "@openzeppelin/contracts/=dependencies/@openzeppelin-contracts-5.3.0/",
+]
+
+[profile.v1]
+src = "src/v1"
+out = "out/v1"
+libs = ["lib", "dependencies"]
+optimizer = true
+optimizer_runs = 9999999
+via_ir = true
 remappings = [
     "@openzeppelin/contracts/=dependencies/@openzeppelin-contracts-5.3.0/",
 ]
