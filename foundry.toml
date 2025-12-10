@@ -2,6 +2,7 @@
 src = "src/v2"
 out = "out/v2"
 libs = ["lib", "dependencies"]
+solc_version = "0.8.30"
 optimizer = true
 optimizer_runs = 9999999
 via_ir = true
@@ -13,9 +14,9 @@ remappings = [
 src = "src/v1"
 out = "out/v1"
 libs = ["lib", "dependencies"]
+solc_version = "0.8.28"
 optimizer = true
 optimizer_runs = 9999999
-via_ir = true
 remappings = [
     "@openzeppelin/contracts/=dependencies/@openzeppelin-contracts-5.3.0/",
 ]

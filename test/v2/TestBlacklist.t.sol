@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.30;
+pragma solidity ^0.8.28;
 
 import {Test, console} from "forge-std-1.9.7/Test.sol";
 import {Vm} from "forge-std-1.9.7/Vm.sol";
@@ -10,8 +10,8 @@ import {IERC173} from "diamond-3-hardhat-1.0.0/interfaces/IERC173.sol";
 import {ERC1967Proxy} from "@openzeppelin-contracts-5.3.0/proxy/ERC1967/ERC1967Proxy.sol";
 import {MessageHashUtils} from "@openzeppelin-contracts-5.3.0/utils/cryptography/MessageHashUtils.sol";
 
-import {ForgeProxyCode} from "../../src/v2/ForgeProxy.sol";
-import {Diamond3Facet} from "../../src/v2/Diamond3Facet.sol";
+import {ForgeProxyCode} from "../../src/ForgeProxy.sol";
+import {Diamond3Facet} from "../../src/Diamond3Facet.sol";
 import {ForgeFactory} from "../../src/v2/ForgeFactory.sol";
 import "../../src/v2/BaseForge.sol";
 import "../../src/v2/ForgeV1.sol";

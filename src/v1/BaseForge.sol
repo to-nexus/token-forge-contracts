@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.28;
+pragma solidity ^0.8.28;
 
 import {Initializable} from "@openzeppelin-contracts-upgradeable-5.3.0/proxy/utils/Initializable.sol";
 import {ContextUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/ContextUpgradeable.sol";

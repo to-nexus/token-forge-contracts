@@ -9,8 +9,8 @@ import {IDiamondLoupe} from "diamond-3-hardhat-1.0.0/interfaces/IDiamondLoupe.so
 import {IERC173} from "diamond-3-hardhat-1.0.0/interfaces/IERC173.sol";
 import {ERC1967Proxy} from "@openzeppelin-contracts-5.3.0/proxy/ERC1967/ERC1967Proxy.sol";
 
-import {ForgeProxyCode} from "../../src/v1/ForgeProxy.sol";
-import {Diamond3Facet} from "../../src/v1/Diamond3Facet.sol";
+import {ForgeProxyCode} from "../../src/ForgeProxy.sol";
+import {Diamond3Facet} from "../../src/Diamond3Facet.sol";
 import {BaseForge, BaseForgeFacet} from "../../src/v1/BaseForge.sol";
 import {ForgeFactory} from "../../src/v1/ForgeFactory.sol";
 
