@@ -3,20 +3,22 @@ pragma solidity 0.8.28;
 
 import {EnumerableSet} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableSet.sol";
 import {NoncesUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/NoncesUpgradeable.sol";
-import {ERC721HolderUpgradeable} from
-    "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC721/utils/ERC721HolderUpgradeable.sol";
-import {ERC1155HolderUpgradeable} from
-    "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
+import {
+    ERC721HolderUpgradeable
+} from "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC721/utils/ERC721HolderUpgradeable.sol";
+import {
+    ERC1155HolderUpgradeable
+} from "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
 
 import {SignatureChecker} from "@openzeppelin-contracts-5.3.0/utils/cryptography/SignatureChecker.sol";
 import {IERC20, SafeERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/utils/SafeERC20.sol";
 import {IERC721} from "@openzeppelin-contracts-5.3.0/token/ERC721/IERC721.sol";
 import {IERC1155} from "@openzeppelin-contracts-5.3.0/token/ERC1155/IERC1155.sol";
 
-import {IERC20Forge} from "./interfaces/IERC20Forge.sol";
-import {IERC721Forge} from "./interfaces/IERC721Forge.sol";
-import {IERC1155Forge} from "./interfaces/IERC1155Forge.sol";
-import {TokenType, IForgeFactoryAlert} from "./interfaces/IForgeFactory.sol";
+import {IERC20Forge} from "../interfaces/IERC20Forge.sol";
+import {IERC721Forge} from "../interfaces/IERC721Forge.sol";
+import {IERC1155Forge} from "../interfaces/IERC1155Forge.sol";
+import {TokenType, IForgeFactoryAlert} from "../interfaces/IForgeFactory.sol";
 import {BaseForge} from "./BaseForge.sol";
 
 abstract contract ERC20ForgeV2 is BaseForge {
@@ -354,8 +356,9 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
 
     error ERC1155ForgeV2__InvalidAccountSignature(address account);
 
-    bytes32 private constant ERC1155_MINT_TYPE_HASH =
-        keccak256("ERC1155Mint(address token,uint256 tokenID,uint256 amount,bytes data,uint256 nonce,uint256 deadline)");
+    bytes32 private constant ERC1155_MINT_TYPE_HASH = keccak256(
+        "ERC1155Mint(address token,uint256 tokenID,uint256 amount,bytes data,uint256 nonce,uint256 deadline)"
+    );
     bytes32 private constant ERC1155_VALIDATOR_MINT_TYPE_HASH =
         keccak256("ValidatorERC1155Mint(address recipient,bytes recipientSig)");
     bytes32 private constant ERC1155_TRANSFER_TYPE_HASH = keccak256(
@@ -378,8 +381,9 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
     );
     bytes32 private constant ERC1155_VALIDATOR_BATCH_TRANSFER_TYPE_HASH =
         keccak256("ValidatorERC1155BatchTransfer(address recipient,bytes recipientSig)");
-    bytes32 private constant ERC1155_BATCH_BURN_TYPE_HASH =
-        keccak256("ERC1155BatchBurn(address token,uint256[] tokenIDs,uint256[] amounts,uint256 nonce,uint256 deadline)");
+    bytes32 private constant ERC1155_BATCH_BURN_TYPE_HASH = keccak256(
+        "ERC1155BatchBurn(address token,uint256[] tokenIDs,uint256[] amounts,uint256 nonce,uint256 deadline)"
+    );
     bytes32 private constant ERC1155_VALIDATOR_BATCH_BURN_TYPE_HASH =
         keccak256("ValidatorERC1155BatchBurn(address from,bytes fromSig)");
 
@@ -608,7 +612,8 @@ abstract contract ERC1155ForgeV2 is BaseForge, ERC1155HolderUpgradeable {
 }
 
 contract ForgeV2 is ERC20ForgeV2, ERC721ForgeV2, ERC1155ForgeV2 {
-// This contract combines the functionality of the three forge contracts
-// and can be used to mint, transfer, and burn ERC20, ERC721, and ERC1155 tokens.
-// It inherits from the individual forge contracts to provide a unified interface.
-}
+    // This contract combines the functionality of the three forge contracts
+    // and can be used to mint, transfer, and burn ERC20, ERC721, and ERC1155 tokens.
+    // It inherits from the individual forge contracts to provide a unified interface.
+
+    }

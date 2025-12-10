@@ -3,19 +3,21 @@ pragma solidity 0.8.28;
 
 import {EnumerableSet} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableSet.sol";
 import {NoncesUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/NoncesUpgradeable.sol";
-import {ERC721HolderUpgradeable} from
-    "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC721/utils/ERC721HolderUpgradeable.sol";
-import {ERC1155HolderUpgradeable} from
-    "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
+import {
+    ERC721HolderUpgradeable
+} from "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC721/utils/ERC721HolderUpgradeable.sol";
+import {
+    ERC1155HolderUpgradeable
+} from "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
 
 import {IERC20, SafeERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/utils/SafeERC20.sol";
 import {IERC721} from "@openzeppelin-contracts-5.3.0/token/ERC721/IERC721.sol";
 import {IERC1155} from "@openzeppelin-contracts-5.3.0/token/ERC1155/IERC1155.sol";
 
-import {IERC20Forge} from "./interfaces/IERC20Forge.sol";
-import {IERC721Forge} from "./interfaces/IERC721Forge.sol";
-import {IERC1155Forge} from "./interfaces/IERC1155Forge.sol";
-import {TokenType, IForgeFactoryAlert} from "./interfaces/IForgeFactory.sol";
+import {IERC20Forge} from "../interfaces/IERC20Forge.sol";
+import {IERC721Forge} from "../interfaces/IERC721Forge.sol";
+import {IERC1155Forge} from "../interfaces/IERC1155Forge.sol";
+import {TokenType, IForgeFactoryAlert} from "../interfaces/IForgeFactory.sol";
 import {BaseForge} from "./BaseForge.sol";
 
 abstract contract ERC20ForgeV3 is BaseForge {
@@ -370,7 +372,8 @@ abstract contract ERC1155ForgeV3 is BaseForge, ERC1155HolderUpgradeable {
 }
 
 contract ForgeV3 is ERC20ForgeV3, ERC721ForgeV3, ERC1155ForgeV3 {
-// This contract serves as a version marker for the Forge contracts.
-// It does not contain any additional logic or state.
-// Future versions can inherit from this contract to maintain compatibility.
-}
+    // This contract serves as a version marker for the Forge contracts.
+    // It does not contain any additional logic or state.
+    // Future versions can inherit from this contract to maintain compatibility.
+
+    }
