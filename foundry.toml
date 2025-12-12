@@ -27,4 +27,12 @@ forge-std = "1.9.7"
 "@openzeppelin-contracts-upgradeable" = "5.3.0"
 diamond-3-hardhat = { version = "1.0.0", git = "https://github.com/mudgen/diamond-3-hardhat.git", rev = "08d415c7e1a27c811c34875d9263a90bc719cee3" }
 
+[lint]
+exclude_lints = [
+    "mixed-case-variable",
+    "mixed-case-function",
+    "unsafe-typecast",
+    "asm-keccak256",
+]
+
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

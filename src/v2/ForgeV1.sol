@@ -2,7 +2,6 @@
 pragma solidity ^0.8.28;
 
 import {EnumerableSet} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableSet.sol";
-import {NoncesUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/NoncesUpgradeable.sol";
 import {
     ERC721HolderUpgradeable
 } from "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC721/utils/ERC721HolderUpgradeable.sol";
@@ -17,7 +16,7 @@ import {IERC1155} from "@openzeppelin-contracts-5.3.0/token/ERC1155/IERC1155.sol
 import {IERC20Forge} from "../interfaces/IERC20Forge.sol";
 import {IERC721Forge} from "../interfaces/IERC721Forge.sol";
 import {IERC1155Forge} from "../interfaces/IERC1155Forge.sol";
-import {TokenType, IForgeFactoryAlert} from "../interfaces/IForgeFactory.sol";
+import {TokenType} from "../interfaces/IForgeFactory.sol";
 import {BaseForge} from "./BaseForge.sol";
 
 abstract contract ERC20ForgeV1 is BaseForge {

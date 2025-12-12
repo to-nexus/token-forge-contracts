@@ -1,28 +1,77 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Test, console} from "forge-std-1.9.7/Test.sol";
+import {Test} from "forge-std-1.9.7/Test.sol";
 import {Vm} from "forge-std-1.9.7/Vm.sol";
 
 import {IDiamondCut} from "diamond-3-hardhat-1.0.0/interfaces/IDiamondCut.sol";
-import {IDiamondLoupe} from "diamond-3-hardhat-1.0.0/interfaces/IDiamondLoupe.sol";
-import {IERC173} from "diamond-3-hardhat-1.0.0/interfaces/IERC173.sol";
 import {ERC1967Proxy} from "@openzeppelin-contracts-5.3.0/proxy/ERC1967/ERC1967Proxy.sol";
 import {MessageHashUtils} from "@openzeppelin-contracts-5.3.0/utils/cryptography/MessageHashUtils.sol";
 
 import {ForgeProxyCode} from "../../src/ForgeProxy.sol";
 import {Diamond3Facet} from "../../src/Diamond3Facet.sol";
 import {ForgeFactory} from "../../src/v1/ForgeFactory.sol";
-import "../../src/v1/BaseForge.sol";
-import "../../src/v1/ForgeV1.sol";
-import "../../src/v1/ForgeV2.sol";
-import "../../src/v1/ForgeV3.sol";
+import {BaseForge, BaseForgeFacet} from "../../src/v1/BaseForge.sol";
+import {ForgeV1} from "../../src/v1/ForgeV1.sol";
+import {ForgeV2} from "../../src/v1/ForgeV2.sol";
+import {ForgeV3} from "../../src/v1/ForgeV3.sol";
 
 import {MockERC20} from "../mock/MockERC20.sol";
 import {MockERC721} from "../mock/MockERC721.sol";
 import {MockERC1155} from "../mock/MockERC1155.sol";
 
-import "../mock/StructHash.sol";
+import {
+
+    // V1
+    ERC20_MINT_TYPE_HASH_V1,
+    ERC20_TRANSFER_TYPE_HASH_V1,
+    ERC20_BURN_TYPE_HASH_V1,
+    ERC721_MINT_TYPE_HASH_V1,
+    ERC721_TRANSFER_TYPE_HASH_V1,
+    ERC721_BURN_TYPE_HASH_V1,
+    ERC1155_MINT_TYPE_HASH_V1,
+    ERC1155_TRANSFER_TYPE_HASH_V1,
+    ERC1155_BURN_TYPE_HASH_V1,
+    ERC1155_MINT_BATCH_TYPE_HASH_V1,
+    ERC1155_TRANSFER_BATCH_TYPE_HASH_V1,
+    ERC1155_BURN_BATCH_TYPE_HASH_V1,
+
+    // V2
+    ERC20_MINT_TYPE_HASH_V2,
+    ERC20_VALIDATOR_MINT_TYPE_HASH_V2,
+    ERC20_TRANSFER_TYPE_HASH_V2,
+    ERC20_VALIDATOR_TRANSFER_TYPE_HASH_V2,
+    ERC20_BURN_TYPE_HASH_V2,
+    ERC20_VALIDATOR_BURN_TYPE_HASH_V2,
+    ERC721_MINT_TYPE_HASH_V2,
+    ERC721_VALIDATOR_MINT_TYPE_HASH_V2,
+    ERC721_TRANSFER_TYPE_HASH_V2,
+    ERC721_VALIDATOR_TRANSFER_TYPE_HASH_V2,
+    ERC721_BURN_TYPE_HASH_V2,
+    ERC721_VALIDATOR_BURN_TYPE_HASH_V2,
+    ERC1155_MINT_TYPE_HASH_V2,
+    ERC1155_VALIDATOR_MINT_TYPE_HASH_V2,
+    ERC1155_TRANSFER_TYPE_HASH_V2,
+    ERC1155_VALIDATOR_TRANSFER_TYPE_HASH_V2,
+    ERC1155_BURN_TYPE_HASH_V2,
+    ERC1155_VALIDATOR_BURN_TYPE_HASH_V2,
+    ERC1155_MINT_BATCH_TYPE_HASH_V2,
+    ERC1155_VALIDATOR_MINT_BATCH_TYPE_HASH_V2,
+    ERC1155_TRANSFER_BATCH_TYPE_HASH_V2,
+    ERC1155_VALIDATOR_TRANSFER_BATCH_TYPE_HASH_V2,
+    ERC1155_BURN_BATCH_TYPE_HASH_V2,
+    ERC1155_VALIDATOR_BURN_BATCH_TYPE_HASH_V2,
+
+    // V3
+    ERC20_MINT_TYPE_HASH_V3,
+    ERC20_TRANSFER_TYPE_HASH_V3,
+    ERC721_MINT_TYPE_HASH_V3,
+    ERC721_TRANSFER_TYPE_HASH_V3,
+    ERC1155_MINT_TYPE_HASH_V3,
+    ERC1155_TRANSFER_TYPE_HASH_V3,
+    ERC1155_MINT_BATCH_TYPE_HASH_V3,
+    ERC1155_TRANSFER_BATCH_TYPE_HASH_V3
+} from "../mock/StructHash.sol";
 
 contract TestException is Test {
     address public constant OWNER = address(bytes20("OWNER"));

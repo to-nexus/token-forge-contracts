@@ -69,13 +69,21 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
     }
 
     modifier onlyBlacklistManager() {
-        if (!isBlacklistManager(_msgSender())) revert BaseForge__NotBlacklistManager();
+        _checkBlacklistManager();
         _;
     }
 
     modifier notBlacklisted(address account) {
-        if (isBlacklisted(account)) revert BaseForge__Blacklisted(account);
+        _checkNotBlacklisted(account);
         _;
+    }
+
+    function _checkBlacklistManager() internal view {
+        if (!isBlacklistManager(_msgSender())) revert BaseForge__NotBlacklistManager();
+    }
+
+    function _checkNotBlacklisted(address account) internal view {
+        if (isBlacklisted(account)) revert BaseForge__Blacklisted(account);
     }
 
     /// @custom:oz-upgrades-unsafe-allow constructor
