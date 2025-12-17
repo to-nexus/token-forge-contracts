@@ -1,21 +1,22 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.28;
+pragma solidity ^0.8.28;
 
 import {EnumerableSet} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableSet.sol";
-import {NoncesUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/NoncesUpgradeable.sol";
-import {ERC721HolderUpgradeable} from
-    "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC721/utils/ERC721HolderUpgradeable.sol";
-import {ERC1155HolderUpgradeable} from
-    "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
+import {
+    ERC721HolderUpgradeable
+} from "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC721/utils/ERC721HolderUpgradeable.sol";
+import {
+    ERC1155HolderUpgradeable
+} from "@openzeppelin-contracts-upgradeable-5.3.0/token/ERC1155/utils/ERC1155HolderUpgradeable.sol";
 
 import {IERC20, SafeERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/utils/SafeERC20.sol";
 import {IERC721} from "@openzeppelin-contracts-5.3.0/token/ERC721/IERC721.sol";
 import {IERC1155} from "@openzeppelin-contracts-5.3.0/token/ERC1155/IERC1155.sol";
 
-import {IERC20Forge} from "./interfaces/IERC20Forge.sol";
-import {IERC721Forge} from "./interfaces/IERC721Forge.sol";
-import {IERC1155Forge} from "./interfaces/IERC1155Forge.sol";
-import {TokenType, IForgeFactoryAlert} from "./interfaces/IForgeFactory.sol";
+import {IERC20Forge} from "../interfaces/IERC20Forge.sol";
+import {IERC721Forge} from "../interfaces/IERC721Forge.sol";
+import {IERC1155Forge} from "../interfaces/IERC1155Forge.sol";
+import {TokenType} from "../interfaces/IForgeFactory.sol";
 import {BaseForge} from "./BaseForge.sol";
 
 abstract contract ERC20ForgeV1 is BaseForge {
@@ -42,7 +43,7 @@ abstract contract ERC20ForgeV1 is BaseForge {
         uint256 feeBPS,
         uint256 deadline,
         bytes calldata validatorSig
-    ) external checkDeadline(deadline) {
+    ) external checkDeadline(deadline) notBlacklisted(_msgSender()) {
         address recipient = _msgSender();
         uint256 nonce = _useNonce(recipient);
         {
@@ -70,7 +71,7 @@ abstract contract ERC20ForgeV1 is BaseForge {
         uint256 feeBPS,
         uint256 deadline,
         bytes calldata validatorSig
-    ) external checkDeadline(deadline) {
+    ) external checkDeadline(deadline) notBlacklisted(_msgSender()) {
         address recipient = _msgSender();
         uint256 nonce = _useNonce(recipient);
         {
@@ -99,7 +100,7 @@ abstract contract ERC20ForgeV1 is BaseForge {
         uint256 feeBPS,
         uint256 deadline,
         bytes calldata validatorSig
-    ) external checkDeadline(deadline) {
+    ) external checkDeadline(deadline) notBlacklisted(_msgSender()) {
         _transferFromERC20(token, amount, feeRecipient, feeBPS, deadline, validatorSig);
     }
 
@@ -111,7 +112,12 @@ abstract contract ERC20ForgeV1 is BaseForge {
         uint256 deadline,
         bytes calldata validatorSig,
         bytes memory permitSig
-    ) external checkDeadline(deadline) erc20Permit(_msgSender(), token, amount, deadline, permitSig) {
+    )
+        external
+        checkDeadline(deadline)
+        notBlacklisted(_msgSender())
+        erc20Permit(_msgSender(), token, amount, deadline, permitSig)
+    {
         _transferFromERC20(token, amount, feeRecipient, feeBPS, deadline, validatorSig);
     }
 
@@ -152,7 +158,7 @@ abstract contract ERC20ForgeV1 is BaseForge {
         uint256 feeBPS,
         uint256 deadline,
         bytes calldata validatorSig
-    ) external checkDeadline(deadline) {
+    ) external checkDeadline(deadline) notBlacklisted(_msgSender()) {
         _burnERC20(token, amount, feeRecipient, feeBPS, deadline, validatorSig);
     }
 
@@ -165,7 +171,12 @@ abstract contract ERC20ForgeV1 is BaseForge {
         uint256 deadline,
         bytes calldata validatorSig,
         bytes memory permitSig
-    ) external checkDeadline(deadline) erc20Permit(_msgSender(), token, amount, deadline, permitSig) {
+    )
+        external
+        checkDeadline(deadline)
+        notBlacklisted(_msgSender())
+        erc20Permit(_msgSender(), token, amount, deadline, permitSig)
+    {
         _burnERC20(token, amount, feeRecipient, feeBPS, deadline, validatorSig);
     }
 
@@ -216,7 +227,7 @@ abstract contract ERC721ForgeV1 is BaseForge, ERC721HolderUpgradeable {
         bytes calldata data,
         uint256 deadline,
         bytes calldata validatorSig
-    ) external checkDeadline(deadline) {
+    ) external checkDeadline(deadline) notBlacklisted(_msgSender()) {
         address recipient = _msgSender();
         uint256 nonce = _useNonce(recipient);
         bytes32 structHash =
@@ -235,7 +246,7 @@ abstract contract ERC721ForgeV1 is BaseForge, ERC721HolderUpgradeable {
         bytes calldata data,
         uint256 deadline,
         bytes calldata validatorSig
-    ) external checkDeadline(deadline) {
+    ) external checkDeadline(deadline) notBlacklisted(_msgSender()) {
         address recipient = _msgSender();
         uint256 nonce = _useNonce(recipient);
         {
@@ -253,6 +264,7 @@ abstract contract ERC721ForgeV1 is BaseForge, ERC721HolderUpgradeable {
     function burnERC721(address token, uint256 tokenID, uint256 deadline, bytes calldata validatorSig)
         external
         checkDeadline(deadline)
+        notBlacklisted(_msgSender())
     {
         address from = _msgSender();
         uint256 nonce = _useNonce(from);
@@ -296,7 +308,7 @@ abstract contract ERC1155ForgeV1 is BaseForge, ERC1155HolderUpgradeable {
         bytes calldata data,
         uint256 deadline,
         bytes calldata validatorSig
-    ) external checkDeadline(deadline) {
+    ) external checkDeadline(deadline) notBlacklisted(_msgSender()) {
         address recipient = _msgSender();
         uint256 nonce = _useNonce(recipient);
         {
@@ -324,7 +336,7 @@ abstract contract ERC1155ForgeV1 is BaseForge, ERC1155HolderUpgradeable {
         bytes calldata data,
         uint256 deadline,
         bytes calldata validatorSig
-    ) external checkDeadline(deadline) {
+    ) external checkDeadline(deadline) notBlacklisted(_msgSender()) {
         address recipient = _msgSender();
         uint256 nonce = _useNonce(recipient);
         {
@@ -350,6 +362,7 @@ abstract contract ERC1155ForgeV1 is BaseForge, ERC1155HolderUpgradeable {
     function burnERC1155(address token, uint256 tokenID, uint256 amount, uint256 deadline, bytes calldata validatorSig)
         external
         checkDeadline(deadline)
+        notBlacklisted(_msgSender())
     {
         address from = _msgSender();
         uint256 nonce = _useNonce(from);
@@ -373,7 +386,7 @@ abstract contract ERC1155ForgeV1 is BaseForge, ERC1155HolderUpgradeable {
         bytes calldata data,
         uint256 deadline,
         bytes calldata validatorSig
-    ) external checkDeadline(deadline) {
+    ) external checkDeadline(deadline) notBlacklisted(_msgSender()) {
         address recipient = _msgSender();
         uint256 nonce = _useNonce(recipient);
         {
@@ -409,7 +422,7 @@ abstract contract ERC1155ForgeV1 is BaseForge, ERC1155HolderUpgradeable {
         bytes calldata data,
         uint256 deadline,
         bytes calldata validatorSig
-    ) external checkDeadline(deadline) {
+    ) external checkDeadline(deadline) notBlacklisted(_msgSender()) {
         address recipient = _msgSender();
         uint256 nonce = _useNonce(recipient);
         {
@@ -444,7 +457,7 @@ abstract contract ERC1155ForgeV1 is BaseForge, ERC1155HolderUpgradeable {
         uint256[] memory amounts,
         uint256 deadline,
         bytes memory validatorSig
-    ) external checkDeadline(deadline) {
+    ) external checkDeadline(deadline) notBlacklisted(_msgSender()) {
         address from = _msgSender();
         uint256 nonce = _useNonce(from);
         bytes32 structHash = keccak256(
@@ -470,7 +483,8 @@ abstract contract ERC1155ForgeV1 is BaseForge, ERC1155HolderUpgradeable {
 }
 
 contract ForgeV1 is ERC20ForgeV1, ERC721ForgeV1, ERC1155ForgeV1 {
-// This contract serves as a version marker for the Forge contracts.
-// It does not contain any additional logic or state.
-// Future versions can inherit from this contract to maintain compatibility.
-}
+    // This contract serves as a version marker for the Forge contracts.
+    // It does not contain any additional logic or state.
+    // Future versions can inherit from this contract to maintain compatibility.
+
+    }

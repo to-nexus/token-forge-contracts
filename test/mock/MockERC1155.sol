@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.28;
+pragma solidity ^0.8.28;
 
 import {IERC1155Forge} from "../../src/interfaces/IERC1155Forge.sol";
 import {AccessControl} from "@openzeppelin-contracts-5.3.0/access/AccessControl.sol";
@@ -48,13 +48,7 @@ contract MockERC1155 is IERC1155Forge, ERC1155("https://token-cdn-domain/{id}.js
         _burnBatch(from, tokenIDs, amounts);
     }
 
-    function supportsInterface(bytes4 interfaceId)
-        public
-        view
-        virtual
-        override(ERC1155, AccessControl)
-        returns (bool)
-    {
+    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC1155, AccessControl) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 }

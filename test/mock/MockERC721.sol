@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.28;
+pragma solidity ^0.8.28;
 
 import {IERC721Forge} from "../../src/interfaces/IERC721Forge.sol";
 import {AccessControl} from "@openzeppelin-contracts-5.3.0/access/AccessControl.sol";

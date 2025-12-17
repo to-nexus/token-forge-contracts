@@ -1,33 +1,85 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Test, console} from "forge-std-1.9.7/Test.sol";
+import {Test} from "forge-std-1.9.7/Test.sol";
 import {Vm} from "forge-std-1.9.7/Vm.sol";
 
 import {IDiamondCut} from "diamond-3-hardhat-1.0.0/interfaces/IDiamondCut.sol";
-import {IDiamondLoupe} from "diamond-3-hardhat-1.0.0/interfaces/IDiamondLoupe.sol";
-import {IERC173} from "diamond-3-hardhat-1.0.0/interfaces/IERC173.sol";
 import {ERC1967Proxy} from "@openzeppelin-contracts-5.3.0/proxy/ERC1967/ERC1967Proxy.sol";
 import {MessageHashUtils} from "@openzeppelin-contracts-5.3.0/utils/cryptography/MessageHashUtils.sol";
 
-import {ForgeProxyCode} from "../src/ForgeProxy.sol";
-import {Diamond3Facet} from "../src/Diamond3Facet.sol";
-import {ForgeFactory} from "../src/ForgeFactory.sol";
-import "../src/BaseForge.sol";
-import "../src/ForgeV1.sol";
-import "../src/ForgeV2.sol";
-import "../src/ForgeV3.sol";
+import {ForgeProxyCode} from "../../src/ForgeProxy.sol";
+import {Diamond3Facet} from "../../src/Diamond3Facet.sol";
+import {ForgeFactory} from "../../src/v1/ForgeFactory.sol";
+import {BaseForge, BaseForgeFacet} from "../../src/v1/BaseForge.sol";
+import {NoncesUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/NoncesUpgradeable.sol";
+import {ForgeV1} from "../../src/v1/ForgeV1.sol";
+import {ForgeV2} from "../../src/v1/ForgeV2.sol";
+import {ForgeV3} from "../../src/v1/ForgeV3.sol";
 
 import {IERC20} from "@openzeppelin-contracts-5.3.0/token/ERC20/IERC20.sol";
 import {IERC20Permit} from "@openzeppelin-contracts-5.3.0/token/ERC20/extensions/IERC20Permit.sol";
 import {IERC721} from "@openzeppelin-contracts-5.3.0/token/ERC721/IERC721.sol";
 import {IERC1155} from "@openzeppelin-contracts-5.3.0/token/ERC1155/IERC1155.sol";
 
-import {MockERC20} from "./mock/MockERC20.sol";
-import {MockERC721} from "./mock/MockERC721.sol";
-import {MockERC1155} from "./mock/MockERC1155.sol";
+import {MockERC20} from "../mock/MockERC20.sol";
+import {MockERC721} from "../mock/MockERC721.sol";
+import {MockERC1155} from "../mock/MockERC1155.sol";
 
-import "./mock/StructHash.sol";
+import {
+
+    // V1
+    ERC20_MINT_TYPE_HASH_V1,
+    ERC20_TRANSFER_TYPE_HASH_V1,
+    ERC20_TRANSFER_FROM_TYPE_HASH_V1,
+    ERC20_BURN_TYPE_HASH_V1,
+    ERC721_MINT_TYPE_HASH_V1,
+    ERC721_TRANSFER_TYPE_HASH_V1,
+    ERC721_BURN_TYPE_HASH_V1,
+    ERC1155_MINT_TYPE_HASH_V1,
+    ERC1155_TRANSFER_TYPE_HASH_V1,
+    ERC1155_BURN_TYPE_HASH_V1,
+    ERC1155_MINT_BATCH_TYPE_HASH_V1,
+    ERC1155_TRANSFER_BATCH_TYPE_HASH_V1,
+    ERC1155_BURN_BATCH_TYPE_HASH_V1,
+
+    // V2
+    ERC20_MINT_TYPE_HASH_V2,
+    ERC20_VALIDATOR_MINT_TYPE_HASH_V2,
+    ERC20_TRANSFER_TYPE_HASH_V2,
+    ERC20_VALIDATOR_TRANSFER_TYPE_HASH_V2,
+    ERC20_TRANSFER_FROM_TYPE_HASH_V2,
+    ERC20_VALIDATOR_TRANSFER_FROM_TYPE_HASH_V2,
+    ERC20_BURN_TYPE_HASH_V2,
+    ERC20_VALIDATOR_BURN_TYPE_HASH_V2,
+    ERC721_MINT_TYPE_HASH_V2,
+    ERC721_VALIDATOR_MINT_TYPE_HASH_V2,
+    ERC721_TRANSFER_TYPE_HASH_V2,
+    ERC721_VALIDATOR_TRANSFER_TYPE_HASH_V2,
+    ERC721_BURN_TYPE_HASH_V2,
+    ERC721_VALIDATOR_BURN_TYPE_HASH_V2,
+    ERC1155_MINT_TYPE_HASH_V2,
+    ERC1155_VALIDATOR_MINT_TYPE_HASH_V2,
+    ERC1155_TRANSFER_TYPE_HASH_V2,
+    ERC1155_VALIDATOR_TRANSFER_TYPE_HASH_V2,
+    ERC1155_BURN_TYPE_HASH_V2,
+    ERC1155_VALIDATOR_BURN_TYPE_HASH_V2,
+    ERC1155_MINT_BATCH_TYPE_HASH_V2,
+    ERC1155_VALIDATOR_MINT_BATCH_TYPE_HASH_V2,
+    ERC1155_TRANSFER_BATCH_TYPE_HASH_V2,
+    ERC1155_VALIDATOR_TRANSFER_BATCH_TYPE_HASH_V2,
+    ERC1155_BURN_BATCH_TYPE_HASH_V2,
+    ERC1155_VALIDATOR_BURN_BATCH_TYPE_HASH_V2,
+
+    // V3
+    ERC20_MINT_TYPE_HASH_V3,
+    ERC20_TRANSFER_TYPE_HASH_V3,
+    ERC20_TRANSFER_FROM_TYPE_HASH_V3,
+    ERC20_BURN_TYPE_HASH_V3,
+
+    // Permit
+    PERMIT_TYPE_HASH
+} from "../mock/StructHash.sol";
 
 contract TestTokenForgeFactory is Test {
     address public constant OWNER = address(bytes20("OWNER"));
@@ -90,9 +142,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV1.mintERC20.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -133,9 +183,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV1.mintERC721.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -178,9 +226,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV1.mintERC1155.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -226,9 +272,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV1.mintERC1155Batch.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -288,9 +332,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV1.transferERC20.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -338,9 +380,7 @@ contract TestTokenForgeFactory is Test {
 
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -389,9 +429,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[2] = forgeV1.onERC1155BatchReceived.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -443,9 +481,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[2] = forgeV1.onERC1155BatchReceived.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -510,9 +546,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV1.burnERC20.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -561,9 +595,7 @@ contract TestTokenForgeFactory is Test {
 
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -612,9 +644,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV1.burnERC1155.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -663,9 +693,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV1.burnERC1155Batch.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -731,9 +759,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV2.mintERC20.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -786,9 +812,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV2.mintERC721.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -843,9 +867,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV2.mintERC1155.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -901,9 +923,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV2.mintERC1155Batch.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -965,9 +985,8 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).mintERC1155Batch(
-            ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, recipientSig, validatorSig
-        );
+        ForgeV2(FORGE)
+            .mintERC1155Batch(ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, recipientSig, validatorSig);
         assertEq(amounts[0], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[0]), "Minted tokenID mismatch");
         assertEq(amounts[1], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[1]), "Minted tokenID mismatch");
     }
@@ -978,9 +997,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV2.transferERC20.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1037,9 +1054,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[1] = forgeV2.onERC721Received.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1100,9 +1115,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[2] = forgeV2.onERC1155BatchReceived.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1165,9 +1178,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[2] = forgeV2.onERC1155BatchReceived.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1234,9 +1245,8 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).transferERC1155Batch(
-            ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, recipientSig, validatorSig
-        );
+        ForgeV2(FORGE)
+            .transferERC1155Batch(ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, recipientSig, validatorSig);
         assertEq(amounts[0], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[0]), "Transfered tokenID mismatch");
         assertEq(amounts[1], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[1]), "Transfered tokenID mismatch");
     }
@@ -1247,9 +1257,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV2.burnERC20.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1309,9 +1317,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV2.burnERC721.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1372,9 +1378,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV2.burnERC1155.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1435,9 +1439,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV2.burnERC1155Batch.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1514,9 +1516,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV3.mintERC20.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV3),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV3), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1556,9 +1556,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV3.mintERC721.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV3),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV3), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1600,9 +1598,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV3.mintERC1155.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV3),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV3), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1648,9 +1644,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV3.mintERC1155Batch.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV3),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV3), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1699,9 +1693,8 @@ contract TestTokenForgeFactory is Test {
         emit ForgeFactory.ERC1155Minted(SERVICE_NAME, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
-        ForgeV3(FORGE).mintERC1155Batch(
-            ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, abi.encodePacked(r, s, v)
-        );
+        ForgeV3(FORGE)
+            .mintERC1155Batch(ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, abi.encodePacked(r, s, v));
         assertEq(amounts[0], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[0]), "Minted tokenID mismatch");
         assertEq(amounts[1], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[1]), "Minted tokenID mismatch");
     }
@@ -1712,9 +1705,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV3.transferERC20.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV3),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV3), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1760,9 +1751,7 @@ contract TestTokenForgeFactory is Test {
 
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV3),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV3), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1810,9 +1799,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[2] = forgeV3.onERC1155BatchReceived.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV3),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV3), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1863,9 +1850,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[2] = forgeV3.onERC1155BatchReceived.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV3),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV3), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -1917,9 +1902,8 @@ contract TestTokenForgeFactory is Test {
         emit ForgeFactory.ERC1155Transferred(SERVICE_NAME, uuid, ACCOUNT.addr, token, tokenIDs[1], amounts[1]);
 
         // send transaction
-        ForgeV3(FORGE).transferERC1155Batch(
-            ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, abi.encodePacked(r, s, v)
-        );
+        ForgeV3(FORGE)
+            .transferERC1155Batch(ACCOUNT.addr, token, tokenIDs, amounts, data, deadline, abi.encodePacked(r, s, v));
         assertEq(amounts[0], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[0]), "Transfered tokenID mismatch");
         assertEq(amounts[1], MockERC1155(token).balanceOf(ACCOUNT.addr, tokenIDs[1]), "Transfered tokenID mismatch");
     }
@@ -1930,9 +1914,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV1.burnERC20Permit.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -2000,9 +1982,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV2.burnERC20Permit.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -2067,9 +2047,8 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).burnERC20Permit(
-            ACCOUNT.addr, token, amount, address(0), 0, deadline, fromSig, validatorSig, permitSig
-        );
+        ForgeV2(FORGE)
+            .burnERC20Permit(ACCOUNT.addr, token, amount, address(0), 0, deadline, fromSig, validatorSig, permitSig);
         assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Burned amount mismatch");
     }
 
@@ -2079,9 +2058,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV3.burnERC20Permit.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV3),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV3), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -2148,9 +2125,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV1.transferFromERC20.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -2199,9 +2174,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV2.transferFromERC20.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -2261,9 +2234,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV1.transferFromERC20Permit.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV1),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV1), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -2331,9 +2302,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV2.transferFromERC20Permit.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV2),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV2), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -2395,9 +2364,10 @@ contract TestTokenForgeFactory is Test {
 
         // send transaction
         vm.prank(ACCOUNT.addr);
-        ForgeV2(FORGE).transferFromERC20Permit(
-            ACCOUNT.addr, token, amount, address(0), 0, deadline, fromSig, validatorSig, permitSig
-        );
+        ForgeV2(FORGE)
+            .transferFromERC20Permit(
+                ACCOUNT.addr, token, amount, address(0), 0, deadline, fromSig, validatorSig, permitSig
+            );
         assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Account balance should be 0");
         assertEq(amount, MockERC20(token).balanceOf(FORGE), "Forge balance should be amount");
     }
@@ -2408,9 +2378,7 @@ contract TestTokenForgeFactory is Test {
         functionSelectors[0] = forgeV3.transferFromERC20Permit.selector;
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
         addCuts[0] = IDiamondCut.FacetCut({
-            facetAddress: address(forgeV3),
-            action: IDiamondCut.FacetCutAction.Add,
-            functionSelectors: functionSelectors
+            facetAddress: address(forgeV3), action: IDiamondCut.FacetCutAction.Add, functionSelectors: functionSelectors
         });
         // deploy forge
         vm.prank(OWNER);
@@ -2466,15 +2434,14 @@ contract TestTokenForgeFactory is Test {
         emit ForgeFactory.ERC20TransferredFrom(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
 
         // send transaction
-        ForgeV3(FORGE).transferFromERC20Permit(
-            ACCOUNT.addr, token, amount, address(0), 0, deadline, validatorSig, permitSig
-        );
+        ForgeV3(FORGE)
+            .transferFromERC20Permit(ACCOUNT.addr, token, amount, address(0), 0, deadline, validatorSig, permitSig);
         assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Account balance should be 0");
         assertEq(amount, MockERC20(token).balanceOf(FORGE), "Forge balance should be amount");
     }
 
-    address private constant feeRecipient = address(bytes20("FeeRecipient"));
-    uint256 private constant feeBPS = 100; // 1%
+    address private constant FEE_RECIPIENT = address(bytes20("FeeRecipient"));
+    uint256 private constant FEE_BPS = 100; // 1%
 
     function test_erc20_fee_v1() external {
         IDiamondCut.FacetCut[] memory addCuts = new IDiamondCut.FacetCut[](1);
@@ -2508,7 +2475,7 @@ contract TestTokenForgeFactory is Test {
         // set test variables
         uint256 amount = 100 ether;
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline
-        uint256 expectedFee = (amount * feeBPS) / 10_000;
+        uint256 expectedFee = (amount * FEE_BPS) / 10_000;
         uint256 expectValue = amount - expectedFee;
         // mint
         {
@@ -2519,21 +2486,23 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(address(0), ACCOUNT.addr, expectValue);
             vm.expectEmit();
-            emit IERC20.Transfer(address(0), feeRecipient, expectedFee);
+            emit IERC20.Transfer(address(0), FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20Minted(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
 
             // send transaction
             bytes32 structHash = keccak256(
-                abi.encode(ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, feeRecipient, feeBPS, nonce, deadline)
+                abi.encode(
+                    ERC20_MINT_TYPE_HASH_V1, ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, nonce, deadline
+                )
             );
             bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
             vm.prank(ACCOUNT.addr);
-            ForgeV1(FORGE).mintERC20(token, amount, feeRecipient, feeBPS, deadline, abi.encodePacked(r, s, v));
+            ForgeV1(FORGE).mintERC20(token, amount, FEE_RECIPIENT, FEE_BPS, deadline, abi.encodePacked(r, s, v));
             assertEq(expectValue, MockERC20(token).balanceOf(ACCOUNT.addr), "Minted amount mismatch");
         }
         vm.prank(OWNER);
@@ -2550,21 +2519,23 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(ACCOUNT.addr, address(0), expectValue);
             vm.expectEmit();
-            emit IERC20.Transfer(ACCOUNT.addr, feeRecipient, expectedFee);
+            emit IERC20.Transfer(ACCOUNT.addr, FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20Burned(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
 
             // send transaction
             bytes32 structHash = keccak256(
-                abi.encode(ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, feeRecipient, feeBPS, nonce, deadline)
+                abi.encode(
+                    ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, nonce, deadline
+                )
             );
             bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
             (uint8 v, bytes32 r, bytes32 s) = vm.sign(VALIDATOR, hash);
 
             vm.prank(ACCOUNT.addr);
-            ForgeV1(FORGE).burnERC20(token, amount, feeRecipient, feeBPS, deadline, abi.encodePacked(r, s, v));
+            ForgeV1(FORGE).burnERC20(token, amount, FEE_RECIPIENT, FEE_BPS, deadline, abi.encodePacked(r, s, v));
             assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Burned amount mismatch");
         }
         vm.prank(OWNER);
@@ -2580,17 +2551,17 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(ACCOUNT.addr, address(0), expectValue);
             vm.expectEmit();
-            emit IERC20.Transfer(ACCOUNT.addr, feeRecipient, expectedFee);
+            emit IERC20.Transfer(ACCOUNT.addr, FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20Burned(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
 
             bytes memory validatorSig;
             {
                 bytes32 structHash = keccak256(
                     abi.encode(
-                        ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, feeRecipient, feeBPS, nonce, deadline
+                        ERC20_BURN_TYPE_HASH_V1, ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, nonce, deadline
                     )
                 );
                 bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
@@ -2602,8 +2573,9 @@ contract TestTokenForgeFactory is Test {
             bytes memory permitSig;
             {
                 uint256 permitNonce = IERC20Permit(token).nonces(ACCOUNT.addr);
-                bytes32 structHash =
-                    keccak256(abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline));
+                bytes32 structHash = keccak256(
+                    abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline)
+                );
 
                 bytes32 domainSeparator = IERC20Permit(token).DOMAIN_SEPARATOR();
                 bytes32 hash = MessageHashUtils.toTypedDataHash(domainSeparator, structHash);
@@ -2612,7 +2584,7 @@ contract TestTokenForgeFactory is Test {
             }
 
             vm.prank(ACCOUNT.addr);
-            ForgeV1(FORGE).burnERC20Permit(token, amount, feeRecipient, feeBPS, deadline, validatorSig, permitSig);
+            ForgeV1(FORGE).burnERC20Permit(token, amount, FEE_RECIPIENT, FEE_BPS, deadline, validatorSig, permitSig);
             assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Burned amount mismatch");
         }
 
@@ -2629,7 +2601,7 @@ contract TestTokenForgeFactory is Test {
 
             bytes32 structHash = keccak256(
                 abi.encode(
-                    ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, feeRecipient, feeBPS, nonce, deadline
+                    ERC20_TRANSFER_TYPE_HASH_V1, ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, nonce, deadline
                 )
             );
             bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
@@ -2639,15 +2611,15 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(FORGE, ACCOUNT.addr, expectValue);
             vm.expectEmit();
-            emit IERC20.Transfer(FORGE, feeRecipient, expectedFee);
+            emit IERC20.Transfer(FORGE, FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20Transferred(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
 
             // send transaction
             vm.prank(ACCOUNT.addr);
-            ForgeV1(FORGE).transferERC20(token, amount, feeRecipient, feeBPS, deadline, abi.encodePacked(r, s, v));
+            ForgeV1(FORGE).transferERC20(token, amount, FEE_RECIPIENT, FEE_BPS, deadline, abi.encodePacked(r, s, v));
             assertEq(expectValue, MockERC20(token).balanceOf(ACCOUNT.addr), "Transfered amount mismatch");
         }
         vm.prank(OWNER);
@@ -2662,7 +2634,14 @@ contract TestTokenForgeFactory is Test {
 
             bytes32 structHash = keccak256(
                 abi.encode(
-                    ERC20_TRANSFER_FROM_TYPE_HASH_V1, ACCOUNT.addr, token, amount, feeRecipient, feeBPS, nonce, deadline
+                    ERC20_TRANSFER_FROM_TYPE_HASH_V1,
+                    ACCOUNT.addr,
+                    token,
+                    amount,
+                    FEE_RECIPIENT,
+                    FEE_BPS,
+                    nonce,
+                    deadline
                 )
             );
             bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
@@ -2672,15 +2651,15 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(ACCOUNT.addr, address(FORGE), amount);
             vm.expectEmit();
-            emit IERC20.Transfer(address(FORGE), feeRecipient, expectedFee);
+            emit IERC20.Transfer(address(FORGE), FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20TransferredFrom(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
 
             // send transaction
             vm.prank(ACCOUNT.addr);
-            ForgeV1(FORGE).transferFromERC20(token, amount, feeRecipient, feeBPS, deadline, abi.encodePacked(r, s, v));
+            ForgeV1(FORGE).transferFromERC20(token, amount, FEE_RECIPIENT, FEE_BPS, deadline, abi.encodePacked(r, s, v));
             assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "TransferFrom amount mismatch");
         }
         vm.prank(OWNER);
@@ -2696,11 +2675,11 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(ACCOUNT.addr, address(FORGE), amount);
             vm.expectEmit();
-            emit IERC20.Transfer(address(FORGE), feeRecipient, expectedFee);
+            emit IERC20.Transfer(address(FORGE), FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20TransferredFrom(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
 
             bytes memory validatorSig;
             {
@@ -2710,8 +2689,8 @@ contract TestTokenForgeFactory is Test {
                         ACCOUNT.addr,
                         token,
                         amount,
-                        feeRecipient,
-                        feeBPS,
+                        FEE_RECIPIENT,
+                        FEE_BPS,
                         nonce,
                         deadline
                     )
@@ -2725,8 +2704,9 @@ contract TestTokenForgeFactory is Test {
             bytes memory permitSig;
             {
                 uint256 permitNonce = IERC20Permit(token).nonces(ACCOUNT.addr);
-                bytes32 structHash =
-                    keccak256(abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline));
+                bytes32 structHash = keccak256(
+                    abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline)
+                );
 
                 bytes32 domainSeparator = IERC20Permit(token).DOMAIN_SEPARATOR();
                 bytes32 hash = MessageHashUtils.toTypedDataHash(domainSeparator, structHash);
@@ -2735,13 +2715,12 @@ contract TestTokenForgeFactory is Test {
             }
 
             vm.prank(ACCOUNT.addr);
-            ForgeV1(FORGE).transferFromERC20Permit(
-                token, amount, feeRecipient, feeBPS, deadline, validatorSig, permitSig
-            );
+            ForgeV1(FORGE)
+                .transferFromERC20Permit(token, amount, FEE_RECIPIENT, FEE_BPS, deadline, validatorSig, permitSig);
             assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "TransferFrom Permit amount mismatch");
         }
 
-        assertEq(expectedFee * 6, IERC20(token).balanceOf(feeRecipient), "Fee recipient balance mismatch");
+        assertEq(expectedFee * 6, IERC20(token).balanceOf(FEE_RECIPIENT), "Fee recipient balance mismatch");
     }
 
     function test_erc20_fee_v2() external {
@@ -2776,7 +2755,7 @@ contract TestTokenForgeFactory is Test {
         // set test variables
         uint256 amount = 100 ether;
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline
-        uint256 expectedFee = (amount * feeBPS) / 10_000;
+        uint256 expectedFee = (amount * FEE_BPS) / 10_000;
         uint256 expectValue = amount - expectedFee;
         // mint
         {
@@ -2787,15 +2766,16 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(address(0), ACCOUNT.addr, expectValue);
             vm.expectEmit();
-            emit IERC20.Transfer(address(0), feeRecipient, expectedFee);
+            emit IERC20.Transfer(address(0), FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20Minted(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
             bytes memory recipientSig;
             {
-                bytes32 recipientStructHash =
-                    keccak256(abi.encode(ERC20_MINT_TYPE_HASH_V2, token, amount, feeRecipient, feeBPS, nonce, deadline));
+                bytes32 recipientStructHash = keccak256(
+                    abi.encode(ERC20_MINT_TYPE_HASH_V2, token, amount, FEE_RECIPIENT, FEE_BPS, nonce, deadline)
+                );
                 bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
                 (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
                 recipientSig = abi.encodePacked(r, s, v);
@@ -2810,9 +2790,8 @@ contract TestTokenForgeFactory is Test {
             }
             // send transaction
             vm.prank(ACCOUNT.addr);
-            ForgeV2(FORGE).mintERC20(
-                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, recipientSig, validatorSig
-            );
+            ForgeV2(FORGE)
+                .mintERC20(ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, deadline, recipientSig, validatorSig);
             assertEq(expectValue, MockERC20(token).balanceOf(ACCOUNT.addr), "Minted amount mismatch");
         }
         vm.prank(OWNER);
@@ -2829,15 +2808,16 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(ACCOUNT.addr, address(0), expectValue);
             vm.expectEmit();
-            emit IERC20.Transfer(ACCOUNT.addr, feeRecipient, expectedFee);
+            emit IERC20.Transfer(ACCOUNT.addr, FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20Burned(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
             bytes memory recipientSig;
             {
-                bytes32 recipientStructHash =
-                    keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, feeRecipient, feeBPS, nonce, deadline));
+                bytes32 recipientStructHash = keccak256(
+                    abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, FEE_RECIPIENT, FEE_BPS, nonce, deadline)
+                );
                 bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
                 (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
                 recipientSig = abi.encodePacked(r, s, v);
@@ -2852,9 +2832,8 @@ contract TestTokenForgeFactory is Test {
             }
 
             // send transaction
-            ForgeV2(FORGE).burnERC20(
-                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, recipientSig, validatorSig
-            );
+            ForgeV2(FORGE)
+                .burnERC20(ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, deadline, recipientSig, validatorSig);
             assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Burned amount mismatch");
         }
         vm.prank(OWNER);
@@ -2869,15 +2848,16 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(ACCOUNT.addr, address(0), expectValue);
             vm.expectEmit();
-            emit IERC20.Transfer(ACCOUNT.addr, feeRecipient, expectedFee);
+            emit IERC20.Transfer(ACCOUNT.addr, FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20Burned(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
             bytes memory recipientSig;
             {
-                bytes32 recipientStructHash =
-                    keccak256(abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, feeRecipient, feeBPS, nonce, deadline));
+                bytes32 recipientStructHash = keccak256(
+                    abi.encode(ERC20_BURN_TYPE_HASH_V2, token, amount, FEE_RECIPIENT, FEE_BPS, nonce, deadline)
+                );
                 bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
                 (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
                 recipientSig = abi.encodePacked(r, s, v);
@@ -2894,8 +2874,9 @@ contract TestTokenForgeFactory is Test {
             bytes memory permitSig;
             {
                 uint256 permitNonce = IERC20Permit(token).nonces(ACCOUNT.addr);
-                bytes32 structHash =
-                    keccak256(abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline));
+                bytes32 structHash = keccak256(
+                    abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline)
+                );
 
                 bytes32 domainSeparator = IERC20Permit(token).DOMAIN_SEPARATOR();
                 bytes32 hash = MessageHashUtils.toTypedDataHash(domainSeparator, structHash);
@@ -2903,9 +2884,10 @@ contract TestTokenForgeFactory is Test {
                 permitSig = abi.encodePacked(r, s, v);
             }
             // send transaction
-            ForgeV2(FORGE).burnERC20Permit(
-                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, recipientSig, validatorSig, permitSig
-            );
+            ForgeV2(FORGE)
+                .burnERC20Permit(
+                    ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, deadline, recipientSig, validatorSig, permitSig
+                );
             assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Burned amount mismatch");
         }
 
@@ -2920,16 +2902,16 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(FORGE, ACCOUNT.addr, expectValue);
             vm.expectEmit();
-            emit IERC20.Transfer(FORGE, feeRecipient, expectedFee);
+            emit IERC20.Transfer(FORGE, FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20Transferred(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
 
             bytes memory recipientSig;
             {
                 bytes32 recipientStructHash = keccak256(
-                    abi.encode(ERC20_TRANSFER_TYPE_HASH_V2, token, amount, feeRecipient, feeBPS, nonce, deadline)
+                    abi.encode(ERC20_TRANSFER_TYPE_HASH_V2, token, amount, FEE_RECIPIENT, FEE_BPS, nonce, deadline)
                 );
                 bytes32 recipientHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, recipientStructHash);
                 (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, recipientHash);
@@ -2944,9 +2926,10 @@ contract TestTokenForgeFactory is Test {
                 validatorSig = abi.encodePacked(r, s, v);
             }
             // send transaction
-            ForgeV2(FORGE).transferERC20(
-                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, recipientSig, validatorSig
-            );
+            ForgeV2(FORGE)
+                .transferERC20(
+                    ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, deadline, recipientSig, validatorSig
+                );
             assertEq(expectValue, MockERC20(token).balanceOf(ACCOUNT.addr), "Transfer amount mismatch");
         }
         vm.prank(OWNER);
@@ -2963,16 +2946,16 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(ACCOUNT.addr, address(FORGE), amount);
             vm.expectEmit();
-            emit IERC20.Transfer(address(FORGE), feeRecipient, expectedFee);
+            emit IERC20.Transfer(address(FORGE), FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20TransferredFrom(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
 
             bytes memory fromSig;
             {
                 bytes32 fromStructHash = keccak256(
-                    abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH_V2, token, amount, feeRecipient, feeBPS, nonce, deadline)
+                    abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH_V2, token, amount, FEE_RECIPIENT, FEE_BPS, nonce, deadline)
                 );
                 bytes32 fromHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, fromStructHash);
                 (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, fromHash);
@@ -2988,9 +2971,8 @@ contract TestTokenForgeFactory is Test {
             }
 
             // send transaction
-            ForgeV2(FORGE).transferFromERC20(
-                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, fromSig, validatorSig
-            );
+            ForgeV2(FORGE)
+                .transferFromERC20(ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, deadline, fromSig, validatorSig);
             assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "TransferFrom amount mismatch");
         }
         vm.prank(OWNER);
@@ -3006,16 +2988,16 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(ACCOUNT.addr, address(FORGE), amount);
             vm.expectEmit();
-            emit IERC20.Transfer(address(FORGE), feeRecipient, expectedFee);
+            emit IERC20.Transfer(address(FORGE), FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20TransferredFrom(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
 
             bytes memory fromSig;
             {
                 bytes32 fromStructHash = keccak256(
-                    abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH_V2, token, amount, feeRecipient, feeBPS, nonce, deadline)
+                    abi.encode(ERC20_TRANSFER_FROM_TYPE_HASH_V2, token, amount, FEE_RECIPIENT, FEE_BPS, nonce, deadline)
                 );
                 bytes32 fromHash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, fromStructHash);
                 (uint8 v, bytes32 r, bytes32 s) = vm.sign(ACCOUNT, fromHash);
@@ -3034,8 +3016,9 @@ contract TestTokenForgeFactory is Test {
             bytes memory permitSig;
             {
                 uint256 permitNonce = IERC20Permit(token).nonces(ACCOUNT.addr);
-                bytes32 structHash =
-                    keccak256(abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline));
+                bytes32 structHash = keccak256(
+                    abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline)
+                );
 
                 bytes32 domainSeparator = IERC20Permit(token).DOMAIN_SEPARATOR();
                 bytes32 hash = MessageHashUtils.toTypedDataHash(domainSeparator, structHash);
@@ -3043,13 +3026,14 @@ contract TestTokenForgeFactory is Test {
                 permitSig = abi.encodePacked(r, s, v);
             }
             vm.prank(ACCOUNT.addr);
-            ForgeV2(FORGE).transferFromERC20Permit(
-                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, fromSig, validatorSig, permitSig
-            );
+            ForgeV2(FORGE)
+                .transferFromERC20Permit(
+                    ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, deadline, fromSig, validatorSig, permitSig
+                );
             assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "TransferFrom Permit amount mismatch");
         }
 
-        assertEq(expectedFee * 6, IERC20(token).balanceOf(feeRecipient), "Fee recipient balance mismatch");
+        assertEq(expectedFee * 6, IERC20(token).balanceOf(FEE_RECIPIENT), "Fee recipient balance mismatch");
     }
 
     function test_erc20_fee_v3() external {
@@ -3082,7 +3066,7 @@ contract TestTokenForgeFactory is Test {
         // set test variables
         uint256 amount = 100 ether;
         uint256 deadline = block.timestamp + 30; // 30 seconds deadline
-        uint256 expectedFee = (amount * feeBPS) / 10_000;
+        uint256 expectedFee = (amount * FEE_BPS) / 10_000;
         uint256 expectValue = amount - expectedFee;
         // mint
         {
@@ -3093,17 +3077,17 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(address(0), ACCOUNT.addr, expectValue);
             vm.expectEmit();
-            emit IERC20.Transfer(address(0), feeRecipient, expectedFee);
+            emit IERC20.Transfer(address(0), FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20Minted(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
 
             bytes memory validatorSig;
             {
                 bytes32 structHash = keccak256(
                     abi.encode(
-                        ERC20_MINT_TYPE_HASH_V3, ACCOUNT.addr, token, amount, feeRecipient, feeBPS, nonce, deadline
+                        ERC20_MINT_TYPE_HASH_V3, ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, nonce, deadline
                     )
                 );
                 bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
@@ -3112,7 +3096,7 @@ contract TestTokenForgeFactory is Test {
             }
 
             // send transaction
-            ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, validatorSig);
+            ForgeV3(FORGE).mintERC20(ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, deadline, validatorSig);
             assertEq(expectValue, MockERC20(token).balanceOf(ACCOUNT.addr), "Minted amount mismatch");
         }
         vm.prank(OWNER);
@@ -3129,17 +3113,17 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(ACCOUNT.addr, address(0), expectValue);
             vm.expectEmit();
-            emit IERC20.Transfer(ACCOUNT.addr, feeRecipient, expectedFee);
+            emit IERC20.Transfer(ACCOUNT.addr, FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20Burned(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
 
             bytes memory validatorSig;
             {
                 bytes32 structHash = keccak256(
                     abi.encode(
-                        ERC20_BURN_TYPE_HASH_V3, ACCOUNT.addr, token, amount, feeRecipient, feeBPS, nonce, deadline
+                        ERC20_BURN_TYPE_HASH_V3, ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, nonce, deadline
                     )
                 );
                 bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
@@ -3151,8 +3135,9 @@ contract TestTokenForgeFactory is Test {
             bytes memory permitSig;
             {
                 uint256 permitNonce = IERC20Permit(token).nonces(ACCOUNT.addr);
-                bytes32 structHash =
-                    keccak256(abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline));
+                bytes32 structHash = keccak256(
+                    abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline)
+                );
 
                 bytes32 domainSeparator = IERC20Permit(token).DOMAIN_SEPARATOR();
                 bytes32 hash = MessageHashUtils.toTypedDataHash(domainSeparator, structHash);
@@ -3161,9 +3146,8 @@ contract TestTokenForgeFactory is Test {
             }
 
             // send transaction
-            ForgeV3(FORGE).burnERC20Permit(
-                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, validatorSig, permitSig
-            );
+            ForgeV3(FORGE)
+                .burnERC20Permit(ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, deadline, validatorSig, permitSig);
             assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "Burned amount mismatch");
         }
         vm.prank(OWNER);
@@ -3177,17 +3161,24 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(FORGE, ACCOUNT.addr, expectValue);
             vm.expectEmit();
-            emit IERC20.Transfer(FORGE, feeRecipient, expectedFee);
+            emit IERC20.Transfer(FORGE, FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20Transferred(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
 
             bytes memory validatorSig;
             {
                 bytes32 structHash = keccak256(
                     abi.encode(
-                        ERC20_TRANSFER_TYPE_HASH_V3, ACCOUNT.addr, token, amount, feeRecipient, feeBPS, nonce, deadline
+                        ERC20_TRANSFER_TYPE_HASH_V3,
+                        ACCOUNT.addr,
+                        token,
+                        amount,
+                        FEE_RECIPIENT,
+                        FEE_BPS,
+                        nonce,
+                        deadline
                     )
                 );
                 bytes32 hash = MessageHashUtils.toTypedDataHash(DOMAIN_SEPARATOR, structHash);
@@ -3196,7 +3187,7 @@ contract TestTokenForgeFactory is Test {
             }
 
             // send transaction
-            ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, validatorSig);
+            ForgeV3(FORGE).transferERC20(ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, deadline, validatorSig);
             assertEq(expectValue, MockERC20(token).balanceOf(ACCOUNT.addr), "Transfer amount mismatch");
         }
         vm.prank(OWNER);
@@ -3212,11 +3203,11 @@ contract TestTokenForgeFactory is Test {
             vm.expectEmit();
             emit IERC20.Transfer(ACCOUNT.addr, address(FORGE), amount);
             vm.expectEmit();
-            emit IERC20.Transfer(address(FORGE), feeRecipient, expectedFee);
+            emit IERC20.Transfer(address(FORGE), FEE_RECIPIENT, expectedFee);
             vm.expectEmit();
             emit ForgeFactory.ERC20TransferredFrom(SERVICE_NAME, uuid, ACCOUNT.addr, token, amount);
             vm.expectEmit();
-            emit ForgeFactory.ERC20FeeCollected(uuid, feeRecipient, token, expectedFee);
+            emit ForgeFactory.ERC20FeeCollected(uuid, FEE_RECIPIENT, token, expectedFee);
 
             bytes memory validatorSig;
             {
@@ -3226,8 +3217,8 @@ contract TestTokenForgeFactory is Test {
                         ACCOUNT.addr,
                         token,
                         amount,
-                        feeRecipient,
-                        feeBPS,
+                        FEE_RECIPIENT,
+                        FEE_BPS,
                         nonce,
                         deadline
                     )
@@ -3241,8 +3232,9 @@ contract TestTokenForgeFactory is Test {
             bytes memory permitSig;
             {
                 uint256 permitNonce = IERC20Permit(token).nonces(ACCOUNT.addr);
-                bytes32 structHash =
-                    keccak256(abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline));
+                bytes32 structHash = keccak256(
+                    abi.encode(PERMIT_TYPE_HASH, ACCOUNT.addr, address(FORGE), amount, permitNonce, deadline)
+                );
 
                 bytes32 domainSeparator = IERC20Permit(token).DOMAIN_SEPARATOR();
                 bytes32 hash = MessageHashUtils.toTypedDataHash(domainSeparator, structHash);
@@ -3251,13 +3243,14 @@ contract TestTokenForgeFactory is Test {
             }
 
             // send transaction
-            ForgeV3(FORGE).transferFromERC20Permit(
-                ACCOUNT.addr, token, amount, feeRecipient, feeBPS, deadline, validatorSig, permitSig
-            );
+            ForgeV3(FORGE)
+                .transferFromERC20Permit(
+                    ACCOUNT.addr, token, amount, FEE_RECIPIENT, FEE_BPS, deadline, validatorSig, permitSig
+                );
             assertEq(0, MockERC20(token).balanceOf(ACCOUNT.addr), "TransferFrom Permit amount mismatch");
         }
 
-        assertEq(expectedFee * 4, IERC20(token).balanceOf(feeRecipient), "Fee recipient balance mismatch");
+        assertEq(expectedFee * 4, IERC20(token).balanceOf(FEE_RECIPIENT), "Fee recipient balance mismatch");
     }
 
     function _calcUUID(uint256 nonce) internal view returns (uint256) {

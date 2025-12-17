@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.28;
+pragma solidity ^0.8.28;
 
 import {IDiamondCut} from "diamond-3-hardhat-1.0.0/interfaces/IDiamondCut.sol";
 import {DiamondCutFacet} from "diamond-3-hardhat-1.0.0/facets/DiamondCutFacet.sol";
@@ -32,3 +32,4 @@ contract Diamond3Facet is IDefaultDiamondCut, DiamondCutFacet, DiamondLoupeFacet
         });
     }
 }
+

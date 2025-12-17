@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.28;
+pragma solidity ^0.8.28;
 
 /**
  * override constructor from diamond-3-hardhat/contracts/Diamond.sol
@@ -68,3 +68,4 @@ contract ForgeProxyCode {
         return type(ForgeProxy).creationCode;
     }
 }
+

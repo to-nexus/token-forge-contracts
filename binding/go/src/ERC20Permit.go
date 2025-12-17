@@ -51,7 +51,8 @@ func (c *ERC20Permit) Instance(backend bind.ContractBackend, addr common.Address
 }
 
 // PackDOMAINSEPARATOR is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x3644e515.
+// the contract method with ID 0x3644e515.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function DOMAIN_SEPARATOR() view returns(bytes32)
 func (eRC20Permit *ERC20Permit) PackDOMAINSEPARATOR() []byte {
@@ -60,6 +61,15 @@ func (eRC20Permit *ERC20Permit) PackDOMAINSEPARATOR() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackDOMAINSEPARATOR is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x3644e515.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function DOMAIN_SEPARATOR() view returns(bytes32)
+func (eRC20Permit *ERC20Permit) TryPackDOMAINSEPARATOR() ([]byte, error) {
+	return eRC20Permit.abi.Pack("DOMAIN_SEPARATOR")
 }
 
 // UnpackDOMAINSEPARATOR is the Go binding that unpacks the parameters returned
@@ -72,11 +82,12 @@ func (eRC20Permit *ERC20Permit) UnpackDOMAINSEPARATOR(data []byte) ([32]byte, er
 		return *new([32]byte), err
 	}
 	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
-	return out0, err
+	return out0, nil
 }
 
 // PackAllowance is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xdd62ed3e.
+// the contract method with ID 0xdd62ed3e.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function allowance(address owner, address spender) view returns(uint256)
 func (eRC20Permit *ERC20Permit) PackAllowance(owner common.Address, spender common.Address) []byte {
@@ -85,6 +96,15 @@ func (eRC20Permit *ERC20Permit) PackAllowance(owner common.Address, spender comm
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackAllowance is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xdd62ed3e.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function allowance(address owner, address spender) view returns(uint256)
+func (eRC20Permit *ERC20Permit) TryPackAllowance(owner common.Address, spender common.Address) ([]byte, error) {
+	return eRC20Permit.abi.Pack("allowance", owner, spender)
 }
 
 // UnpackAllowance is the Go binding that unpacks the parameters returned
@@ -97,11 +117,12 @@ func (eRC20Permit *ERC20Permit) UnpackAllowance(data []byte) (*big.Int, error) {
 		return new(big.Int), err
 	}
 	out0 := abi.ConvertType(out[0], new(big.Int)).(*big.Int)
-	return out0, err
+	return out0, nil
 }
 
 // PackApprove is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x095ea7b3.
+// the contract method with ID 0x095ea7b3.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function approve(address spender, uint256 value) returns(bool)
 func (eRC20Permit *ERC20Permit) PackApprove(spender common.Address, value *big.Int) []byte {
@@ -110,6 +131,15 @@ func (eRC20Permit *ERC20Permit) PackApprove(spender common.Address, value *big.I
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackApprove is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x095ea7b3.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function approve(address spender, uint256 value) returns(bool)
+func (eRC20Permit *ERC20Permit) TryPackApprove(spender common.Address, value *big.Int) ([]byte, error) {
+	return eRC20Permit.abi.Pack("approve", spender, value)
 }
 
 // UnpackApprove is the Go binding that unpacks the parameters returned
@@ -122,11 +152,12 @@ func (eRC20Permit *ERC20Permit) UnpackApprove(data []byte) (bool, error) {
 		return *new(bool), err
 	}
 	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-	return out0, err
+	return out0, nil
 }
 
 // PackBalanceOf is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x70a08231.
+// the contract method with ID 0x70a08231.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function balanceOf(address account) view returns(uint256)
 func (eRC20Permit *ERC20Permit) PackBalanceOf(account common.Address) []byte {
@@ -135,6 +166,15 @@ func (eRC20Permit *ERC20Permit) PackBalanceOf(account common.Address) []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackBalanceOf is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x70a08231.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function balanceOf(address account) view returns(uint256)
+func (eRC20Permit *ERC20Permit) TryPackBalanceOf(account common.Address) ([]byte, error) {
+	return eRC20Permit.abi.Pack("balanceOf", account)
 }
 
 // UnpackBalanceOf is the Go binding that unpacks the parameters returned
@@ -147,11 +187,12 @@ func (eRC20Permit *ERC20Permit) UnpackBalanceOf(data []byte) (*big.Int, error) {
 		return new(big.Int), err
 	}
 	out0 := abi.ConvertType(out[0], new(big.Int)).(*big.Int)
-	return out0, err
+	return out0, nil
 }
 
 // PackDecimals is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x313ce567.
+// the contract method with ID 0x313ce567.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function decimals() view returns(uint8)
 func (eRC20Permit *ERC20Permit) PackDecimals() []byte {
@@ -160,6 +201,15 @@ func (eRC20Permit *ERC20Permit) PackDecimals() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackDecimals is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x313ce567.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function decimals() view returns(uint8)
+func (eRC20Permit *ERC20Permit) TryPackDecimals() ([]byte, error) {
+	return eRC20Permit.abi.Pack("decimals")
 }
 
 // UnpackDecimals is the Go binding that unpacks the parameters returned
@@ -172,11 +222,12 @@ func (eRC20Permit *ERC20Permit) UnpackDecimals(data []byte) (uint8, error) {
 		return *new(uint8), err
 	}
 	out0 := *abi.ConvertType(out[0], new(uint8)).(*uint8)
-	return out0, err
+	return out0, nil
 }
 
 // PackEip712Domain is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x84b0196e.
+// the contract method with ID 0x84b0196e.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function eip712Domain() view returns(bytes1 fields, string name, string version, uint256 chainId, address verifyingContract, bytes32 salt, uint256[] extensions)
 func (eRC20Permit *ERC20Permit) PackEip712Domain() []byte {
@@ -186,6 +237,18 @@ func (eRC20Permit *ERC20Permit) PackEip712Domain() []byte {
 	}
 	return enc
 }
+
+// TryPackEip712Domain is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x84b0196e.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function eip712Domain() view returns(bytes1 fields, string name, string version, uint256 chainId, address verifyingContract, bytes32 salt, uint256[] extensions)
+func (eRC20Permit *ERC20Permit) TryPackEip712Domain() ([]byte, error) {
+	return eRC20Permit.abi.Pack("eip712Domain")
+}
+
+// Eip712DomainOutput serves as a container for the return parameters of contract
+// method Eip712Domain.
 
 // UnpackEip712Domain is the Go binding that unpacks the parameters returned
 // from invoking the contract method with ID 0x84b0196e.
@@ -204,12 +267,12 @@ func (eRC20Permit *ERC20Permit) UnpackEip712Domain(data []byte) (Eip712DomainOut
 	outstruct.VerifyingContract = *abi.ConvertType(out[4], new(common.Address)).(*common.Address)
 	outstruct.Salt = *abi.ConvertType(out[5], new([32]byte)).(*[32]byte)
 	outstruct.Extensions = *abi.ConvertType(out[6], new([]*big.Int)).(*[]*big.Int)
-	return *outstruct, err
-
+	return *outstruct, nil
 }
 
 // PackName is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x06fdde03.
+// the contract method with ID 0x06fdde03.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function name() view returns(string)
 func (eRC20Permit *ERC20Permit) PackName() []byte {
@@ -218,6 +281,15 @@ func (eRC20Permit *ERC20Permit) PackName() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackName is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x06fdde03.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function name() view returns(string)
+func (eRC20Permit *ERC20Permit) TryPackName() ([]byte, error) {
+	return eRC20Permit.abi.Pack("name")
 }
 
 // UnpackName is the Go binding that unpacks the parameters returned
@@ -230,11 +302,12 @@ func (eRC20Permit *ERC20Permit) UnpackName(data []byte) (string, error) {
 		return *new(string), err
 	}
 	out0 := *abi.ConvertType(out[0], new(string)).(*string)
-	return out0, err
+	return out0, nil
 }
 
 // PackNonces is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x7ecebe00.
+// the contract method with ID 0x7ecebe00.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function nonces(address owner) view returns(uint256)
 func (eRC20Permit *ERC20Permit) PackNonces(owner common.Address) []byte {
@@ -243,6 +316,15 @@ func (eRC20Permit *ERC20Permit) PackNonces(owner common.Address) []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackNonces is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x7ecebe00.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function nonces(address owner) view returns(uint256)
+func (eRC20Permit *ERC20Permit) TryPackNonces(owner common.Address) ([]byte, error) {
+	return eRC20Permit.abi.Pack("nonces", owner)
 }
 
 // UnpackNonces is the Go binding that unpacks the parameters returned
@@ -255,11 +337,12 @@ func (eRC20Permit *ERC20Permit) UnpackNonces(data []byte) (*big.Int, error) {
 		return new(big.Int), err
 	}
 	out0 := abi.ConvertType(out[0], new(big.Int)).(*big.Int)
-	return out0, err
+	return out0, nil
 }
 
 // PackPermit is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xd505accf.
+// the contract method with ID 0xd505accf.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) returns()
 func (eRC20Permit *ERC20Permit) PackPermit(owner common.Address, spender common.Address, value *big.Int, deadline *big.Int, v uint8, r [32]byte, s [32]byte) []byte {
@@ -270,8 +353,18 @@ func (eRC20Permit *ERC20Permit) PackPermit(owner common.Address, spender common.
 	return enc
 }
 
+// TryPackPermit is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xd505accf.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) returns()
+func (eRC20Permit *ERC20Permit) TryPackPermit(owner common.Address, spender common.Address, value *big.Int, deadline *big.Int, v uint8, r [32]byte, s [32]byte) ([]byte, error) {
+	return eRC20Permit.abi.Pack("permit", owner, spender, value, deadline, v, r, s)
+}
+
 // PackSymbol is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x95d89b41.
+// the contract method with ID 0x95d89b41.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function symbol() view returns(string)
 func (eRC20Permit *ERC20Permit) PackSymbol() []byte {
@@ -280,6 +373,15 @@ func (eRC20Permit *ERC20Permit) PackSymbol() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackSymbol is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x95d89b41.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function symbol() view returns(string)
+func (eRC20Permit *ERC20Permit) TryPackSymbol() ([]byte, error) {
+	return eRC20Permit.abi.Pack("symbol")
 }
 
 // UnpackSymbol is the Go binding that unpacks the parameters returned
@@ -292,11 +394,12 @@ func (eRC20Permit *ERC20Permit) UnpackSymbol(data []byte) (string, error) {
 		return *new(string), err
 	}
 	out0 := *abi.ConvertType(out[0], new(string)).(*string)
-	return out0, err
+	return out0, nil
 }
 
 // PackTotalSupply is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x18160ddd.
+// the contract method with ID 0x18160ddd.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function totalSupply() view returns(uint256)
 func (eRC20Permit *ERC20Permit) PackTotalSupply() []byte {
@@ -305,6 +408,15 @@ func (eRC20Permit *ERC20Permit) PackTotalSupply() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackTotalSupply is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x18160ddd.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function totalSupply() view returns(uint256)
+func (eRC20Permit *ERC20Permit) TryPackTotalSupply() ([]byte, error) {
+	return eRC20Permit.abi.Pack("totalSupply")
 }
 
 // UnpackTotalSupply is the Go binding that unpacks the parameters returned
@@ -317,11 +429,12 @@ func (eRC20Permit *ERC20Permit) UnpackTotalSupply(data []byte) (*big.Int, error)
 		return new(big.Int), err
 	}
 	out0 := abi.ConvertType(out[0], new(big.Int)).(*big.Int)
-	return out0, err
+	return out0, nil
 }
 
 // PackTransfer is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xa9059cbb.
+// the contract method with ID 0xa9059cbb.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function transfer(address to, uint256 value) returns(bool)
 func (eRC20Permit *ERC20Permit) PackTransfer(to common.Address, value *big.Int) []byte {
@@ -330,6 +443,15 @@ func (eRC20Permit *ERC20Permit) PackTransfer(to common.Address, value *big.Int) 
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackTransfer is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xa9059cbb.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function transfer(address to, uint256 value) returns(bool)
+func (eRC20Permit *ERC20Permit) TryPackTransfer(to common.Address, value *big.Int) ([]byte, error) {
+	return eRC20Permit.abi.Pack("transfer", to, value)
 }
 
 // UnpackTransfer is the Go binding that unpacks the parameters returned
@@ -342,11 +464,12 @@ func (eRC20Permit *ERC20Permit) UnpackTransfer(data []byte) (bool, error) {
 		return *new(bool), err
 	}
 	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-	return out0, err
+	return out0, nil
 }
 
 // PackTransferFrom is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x23b872dd.
+// the contract method with ID 0x23b872dd.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function transferFrom(address from, address to, uint256 value) returns(bool)
 func (eRC20Permit *ERC20Permit) PackTransferFrom(from common.Address, to common.Address, value *big.Int) []byte {
@@ -355,6 +478,15 @@ func (eRC20Permit *ERC20Permit) PackTransferFrom(from common.Address, to common.
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackTransferFrom is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x23b872dd.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function transferFrom(address from, address to, uint256 value) returns(bool)
+func (eRC20Permit *ERC20Permit) TryPackTransferFrom(from common.Address, to common.Address, value *big.Int) ([]byte, error) {
+	return eRC20Permit.abi.Pack("transferFrom", from, to, value)
 }
 
 // UnpackTransferFrom is the Go binding that unpacks the parameters returned
@@ -367,7 +499,7 @@ func (eRC20Permit *ERC20Permit) UnpackTransferFrom(data []byte) (bool, error) {
 		return *new(bool), err
 	}
 	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-	return out0, err
+	return out0, nil
 }
 
 // ERC20PermitApproval represents a Approval event raised by the ERC20Permit contract.
@@ -391,7 +523,7 @@ func (ERC20PermitApproval) ContractEventName() string {
 // Solidity: event Approval(address indexed owner, address indexed spender, uint256 value)
 func (eRC20Permit *ERC20Permit) UnpackApprovalEvent(log *types.Log) (*ERC20PermitApproval, error) {
 	event := "Approval"
-	if log.Topics[0] != eRC20Permit.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != eRC20Permit.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ERC20PermitApproval)
@@ -431,7 +563,7 @@ func (ERC20PermitEIP712DomainChanged) ContractEventName() string {
 // Solidity: event EIP712DomainChanged()
 func (eRC20Permit *ERC20Permit) UnpackEIP712DomainChangedEvent(log *types.Log) (*ERC20PermitEIP712DomainChanged, error) {
 	event := "EIP712DomainChanged"
-	if log.Topics[0] != eRC20Permit.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != eRC20Permit.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ERC20PermitEIP712DomainChanged)
@@ -474,7 +606,7 @@ func (ERC20PermitTransfer) ContractEventName() string {
 // Solidity: event Transfer(address indexed from, address indexed to, uint256 value)
 func (eRC20Permit *ERC20Permit) UnpackTransferEvent(log *types.Log) (*ERC20PermitTransfer, error) {
 	event := "Transfer"
-	if log.Topics[0] != eRC20Permit.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != eRC20Permit.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ERC20PermitTransfer)

@@ -24,6 +24,8 @@ var (
 	_ = abi.ConvertType
 )
 
+// IDiamondCutFacetCut is an auto generated low-level Go binding around an user-defined struct.
+
 // IDiamondCutMetaData contains all meta data concerning the IDiamondCut contract.
 var IDiamondCutMetaData = bind.MetaData{
 	ABI: "[{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"facetAddress\",\"type\":\"address\"},{\"internalType\":\"enumIDiamondCut.FacetCutAction\",\"name\":\"action\",\"type\":\"uint8\"},{\"internalType\":\"bytes4[]\",\"name\":\"functionSelectors\",\"type\":\"bytes4[]\"}],\"internalType\":\"structIDiamondCut.FacetCut[]\",\"name\":\"_diamondCut\",\"type\":\"tuple[]\"},{\"internalType\":\"address\",\"name\":\"_init\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_calldata\",\"type\":\"bytes\"}],\"name\":\"diamondCut\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"facetAddress\",\"type\":\"address\"},{\"internalType\":\"enumIDiamondCut.FacetCutAction\",\"name\":\"action\",\"type\":\"uint8\"},{\"internalType\":\"bytes4[]\",\"name\":\"functionSelectors\",\"type\":\"bytes4[]\"}],\"indexed\":false,\"internalType\":\"structIDiamondCut.FacetCut[]\",\"name\":\"_diamondCut\",\"type\":\"tuple[]\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"_init\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"_calldata\",\"type\":\"bytes\"}],\"name\":\"DiamondCut\",\"type\":\"event\"}]",
@@ -51,7 +53,8 @@ func (c *IDiamondCut) Instance(backend bind.ContractBackend, addr common.Address
 }
 
 // PackDiamondCut is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x1f931c1c.
+// the contract method with ID 0x1f931c1c.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function diamondCut((address,uint8,bytes4[])[] _diamondCut, address _init, bytes _calldata) returns()
 func (iDiamondCut *IDiamondCut) PackDiamondCut(diamondCut []IDiamondCutFacetCut, init common.Address, calldata []byte) []byte {
@@ -60,6 +63,15 @@ func (iDiamondCut *IDiamondCut) PackDiamondCut(diamondCut []IDiamondCutFacetCut,
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackDiamondCut is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x1f931c1c.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function diamondCut((address,uint8,bytes4[])[] _diamondCut, address _init, bytes _calldata) returns()
+func (iDiamondCut *IDiamondCut) TryPackDiamondCut(diamondCut []IDiamondCutFacetCut, init common.Address, calldata []byte) ([]byte, error) {
+	return iDiamondCut.abi.Pack("diamondCut", diamondCut, init, calldata)
 }
 
 // IDiamondCutDiamondCut represents a DiamondCut event raised by the IDiamondCut contract.
@@ -83,7 +95,7 @@ func (IDiamondCutDiamondCut) ContractEventName() string {
 // Solidity: event DiamondCut((address,uint8,bytes4[])[] _diamondCut, address _init, bytes _calldata)
 func (iDiamondCut *IDiamondCut) UnpackDiamondCutEvent(log *types.Log) (*IDiamondCutDiamondCut, error) {
 	event := "DiamondCut"
-	if log.Topics[0] != iDiamondCut.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != iDiamondCut.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(IDiamondCutDiamondCut)

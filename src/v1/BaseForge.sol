@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.28;
+pragma solidity ^0.8.28;
 
 import {Initializable} from "@openzeppelin-contracts-upgradeable-5.3.0/proxy/utils/Initializable.sol";
 import {ContextUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils/ContextUpgradeable.sol";
@@ -8,7 +8,7 @@ import {NoncesUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/utils
 import {IERC20Permit} from "@openzeppelin-contracts-5.3.0/token/ERC20/extensions/IERC20Permit.sol";
 import {SignatureChecker} from "@openzeppelin-contracts-5.3.0/utils/cryptography/SignatureChecker.sol";
 
-import {TokenType, IForgeFactoryAlert} from "./interfaces/IForgeFactory.sol";
+import {TokenType, IForgeFactoryAlert} from "../interfaces/IForgeFactory.sol";
 
 abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradeable, NoncesUpgradeable {
     error BaseForge__ZeroAddress();
@@ -76,7 +76,9 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
     function _verifyValidatorSignature(bytes32 hash, bytes memory sig) internal view {
         address _validator = validator();
         if (_validator == address(0)) revert BaseForge__ZeroAddress(); // not initialized
-        if (!SignatureChecker.isValidSignatureNow(_validator, hash, sig)) revert BaseForge__InvalidValidatorSignature();
+        if (!SignatureChecker.isValidSignatureNow(_validator, hash, sig)) {
+            revert BaseForge__InvalidValidatorSignature();
+        }
     }
 
     function _verifyDeadline(uint256 deadline) internal view {
@@ -93,9 +95,7 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
         factory.alertTransfer(tokenType, uuid, token, data);
     }
 
-    function _alertTransferFromToFactory(TokenType tokenType, uint256 uuid, address token, bytes memory data)
-        internal
-    {
+    function _alertTransferFromToFactory(TokenType tokenType, uint256 uuid, address token, bytes memory data) internal {
         IForgeFactoryAlert factory = IForgeFactoryAlert(_getBaseForgeStorage()._factory);
         factory.alertTransferFrom(tokenType, uuid, token, data);
     }
@@ -151,8 +151,8 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
 }
 
 import {IDiamondCut, LibDiamond} from "diamond-3-hardhat-1.0.0/libraries/LibDiamond.sol";
-import {IDefaultDiamondCut} from "./interfaces/IDefaultDiamondCut.sol";
-import {IBaseForgeFacet} from "./interfaces/IBaseForgeFacet.sol";
+import {IDefaultDiamondCut} from "../interfaces/IDefaultDiamondCut.sol";
+import {IBaseForgeFacet} from "../interfaces/IBaseForgeFacet.sol";
 
 contract BaseForgeFacet is IDefaultDiamondCut, IBaseForgeFacet, BaseForge {
     bytes4[] public BASEFORGE_FACET_FUNCTIONS;

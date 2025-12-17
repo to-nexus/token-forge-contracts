@@ -1,17 +1,16 @@
 // SPDX-License-Identifier: BUSL-1.1
-pragma solidity 0.8.28;
+pragma solidity ^0.8.28;
 
 import {IDiamondCut} from "diamond-3-hardhat-1.0.0/interfaces/IDiamondCut.sol";
-import {Diamond} from "diamond-3-hardhat-1.0.0/Diamond.sol";
 import {AccessControlUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/access/AccessControlUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin-contracts-upgradeable-5.3.0/proxy/utils/UUPSUpgradeable.sol";
 
 import {EnumerableMap} from "@openzeppelin-contracts-5.3.0/utils/structs/EnumerableMap.sol";
 import {Create2} from "@openzeppelin-contracts-5.3.0/utils/Create2.sol";
 
-import {TokenType, IForgeFactoryAlert} from "./interfaces/IForgeFactory.sol";
-import {IDefaultDiamondCut} from "./interfaces/IDefaultDiamondCut.sol";
-import {ForgeProxyCode} from "./ForgeProxy.sol";
+import {TokenType, IForgeFactoryAlert} from "../interfaces/IForgeFactory.sol";
+import {IDefaultDiamondCut} from "../interfaces/IDefaultDiamondCut.sol";
+import {ForgeProxyCode} from "../ForgeProxy.sol";
 
 contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgradeable {
     using EnumerableMap for EnumerableMap.Bytes32ToAddressMap;
@@ -367,6 +366,20 @@ contract ForgeFactory is IForgeFactoryAlert, AccessControlUpgradeable, UUPSUpgra
 
             emit ServicePaused(service, paused);
         }
+    }
+
+    ///////////////////////
+    // Upgrade functions //
+    ///////////////////////
+
+    function reinitialize(address _baseImpl) external reinitializer(2) onlyRole(DEFAULT_ADMIN_ROLE) {
+        if (_baseImpl == address(0)) revert TokenForgeFactory__InvalidData("baseImpl");
+        if (_baseImpl != IDefaultDiamondCut(_baseImpl).defaultDiamondFacetCut().facetAddress) {
+            revert TokenForgeFactory__InvalidData("baseImpl facet");
+        }
+
+        ForgeFactoryStorage storage $ = _getForgeFactoryStorage();
+        $._baseImpl = _baseImpl;
     }
 
     function _authorizeUpgrade(address) internal override onlyRole(DEFAULT_ADMIN_ROLE) {}
