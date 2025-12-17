@@ -24,6 +24,33 @@ var (
 	_ = abi.ConvertType
 )
 
+// IMulticall3Call is an auto generated low-level Go binding around an user-defined struct.
+type IMulticall3Call struct {
+	Target   common.Address
+	CallData []byte
+}
+
+// IMulticall3Call3 is an auto generated low-level Go binding around an user-defined struct.
+type IMulticall3Call3 struct {
+	Target       common.Address
+	AllowFailure bool
+	CallData     []byte
+}
+
+// IMulticall3Call3Value is an auto generated low-level Go binding around an user-defined struct.
+type IMulticall3Call3Value struct {
+	Target       common.Address
+	AllowFailure bool
+	Value        *big.Int
+	CallData     []byte
+}
+
+// IMulticall3Result is an auto generated low-level Go binding around an user-defined struct.
+type IMulticall3Result struct {
+	Success    bool
+	ReturnData []byte
+}
+
 // IMulticall3MetaData contains all meta data concerning the IMulticall3 contract.
 var IMulticall3MetaData = bind.MetaData{
 	ABI: "[{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"}],\"internalType\":\"structIMulticall3.Call[]\",\"name\":\"calls\",\"type\":\"tuple[]\"}],\"name\":\"aggregate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"},{\"internalType\":\"bytes[]\",\"name\":\"returnData\",\"type\":\"bytes[]\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"allowFailure\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"}],\"internalType\":\"structIMulticall3.Call3[]\",\"name\":\"calls\",\"type\":\"tuple[]\"}],\"name\":\"aggregate3\",\"outputs\":[{\"components\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"returnData\",\"type\":\"bytes\"}],\"internalType\":\"structIMulticall3.Result[]\",\"name\":\"returnData\",\"type\":\"tuple[]\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"allowFailure\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"value\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"}],\"internalType\":\"structIMulticall3.Call3Value[]\",\"name\":\"calls\",\"type\":\"tuple[]\"}],\"name\":\"aggregate3Value\",\"outputs\":[{\"components\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"returnData\",\"type\":\"bytes\"}],\"internalType\":\"structIMulticall3.Result[]\",\"name\":\"returnData\",\"type\":\"tuple[]\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"}],\"internalType\":\"structIMulticall3.Call[]\",\"name\":\"calls\",\"type\":\"tuple[]\"}],\"name\":\"blockAndAggregate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"blockHash\",\"type\":\"bytes32\"},{\"components\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"returnData\",\"type\":\"bytes\"}],\"internalType\":\"structIMulticall3.Result[]\",\"name\":\"returnData\",\"type\":\"tuple[]\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getBasefee\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"basefee\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"}],\"name\":\"getBlockHash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"blockHash\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getBlockNumber\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getChainId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"chainid\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentBlockCoinbase\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"coinbase\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentBlockDifficulty\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"difficulty\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentBlockGasLimit\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"gaslimit\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getCurrentBlockTimestamp\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"timestamp\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"getEthBalance\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getLastBlockHash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"blockHash\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"requireSuccess\",\"type\":\"bool\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"}],\"internalType\":\"structIMulticall3.Call[]\",\"name\":\"calls\",\"type\":\"tuple[]\"}],\"name\":\"tryAggregate\",\"outputs\":[{\"components\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"returnData\",\"type\":\"bytes\"}],\"internalType\":\"structIMulticall3.Result[]\",\"name\":\"returnData\",\"type\":\"tuple[]\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bool\",\"name\":\"requireSuccess\",\"type\":\"bool\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"callData\",\"type\":\"bytes\"}],\"internalType\":\"structIMulticall3.Call[]\",\"name\":\"calls\",\"type\":\"tuple[]\"}],\"name\":\"tryBlockAndAggregate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"blockNumber\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"blockHash\",\"type\":\"bytes32\"},{\"components\":[{\"internalType\":\"bool\",\"name\":\"success\",\"type\":\"bool\"},{\"internalType\":\"bytes\",\"name\":\"returnData\",\"type\":\"bytes\"}],\"internalType\":\"structIMulticall3.Result[]\",\"name\":\"returnData\",\"type\":\"tuple[]\"}],\"stateMutability\":\"payable\",\"type\":\"function\"}]",
@@ -51,7 +78,8 @@ func (c *IMulticall3) Instance(backend bind.ContractBackend, addr common.Address
 }
 
 // PackAggregate is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x252dba42.
+// the contract method with ID 0x252dba42.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function aggregate((address,bytes)[] calls) payable returns(uint256 blockNumber, bytes[] returnData)
 func (iMulticall3 *IMulticall3) PackAggregate(calls []IMulticall3Call) []byte {
@@ -60,6 +88,15 @@ func (iMulticall3 *IMulticall3) PackAggregate(calls []IMulticall3Call) []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackAggregate is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x252dba42.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function aggregate((address,bytes)[] calls) payable returns(uint256 blockNumber, bytes[] returnData)
+func (iMulticall3 *IMulticall3) TryPackAggregate(calls []IMulticall3Call) ([]byte, error) {
+	return iMulticall3.abi.Pack("aggregate", calls)
 }
 
 // AggregateOutput serves as a container for the return parameters of contract
@@ -81,12 +118,12 @@ func (iMulticall3 *IMulticall3) UnpackAggregate(data []byte) (AggregateOutput, e
 	}
 	outstruct.BlockNumber = abi.ConvertType(out[0], new(big.Int)).(*big.Int)
 	outstruct.ReturnData = *abi.ConvertType(out[1], new([][]byte)).(*[][]byte)
-	return *outstruct, err
-
+	return *outstruct, nil
 }
 
 // PackAggregate3 is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x82ad56cb.
+// the contract method with ID 0x82ad56cb.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function aggregate3((address,bool,bytes)[] calls) payable returns((bool,bytes)[] returnData)
 func (iMulticall3 *IMulticall3) PackAggregate3(calls []IMulticall3Call3) []byte {
@@ -95,6 +132,15 @@ func (iMulticall3 *IMulticall3) PackAggregate3(calls []IMulticall3Call3) []byte 
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackAggregate3 is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x82ad56cb.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function aggregate3((address,bool,bytes)[] calls) payable returns((bool,bytes)[] returnData)
+func (iMulticall3 *IMulticall3) TryPackAggregate3(calls []IMulticall3Call3) ([]byte, error) {
+	return iMulticall3.abi.Pack("aggregate3", calls)
 }
 
 // UnpackAggregate3 is the Go binding that unpacks the parameters returned
@@ -107,11 +153,12 @@ func (iMulticall3 *IMulticall3) UnpackAggregate3(data []byte) ([]IMulticall3Resu
 		return *new([]IMulticall3Result), err
 	}
 	out0 := *abi.ConvertType(out[0], new([]IMulticall3Result)).(*[]IMulticall3Result)
-	return out0, err
+	return out0, nil
 }
 
 // PackAggregate3Value is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x174dea71.
+// the contract method with ID 0x174dea71.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function aggregate3Value((address,bool,uint256,bytes)[] calls) payable returns((bool,bytes)[] returnData)
 func (iMulticall3 *IMulticall3) PackAggregate3Value(calls []IMulticall3Call3Value) []byte {
@@ -120,6 +167,15 @@ func (iMulticall3 *IMulticall3) PackAggregate3Value(calls []IMulticall3Call3Valu
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackAggregate3Value is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x174dea71.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function aggregate3Value((address,bool,uint256,bytes)[] calls) payable returns((bool,bytes)[] returnData)
+func (iMulticall3 *IMulticall3) TryPackAggregate3Value(calls []IMulticall3Call3Value) ([]byte, error) {
+	return iMulticall3.abi.Pack("aggregate3Value", calls)
 }
 
 // UnpackAggregate3Value is the Go binding that unpacks the parameters returned
@@ -132,11 +188,12 @@ func (iMulticall3 *IMulticall3) UnpackAggregate3Value(data []byte) ([]IMulticall
 		return *new([]IMulticall3Result), err
 	}
 	out0 := *abi.ConvertType(out[0], new([]IMulticall3Result)).(*[]IMulticall3Result)
-	return out0, err
+	return out0, nil
 }
 
 // PackBlockAndAggregate is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xc3077fa9.
+// the contract method with ID 0xc3077fa9.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function blockAndAggregate((address,bytes)[] calls) payable returns(uint256 blockNumber, bytes32 blockHash, (bool,bytes)[] returnData)
 func (iMulticall3 *IMulticall3) PackBlockAndAggregate(calls []IMulticall3Call) []byte {
@@ -145,6 +202,15 @@ func (iMulticall3 *IMulticall3) PackBlockAndAggregate(calls []IMulticall3Call) [
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackBlockAndAggregate is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xc3077fa9.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function blockAndAggregate((address,bytes)[] calls) payable returns(uint256 blockNumber, bytes32 blockHash, (bool,bytes)[] returnData)
+func (iMulticall3 *IMulticall3) TryPackBlockAndAggregate(calls []IMulticall3Call) ([]byte, error) {
+	return iMulticall3.abi.Pack("blockAndAggregate", calls)
 }
 
 // BlockAndAggregateOutput serves as a container for the return parameters of contract
@@ -168,12 +234,12 @@ func (iMulticall3 *IMulticall3) UnpackBlockAndAggregate(data []byte) (BlockAndAg
 	outstruct.BlockNumber = abi.ConvertType(out[0], new(big.Int)).(*big.Int)
 	outstruct.BlockHash = *abi.ConvertType(out[1], new([32]byte)).(*[32]byte)
 	outstruct.ReturnData = *abi.ConvertType(out[2], new([]IMulticall3Result)).(*[]IMulticall3Result)
-	return *outstruct, err
-
+	return *outstruct, nil
 }
 
 // PackGetBasefee is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x3e64a696.
+// the contract method with ID 0x3e64a696.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function getBasefee() view returns(uint256 basefee)
 func (iMulticall3 *IMulticall3) PackGetBasefee() []byte {
@@ -182,6 +248,15 @@ func (iMulticall3 *IMulticall3) PackGetBasefee() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackGetBasefee is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x3e64a696.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function getBasefee() view returns(uint256 basefee)
+func (iMulticall3 *IMulticall3) TryPackGetBasefee() ([]byte, error) {
+	return iMulticall3.abi.Pack("getBasefee")
 }
 
 // UnpackGetBasefee is the Go binding that unpacks the parameters returned
@@ -194,11 +269,12 @@ func (iMulticall3 *IMulticall3) UnpackGetBasefee(data []byte) (*big.Int, error) 
 		return new(big.Int), err
 	}
 	out0 := abi.ConvertType(out[0], new(big.Int)).(*big.Int)
-	return out0, err
+	return out0, nil
 }
 
 // PackGetBlockHash is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xee82ac5e.
+// the contract method with ID 0xee82ac5e.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function getBlockHash(uint256 blockNumber) view returns(bytes32 blockHash)
 func (iMulticall3 *IMulticall3) PackGetBlockHash(blockNumber *big.Int) []byte {
@@ -207,6 +283,15 @@ func (iMulticall3 *IMulticall3) PackGetBlockHash(blockNumber *big.Int) []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackGetBlockHash is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xee82ac5e.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function getBlockHash(uint256 blockNumber) view returns(bytes32 blockHash)
+func (iMulticall3 *IMulticall3) TryPackGetBlockHash(blockNumber *big.Int) ([]byte, error) {
+	return iMulticall3.abi.Pack("getBlockHash", blockNumber)
 }
 
 // UnpackGetBlockHash is the Go binding that unpacks the parameters returned
@@ -219,11 +304,12 @@ func (iMulticall3 *IMulticall3) UnpackGetBlockHash(data []byte) ([32]byte, error
 		return *new([32]byte), err
 	}
 	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
-	return out0, err
+	return out0, nil
 }
 
 // PackGetBlockNumber is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x42cbb15c.
+// the contract method with ID 0x42cbb15c.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function getBlockNumber() view returns(uint256 blockNumber)
 func (iMulticall3 *IMulticall3) PackGetBlockNumber() []byte {
@@ -232,6 +318,15 @@ func (iMulticall3 *IMulticall3) PackGetBlockNumber() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackGetBlockNumber is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x42cbb15c.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function getBlockNumber() view returns(uint256 blockNumber)
+func (iMulticall3 *IMulticall3) TryPackGetBlockNumber() ([]byte, error) {
+	return iMulticall3.abi.Pack("getBlockNumber")
 }
 
 // UnpackGetBlockNumber is the Go binding that unpacks the parameters returned
@@ -244,11 +339,12 @@ func (iMulticall3 *IMulticall3) UnpackGetBlockNumber(data []byte) (*big.Int, err
 		return new(big.Int), err
 	}
 	out0 := abi.ConvertType(out[0], new(big.Int)).(*big.Int)
-	return out0, err
+	return out0, nil
 }
 
 // PackGetChainId is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x3408e470.
+// the contract method with ID 0x3408e470.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function getChainId() view returns(uint256 chainid)
 func (iMulticall3 *IMulticall3) PackGetChainId() []byte {
@@ -257,6 +353,15 @@ func (iMulticall3 *IMulticall3) PackGetChainId() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackGetChainId is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x3408e470.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function getChainId() view returns(uint256 chainid)
+func (iMulticall3 *IMulticall3) TryPackGetChainId() ([]byte, error) {
+	return iMulticall3.abi.Pack("getChainId")
 }
 
 // UnpackGetChainId is the Go binding that unpacks the parameters returned
@@ -269,11 +374,12 @@ func (iMulticall3 *IMulticall3) UnpackGetChainId(data []byte) (*big.Int, error) 
 		return new(big.Int), err
 	}
 	out0 := abi.ConvertType(out[0], new(big.Int)).(*big.Int)
-	return out0, err
+	return out0, nil
 }
 
 // PackGetCurrentBlockCoinbase is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xa8b0574e.
+// the contract method with ID 0xa8b0574e.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function getCurrentBlockCoinbase() view returns(address coinbase)
 func (iMulticall3 *IMulticall3) PackGetCurrentBlockCoinbase() []byte {
@@ -282,6 +388,15 @@ func (iMulticall3 *IMulticall3) PackGetCurrentBlockCoinbase() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackGetCurrentBlockCoinbase is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xa8b0574e.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function getCurrentBlockCoinbase() view returns(address coinbase)
+func (iMulticall3 *IMulticall3) TryPackGetCurrentBlockCoinbase() ([]byte, error) {
+	return iMulticall3.abi.Pack("getCurrentBlockCoinbase")
 }
 
 // UnpackGetCurrentBlockCoinbase is the Go binding that unpacks the parameters returned
@@ -294,11 +409,12 @@ func (iMulticall3 *IMulticall3) UnpackGetCurrentBlockCoinbase(data []byte) (comm
 		return *new(common.Address), err
 	}
 	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-	return out0, err
+	return out0, nil
 }
 
 // PackGetCurrentBlockDifficulty is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x72425d9d.
+// the contract method with ID 0x72425d9d.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function getCurrentBlockDifficulty() view returns(uint256 difficulty)
 func (iMulticall3 *IMulticall3) PackGetCurrentBlockDifficulty() []byte {
@@ -307,6 +423,15 @@ func (iMulticall3 *IMulticall3) PackGetCurrentBlockDifficulty() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackGetCurrentBlockDifficulty is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x72425d9d.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function getCurrentBlockDifficulty() view returns(uint256 difficulty)
+func (iMulticall3 *IMulticall3) TryPackGetCurrentBlockDifficulty() ([]byte, error) {
+	return iMulticall3.abi.Pack("getCurrentBlockDifficulty")
 }
 
 // UnpackGetCurrentBlockDifficulty is the Go binding that unpacks the parameters returned
@@ -319,11 +444,12 @@ func (iMulticall3 *IMulticall3) UnpackGetCurrentBlockDifficulty(data []byte) (*b
 		return new(big.Int), err
 	}
 	out0 := abi.ConvertType(out[0], new(big.Int)).(*big.Int)
-	return out0, err
+	return out0, nil
 }
 
 // PackGetCurrentBlockGasLimit is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x86d516e8.
+// the contract method with ID 0x86d516e8.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function getCurrentBlockGasLimit() view returns(uint256 gaslimit)
 func (iMulticall3 *IMulticall3) PackGetCurrentBlockGasLimit() []byte {
@@ -332,6 +458,15 @@ func (iMulticall3 *IMulticall3) PackGetCurrentBlockGasLimit() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackGetCurrentBlockGasLimit is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x86d516e8.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function getCurrentBlockGasLimit() view returns(uint256 gaslimit)
+func (iMulticall3 *IMulticall3) TryPackGetCurrentBlockGasLimit() ([]byte, error) {
+	return iMulticall3.abi.Pack("getCurrentBlockGasLimit")
 }
 
 // UnpackGetCurrentBlockGasLimit is the Go binding that unpacks the parameters returned
@@ -344,11 +479,12 @@ func (iMulticall3 *IMulticall3) UnpackGetCurrentBlockGasLimit(data []byte) (*big
 		return new(big.Int), err
 	}
 	out0 := abi.ConvertType(out[0], new(big.Int)).(*big.Int)
-	return out0, err
+	return out0, nil
 }
 
 // PackGetCurrentBlockTimestamp is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x0f28c97d.
+// the contract method with ID 0x0f28c97d.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function getCurrentBlockTimestamp() view returns(uint256 timestamp)
 func (iMulticall3 *IMulticall3) PackGetCurrentBlockTimestamp() []byte {
@@ -357,6 +493,15 @@ func (iMulticall3 *IMulticall3) PackGetCurrentBlockTimestamp() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackGetCurrentBlockTimestamp is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x0f28c97d.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function getCurrentBlockTimestamp() view returns(uint256 timestamp)
+func (iMulticall3 *IMulticall3) TryPackGetCurrentBlockTimestamp() ([]byte, error) {
+	return iMulticall3.abi.Pack("getCurrentBlockTimestamp")
 }
 
 // UnpackGetCurrentBlockTimestamp is the Go binding that unpacks the parameters returned
@@ -369,11 +514,12 @@ func (iMulticall3 *IMulticall3) UnpackGetCurrentBlockTimestamp(data []byte) (*bi
 		return new(big.Int), err
 	}
 	out0 := abi.ConvertType(out[0], new(big.Int)).(*big.Int)
-	return out0, err
+	return out0, nil
 }
 
 // PackGetEthBalance is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x4d2301cc.
+// the contract method with ID 0x4d2301cc.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function getEthBalance(address addr) view returns(uint256 balance)
 func (iMulticall3 *IMulticall3) PackGetEthBalance(addr common.Address) []byte {
@@ -382,6 +528,15 @@ func (iMulticall3 *IMulticall3) PackGetEthBalance(addr common.Address) []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackGetEthBalance is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x4d2301cc.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function getEthBalance(address addr) view returns(uint256 balance)
+func (iMulticall3 *IMulticall3) TryPackGetEthBalance(addr common.Address) ([]byte, error) {
+	return iMulticall3.abi.Pack("getEthBalance", addr)
 }
 
 // UnpackGetEthBalance is the Go binding that unpacks the parameters returned
@@ -394,11 +549,12 @@ func (iMulticall3 *IMulticall3) UnpackGetEthBalance(data []byte) (*big.Int, erro
 		return new(big.Int), err
 	}
 	out0 := abi.ConvertType(out[0], new(big.Int)).(*big.Int)
-	return out0, err
+	return out0, nil
 }
 
 // PackGetLastBlockHash is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x27e86d6e.
+// the contract method with ID 0x27e86d6e.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function getLastBlockHash() view returns(bytes32 blockHash)
 func (iMulticall3 *IMulticall3) PackGetLastBlockHash() []byte {
@@ -407,6 +563,15 @@ func (iMulticall3 *IMulticall3) PackGetLastBlockHash() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackGetLastBlockHash is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x27e86d6e.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function getLastBlockHash() view returns(bytes32 blockHash)
+func (iMulticall3 *IMulticall3) TryPackGetLastBlockHash() ([]byte, error) {
+	return iMulticall3.abi.Pack("getLastBlockHash")
 }
 
 // UnpackGetLastBlockHash is the Go binding that unpacks the parameters returned
@@ -419,11 +584,12 @@ func (iMulticall3 *IMulticall3) UnpackGetLastBlockHash(data []byte) ([32]byte, e
 		return *new([32]byte), err
 	}
 	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
-	return out0, err
+	return out0, nil
 }
 
 // PackTryAggregate is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xbce38bd7.
+// the contract method with ID 0xbce38bd7.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function tryAggregate(bool requireSuccess, (address,bytes)[] calls) payable returns((bool,bytes)[] returnData)
 func (iMulticall3 *IMulticall3) PackTryAggregate(requireSuccess bool, calls []IMulticall3Call) []byte {
@@ -432,6 +598,15 @@ func (iMulticall3 *IMulticall3) PackTryAggregate(requireSuccess bool, calls []IM
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackTryAggregate is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xbce38bd7.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function tryAggregate(bool requireSuccess, (address,bytes)[] calls) payable returns((bool,bytes)[] returnData)
+func (iMulticall3 *IMulticall3) TryPackTryAggregate(requireSuccess bool, calls []IMulticall3Call) ([]byte, error) {
+	return iMulticall3.abi.Pack("tryAggregate", requireSuccess, calls)
 }
 
 // UnpackTryAggregate is the Go binding that unpacks the parameters returned
@@ -444,11 +619,12 @@ func (iMulticall3 *IMulticall3) UnpackTryAggregate(data []byte) ([]IMulticall3Re
 		return *new([]IMulticall3Result), err
 	}
 	out0 := *abi.ConvertType(out[0], new([]IMulticall3Result)).(*[]IMulticall3Result)
-	return out0, err
+	return out0, nil
 }
 
 // PackTryBlockAndAggregate is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x399542e9.
+// the contract method with ID 0x399542e9.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function tryBlockAndAggregate(bool requireSuccess, (address,bytes)[] calls) payable returns(uint256 blockNumber, bytes32 blockHash, (bool,bytes)[] returnData)
 func (iMulticall3 *IMulticall3) PackTryBlockAndAggregate(requireSuccess bool, calls []IMulticall3Call) []byte {
@@ -457,6 +633,15 @@ func (iMulticall3 *IMulticall3) PackTryBlockAndAggregate(requireSuccess bool, ca
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackTryBlockAndAggregate is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x399542e9.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function tryBlockAndAggregate(bool requireSuccess, (address,bytes)[] calls) payable returns(uint256 blockNumber, bytes32 blockHash, (bool,bytes)[] returnData)
+func (iMulticall3 *IMulticall3) TryPackTryBlockAndAggregate(requireSuccess bool, calls []IMulticall3Call) ([]byte, error) {
+	return iMulticall3.abi.Pack("tryBlockAndAggregate", requireSuccess, calls)
 }
 
 // TryBlockAndAggregateOutput serves as a container for the return parameters of contract
@@ -480,6 +665,5 @@ func (iMulticall3 *IMulticall3) UnpackTryBlockAndAggregate(data []byte) (TryBloc
 	outstruct.BlockNumber = abi.ConvertType(out[0], new(big.Int)).(*big.Int)
 	outstruct.BlockHash = *abi.ConvertType(out[1], new([32]byte)).(*[32]byte)
 	outstruct.ReturnData = *abi.ConvertType(out[2], new([]IMulticall3Result)).(*[]IMulticall3Result)
-	return *outstruct, err
-
+	return *outstruct, nil
 }

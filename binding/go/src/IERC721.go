@@ -51,7 +51,8 @@ func (c *IERC721) Instance(backend bind.ContractBackend, addr common.Address) *b
 }
 
 // PackApprove is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x095ea7b3.
+// the contract method with ID 0x095ea7b3.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function approve(address to, uint256 tokenId) returns()
 func (iERC721 *IERC721) PackApprove(to common.Address, tokenId *big.Int) []byte {
@@ -62,8 +63,18 @@ func (iERC721 *IERC721) PackApprove(to common.Address, tokenId *big.Int) []byte 
 	return enc
 }
 
+// TryPackApprove is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x095ea7b3.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function approve(address to, uint256 tokenId) returns()
+func (iERC721 *IERC721) TryPackApprove(to common.Address, tokenId *big.Int) ([]byte, error) {
+	return iERC721.abi.Pack("approve", to, tokenId)
+}
+
 // PackBalanceOf is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x70a08231.
+// the contract method with ID 0x70a08231.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function balanceOf(address owner) view returns(uint256 balance)
 func (iERC721 *IERC721) PackBalanceOf(owner common.Address) []byte {
@@ -72,6 +83,15 @@ func (iERC721 *IERC721) PackBalanceOf(owner common.Address) []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackBalanceOf is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x70a08231.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function balanceOf(address owner) view returns(uint256 balance)
+func (iERC721 *IERC721) TryPackBalanceOf(owner common.Address) ([]byte, error) {
+	return iERC721.abi.Pack("balanceOf", owner)
 }
 
 // UnpackBalanceOf is the Go binding that unpacks the parameters returned
@@ -84,11 +104,12 @@ func (iERC721 *IERC721) UnpackBalanceOf(data []byte) (*big.Int, error) {
 		return new(big.Int), err
 	}
 	out0 := abi.ConvertType(out[0], new(big.Int)).(*big.Int)
-	return out0, err
+	return out0, nil
 }
 
 // PackGetApproved is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x081812fc.
+// the contract method with ID 0x081812fc.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function getApproved(uint256 tokenId) view returns(address operator)
 func (iERC721 *IERC721) PackGetApproved(tokenId *big.Int) []byte {
@@ -97,6 +118,15 @@ func (iERC721 *IERC721) PackGetApproved(tokenId *big.Int) []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackGetApproved is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x081812fc.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function getApproved(uint256 tokenId) view returns(address operator)
+func (iERC721 *IERC721) TryPackGetApproved(tokenId *big.Int) ([]byte, error) {
+	return iERC721.abi.Pack("getApproved", tokenId)
 }
 
 // UnpackGetApproved is the Go binding that unpacks the parameters returned
@@ -109,11 +139,12 @@ func (iERC721 *IERC721) UnpackGetApproved(data []byte) (common.Address, error) {
 		return *new(common.Address), err
 	}
 	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-	return out0, err
+	return out0, nil
 }
 
 // PackIsApprovedForAll is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xe985e9c5.
+// the contract method with ID 0xe985e9c5.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function isApprovedForAll(address owner, address operator) view returns(bool)
 func (iERC721 *IERC721) PackIsApprovedForAll(owner common.Address, operator common.Address) []byte {
@@ -122,6 +153,15 @@ func (iERC721 *IERC721) PackIsApprovedForAll(owner common.Address, operator comm
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackIsApprovedForAll is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xe985e9c5.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function isApprovedForAll(address owner, address operator) view returns(bool)
+func (iERC721 *IERC721) TryPackIsApprovedForAll(owner common.Address, operator common.Address) ([]byte, error) {
+	return iERC721.abi.Pack("isApprovedForAll", owner, operator)
 }
 
 // UnpackIsApprovedForAll is the Go binding that unpacks the parameters returned
@@ -134,11 +174,12 @@ func (iERC721 *IERC721) UnpackIsApprovedForAll(data []byte) (bool, error) {
 		return *new(bool), err
 	}
 	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-	return out0, err
+	return out0, nil
 }
 
 // PackOwnerOf is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x6352211e.
+// the contract method with ID 0x6352211e.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function ownerOf(uint256 tokenId) view returns(address owner)
 func (iERC721 *IERC721) PackOwnerOf(tokenId *big.Int) []byte {
@@ -147,6 +188,15 @@ func (iERC721 *IERC721) PackOwnerOf(tokenId *big.Int) []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackOwnerOf is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x6352211e.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function ownerOf(uint256 tokenId) view returns(address owner)
+func (iERC721 *IERC721) TryPackOwnerOf(tokenId *big.Int) ([]byte, error) {
+	return iERC721.abi.Pack("ownerOf", tokenId)
 }
 
 // UnpackOwnerOf is the Go binding that unpacks the parameters returned
@@ -159,11 +209,12 @@ func (iERC721 *IERC721) UnpackOwnerOf(data []byte) (common.Address, error) {
 		return *new(common.Address), err
 	}
 	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-	return out0, err
+	return out0, nil
 }
 
 // PackSafeTransferFrom is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x42842e0e.
+// the contract method with ID 0x42842e0e.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function safeTransferFrom(address from, address to, uint256 tokenId) returns()
 func (iERC721 *IERC721) PackSafeTransferFrom(from common.Address, to common.Address, tokenId *big.Int) []byte {
@@ -174,8 +225,18 @@ func (iERC721 *IERC721) PackSafeTransferFrom(from common.Address, to common.Addr
 	return enc
 }
 
+// TryPackSafeTransferFrom is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x42842e0e.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function safeTransferFrom(address from, address to, uint256 tokenId) returns()
+func (iERC721 *IERC721) TryPackSafeTransferFrom(from common.Address, to common.Address, tokenId *big.Int) ([]byte, error) {
+	return iERC721.abi.Pack("safeTransferFrom", from, to, tokenId)
+}
+
 // PackSafeTransferFrom0 is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xb88d4fde.
+// the contract method with ID 0xb88d4fde.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function safeTransferFrom(address from, address to, uint256 tokenId, bytes data) returns()
 func (iERC721 *IERC721) PackSafeTransferFrom0(from common.Address, to common.Address, tokenId *big.Int, data []byte) []byte {
@@ -186,8 +247,18 @@ func (iERC721 *IERC721) PackSafeTransferFrom0(from common.Address, to common.Add
 	return enc
 }
 
+// TryPackSafeTransferFrom0 is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xb88d4fde.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function safeTransferFrom(address from, address to, uint256 tokenId, bytes data) returns()
+func (iERC721 *IERC721) TryPackSafeTransferFrom0(from common.Address, to common.Address, tokenId *big.Int, data []byte) ([]byte, error) {
+	return iERC721.abi.Pack("safeTransferFrom0", from, to, tokenId, data)
+}
+
 // PackSetApprovalForAll is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xa22cb465.
+// the contract method with ID 0xa22cb465.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function setApprovalForAll(address operator, bool approved) returns()
 func (iERC721 *IERC721) PackSetApprovalForAll(operator common.Address, approved bool) []byte {
@@ -198,8 +269,18 @@ func (iERC721 *IERC721) PackSetApprovalForAll(operator common.Address, approved 
 	return enc
 }
 
+// TryPackSetApprovalForAll is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xa22cb465.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function setApprovalForAll(address operator, bool approved) returns()
+func (iERC721 *IERC721) TryPackSetApprovalForAll(operator common.Address, approved bool) ([]byte, error) {
+	return iERC721.abi.Pack("setApprovalForAll", operator, approved)
+}
+
 // PackSupportsInterface is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x01ffc9a7.
+// the contract method with ID 0x01ffc9a7.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function supportsInterface(bytes4 interfaceId) view returns(bool)
 func (iERC721 *IERC721) PackSupportsInterface(interfaceId [4]byte) []byte {
@@ -208,6 +289,15 @@ func (iERC721 *IERC721) PackSupportsInterface(interfaceId [4]byte) []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackSupportsInterface is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x01ffc9a7.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function supportsInterface(bytes4 interfaceId) view returns(bool)
+func (iERC721 *IERC721) TryPackSupportsInterface(interfaceId [4]byte) ([]byte, error) {
+	return iERC721.abi.Pack("supportsInterface", interfaceId)
 }
 
 // UnpackSupportsInterface is the Go binding that unpacks the parameters returned
@@ -220,11 +310,12 @@ func (iERC721 *IERC721) UnpackSupportsInterface(data []byte) (bool, error) {
 		return *new(bool), err
 	}
 	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-	return out0, err
+	return out0, nil
 }
 
 // PackTransferFrom is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x23b872dd.
+// the contract method with ID 0x23b872dd.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function transferFrom(address from, address to, uint256 tokenId) returns()
 func (iERC721 *IERC721) PackTransferFrom(from common.Address, to common.Address, tokenId *big.Int) []byte {
@@ -233,6 +324,15 @@ func (iERC721 *IERC721) PackTransferFrom(from common.Address, to common.Address,
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackTransferFrom is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x23b872dd.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function transferFrom(address from, address to, uint256 tokenId) returns()
+func (iERC721 *IERC721) TryPackTransferFrom(from common.Address, to common.Address, tokenId *big.Int) ([]byte, error) {
+	return iERC721.abi.Pack("transferFrom", from, to, tokenId)
 }
 
 // IERC721Approval represents a Approval event raised by the IERC721 contract.
@@ -256,7 +356,7 @@ func (IERC721Approval) ContractEventName() string {
 // Solidity: event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId)
 func (iERC721 *IERC721) UnpackApprovalEvent(log *types.Log) (*IERC721Approval, error) {
 	event := "Approval"
-	if log.Topics[0] != iERC721.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != iERC721.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(IERC721Approval)
@@ -299,7 +399,7 @@ func (IERC721ApprovalForAll) ContractEventName() string {
 // Solidity: event ApprovalForAll(address indexed owner, address indexed operator, bool approved)
 func (iERC721 *IERC721) UnpackApprovalForAllEvent(log *types.Log) (*IERC721ApprovalForAll, error) {
 	event := "ApprovalForAll"
-	if log.Topics[0] != iERC721.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != iERC721.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(IERC721ApprovalForAll)
@@ -342,7 +442,7 @@ func (IERC721Transfer) ContractEventName() string {
 // Solidity: event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)
 func (iERC721 *IERC721) UnpackTransferEvent(log *types.Log) (*IERC721Transfer, error) {
 	event := "Transfer"
-	if log.Topics[0] != iERC721.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != iERC721.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(IERC721Transfer)

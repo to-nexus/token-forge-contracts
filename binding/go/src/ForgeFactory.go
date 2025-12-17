@@ -24,11 +24,13 @@ var (
 	_ = abi.ConvertType
 )
 
+// IDiamondCutFacetCut is an auto generated low-level Go binding around an user-defined struct.
+
 // ForgeFactoryMetaData contains all meta data concerning the ForgeFactory contract.
 var ForgeFactoryMetaData = bind.MetaData{
 	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"DEFAULT_ADMIN_ROLE\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"UPGRADE_INTERFACE_VERSION\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"validator\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"facetAddress\",\"type\":\"address\"},{\"internalType\":\"enumIDiamondCut.FacetCutAction\",\"name\":\"action\",\"type\":\"uint8\"},{\"internalType\":\"bytes4[]\",\"name\":\"functionSelectors\",\"type\":\"bytes4[]\"}],\"internalType\":\"structIDiamondCut.FacetCut[]\",\"name\":\"addCuts\",\"type\":\"tuple[]\"}],\"name\":\"addService\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"forge\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enumTokenType\",\"name\":\"tokenType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"alertBurn\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enumTokenType\",\"name\":\"tokenType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"alertMint\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enumTokenType\",\"name\":\"tokenType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"alertTransfer\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"enumTokenType\",\"name\":\"tokenType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"alertTransferFrom\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"allForges\",\"outputs\":[{\"internalType\":\"bytes32[]\",\"name\":\"\",\"type\":\"bytes32[]\"},{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"forgeByIndex\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"forge\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"running\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"}],\"name\":\"forgeByService\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"forge\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"running\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"}],\"name\":\"getRoleAdmin\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"grantRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"hasRole\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_owner\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_forgeProxyCode\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_diamondImpl\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_baseImpl\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"forge\",\"type\":\"address\"}],\"name\":\"isRunningForge\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"internalType\":\"bool\",\"name\":\"running\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"lengthAllForges\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"internalType\":\"bool\",\"name\":\"paused\",\"type\":\"bool\"}],\"name\":\"pauseService\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"proxiableUUID\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"}],\"name\":\"removeService\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"callerConfirmation\",\"type\":\"address\"}],\"name\":\"renounceRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"revokeRole\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes4\",\"name\":\"interfaceId\",\"type\":\"bytes4\"}],\"name\":\"supportsInterface\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newImplementation\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"upgradeToAndCall\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenID\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"ERC1155Burned\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenID\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"ERC1155Minted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenID\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"ERC1155Transferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"ERC20Burned\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"feeRecipient\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"fee\",\"type\":\"uint256\"}],\"name\":\"ERC20FeeCollected\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"ERC20Minted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"ERC20Transferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"ERC20TransferredFrom\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"from\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenID\",\"type\":\"uint256\"}],\"name\":\"ERC721Burned\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenID\",\"type\":\"uint256\"}],\"name\":\"ERC721Minted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"uuid\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"to\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"token\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"tokenID\",\"type\":\"uint256\"}],\"name\":\"ERC721Transferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"version\",\"type\":\"uint64\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"previousAdminRole\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"newAdminRole\",\"type\":\"bytes32\"}],\"name\":\"RoleAdminChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleGranted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleRevoked\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"paused\",\"type\":\"bool\"}],\"name\":\"ServicePaused\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"forge\",\"type\":\"address\"}],\"name\":\"ServiceRegistered\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"}],\"name\":\"ServiceUnregistered\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"Upgraded\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"AccessControlBadConfirmation\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"bytes32\",\"name\":\"neededRole\",\"type\":\"bytes32\"}],\"name\":\"AccessControlUnauthorizedAccount\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"}],\"name\":\"AddressEmptyCode\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"Create2EmptyBytecode\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"ERC1967InvalidImplementation\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ERC1967NonPayable\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"FailedCall\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"FailedDeployment\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"balance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"needed\",\"type\":\"uint256\"}],\"name\":\"InsufficientBalance\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidInitialization\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotInitializing\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"}],\"name\":\"TokenForgeFactory__AlreadyUsedService\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"caller\",\"type\":\"address\"}],\"name\":\"TokenForgeFactory__CallerIsNotForge\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"caller\",\"type\":\"address\"}],\"name\":\"TokenForgeFactory__CallerIsPausedForge\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"field\",\"type\":\"bytes32\"}],\"name\":\"TokenForgeFactory__InvalidData\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"service\",\"type\":\"bytes32\"}],\"name\":\"TokenForgeFactory__ServiceNotFound\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"TokenForge__InvalidTokenType\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"UUPSUnauthorizedCallContext\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"slot\",\"type\":\"bytes32\"}],\"name\":\"UUPSUnsupportedProxiableUUID\",\"type\":\"error\"}]",
 	ID:  "ForgeFactory",
-	Bin: "0x60a060405230608052348015610013575f5ffd5b5061001c610021565b6100d3565b7ff0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a00805468010000000000000000900460ff16156100715760405163f92ee8a960e01b815260040160405180910390fd5b80546001600160401b03908116146100d05780546001600160401b0319166001600160401b0390811782556040519081527fc7f505b2f371ae2175ee4913f4499e1f2633a7b5936321eed1cdaeb6115181d29060200160405180910390a15b50565b608051613bdc6100f95f395f81816120640152818161208d01526122ad0152613bdc5ff3fe608060405260043610610178575f3560e01c806391d14854116100d1578063d547741f1161007c578063ec0b6a4d11610057578063ec0b6a4d14610503578063ecf5bcc11461054e578063f8c8765e1461056d575f5ffd5b8063d547741f146104a3578063e57997d2146104c2578063e98a5784146104e4575f5ffd5b8063ad3cb1cc116100ac578063ad3cb1cc146103fb578063c7525cba14610450578063d3884c3f14610484575f5ffd5b806391d14854146103275780639ca92df914610397578063a217fddf146103e8575f5ffd5b806336568abe116101315780634f1ef2861161010c5780634f1ef286146102bc57806352d1902d146102cf5780637f765bfe146102e3575f5ffd5b806336568abe1461025f5780633a15d0701461027e5780633ea113d01461029d575f5ffd5b8063248a9ca311610161578063248a9ca3146101d15780632f2ff15d1461022c5780632f44ec091461024b575f5ffd5b806301ffc9a71461017c5780630b7e40c6146101b0575b5f5ffd5b348015610187575f5ffd5b5061019b61019636600461304b565b61058c565b60405190151581526020015b60405180910390f35b3480156101bb575f5ffd5b506101cf6101ca366004613093565b610624565b005b3480156101dc575f5ffd5b5061021e6101eb36600461312c565b5f9081527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b626800602052604090206001015490565b6040519081526020016101a7565b348015610237575f5ffd5b506101cf610246366004613143565b6109ea565b348015610256575f5ffd5b5061021e610a33565b34801561026a575f5ffd5b506101cf610279366004613143565b610a62565b348015610289575f5ffd5b506101cf610298366004613093565b610ac0565b3480156102a8575f5ffd5b506101cf6102b7366004613093565b610b87565b6101cf6102ca3660046132ad565b610e69565b3480156102da575f5ffd5b5061021e610e88565b3480156102ee575f5ffd5b506103026102fd3660046132fa565b610eb6565b60405173ffffffffffffffffffffffffffffffffffffffff90911681526020016101a7565b348015610332575f5ffd5b5061019b610341366004613143565b5f9182527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b6268006020908152604080842073ffffffffffffffffffffffffffffffffffffffff93909316845291905290205460ff1690565b3480156103a2575f5ffd5b506103b66103b136600461312c565b61131c565b6040805193845273ffffffffffffffffffffffffffffffffffffffff90921660208401521515908201526060016101a7565b3480156103f3575f5ffd5b5061021e5f81565b348015610406575f5ffd5b506104436040518060400160405280600581526020017f352e302e3000000000000000000000000000000000000000000000000000000081525081565b6040516101a79190613385565b34801561045b575f5ffd5b5061046f61046a3660046133d8565b61138b565b604080519283529015156020830152016101a7565b34801561048f575f5ffd5b506101cf61049e36600461312c565b611413565b3480156104ae575f5ffd5b506101cf6104bd366004613143565b611562565b3480156104cd575f5ffd5b506104d66115a5565b6040516101a79291906133f3565b3480156104ef575f5ffd5b506101cf6104fe366004613093565b611700565b34801561050e575f5ffd5b5061052261051d36600461312c565b6119e2565b6040805173ffffffffffffffffffffffffffffffffffffffff90931683529015156020830152016101a7565b348015610559575f5ffd5b506101cf61056836600461349d565b611a57565b348015610578575f5ffd5b506101cf6105873660046134c7565b611bde565b5f7fffffffff0000000000000000000000000000000000000000000000000000000082167f7965db0b00000000000000000000000000000000000000000000000000000000148061061e57507f01ffc9a7000000000000000000000000000000000000000000000000000000007fffffffff000000000000000000000000000000000000000000000000000000008316145b92915050565b5f6106507f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e005b33611d5d565b90505f86600281111561066557610665613520565b0361076d575f80808061067a8688018861354d565b93509350935093508373ffffffffffffffffffffffffffffffffffffffff1689867f86d733c2654f9db1a830cfbbf2180ee3329101d853428a7ead4e85ddb3230d608b876040516106ed92919073ffffffffffffffffffffffffffffffffffffffff929092168252602082015260400190565b60405180910390a48015610764578773ffffffffffffffffffffffffffffffffffffffff168273ffffffffffffffffffffffffffffffffffffffff168a7fa2b448c8495be4baf0f3195bf0d82d5ec29d24aa3c5dd949969149bd797fb3158460405161075b91815260200190565b60405180910390a45b505050506109e2565b600186600281111561078157610781613520565b03610812575f8061079484860186613592565b915091508173ffffffffffffffffffffffffffffffffffffffff1687847fa36201ae386aaacb89bc573b7c0ecc0913a93028f710f28ca29840454f446886898560405161080392919073ffffffffffffffffffffffffffffffffffffffff929092168252602082015260400190565b60405180910390a450506109e2565b600286600281111561082657610826613520565b036109b0575f80610839848601866135bc565b915091508115610926575f5f5f8380602001905181019061085a919061365e565b815192955090935091505f5b8181101561091c578473ffffffffffffffffffffffffffffffffffffffff168c897fa34d0136fb3d65c2424efbe91bfe903716015137d5dd5e965f59e7f0820eb2c38e8886815181106108bb576108bb6136d5565b60200260200101518887815181106108d5576108d56136d5565b6020908102919091018101516040805173ffffffffffffffffffffffffffffffffffffffff90951685529184019290925282015260600160405180910390a4600101610866565b50505050506109a9565b5f5f5f8380602001905181019061093d9190613702565b6040805173ffffffffffffffffffffffffffffffffffffffff8e811682526020820185905291810183905293965091945092508416908b9088907fa34d0136fb3d65c2424efbe91bfe903716015137d5dd5e965f59e7f0820eb2c3906060015b60405180910390a45050505b50506109e2565b6040517f9570ddf500000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b505050505050565b5f8281527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b6268006020526040902060010154610a2381611e3b565b610a2d8383611e48565b50505050565b5f610a5d7f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e03611f66565b905090565b73ffffffffffffffffffffffffffffffffffffffff81163314610ab1576040517f6697b23200000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b610abb8282611f70565b505050565b5f610aea7f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0061064a565b90505f866002811115610aff57610aff613520565b036109b0575f808080610b148688018861354d565b93509350935093508373ffffffffffffffffffffffffffffffffffffffff1689867f14bed88907ac31fe1ba4cf8981f80fd25e29877a08d1568c7210adc31ee9bc958b876040516106ed92919073ffffffffffffffffffffffffffffffffffffffff929092168252602082015260400190565b5f610bb17f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0061064a565b90505f866002811115610bc657610bc6613520565b03610c4e575f808080610bdb8688018861354d565b93509350935093508373ffffffffffffffffffffffffffffffffffffffff1689867fe5e0650048e213b8a668474e72c774ec69d8a6830270b7cc1c339fcd6a3b2e418b876040516106ed92919073ffffffffffffffffffffffffffffffffffffffff929092168252602082015260400190565b6001866002811115610c6257610c62613520565b03610ce4575f80610c7584860186613592565b915091508173ffffffffffffffffffffffffffffffffffffffff1687847f28fcdc3e3355f548f5fe83373acf91a82e1e561ee22797f6e91f831d2b2b3e13898560405161080392919073ffffffffffffffffffffffffffffffffffffffff929092168252602082015260400190565b6002866002811115610cf857610cf8613520565b036109b0575f80610d0b848601866135bc565b915091508115610dee575f5f5f83806020019051810190610d2c919061365e565b815192955090935091505f5b8181101561091c578473ffffffffffffffffffffffffffffffffffffffff168c897f147c7aeaea1a7b56f7269db0eaea2435d8f957090d1bee114b6a6df6e556c42b8e888681518110610d8d57610d8d6136d5565b6020026020010151888781518110610da757610da76136d5565b6020908102919091018101516040805173ffffffffffffffffffffffffffffffffffffffff90951685529184019290925282015260600160405180910390a4600101610d38565b5f5f5f83806020019051810190610e059190613702565b6040805173ffffffffffffffffffffffffffffffffffffffff8e811682526020820185905291810183905293965091945092508416908b9088907f147c7aeaea1a7b56f7269db0eaea2435d8f957090d1bee114b6a6df6e556c42b9060600161099d565b610e7161204c565b610e7a82612152565b610e84828261215c565b5050565b5f610e91612295565b507f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc90565b5f7faf290d8680820aad922855f39b306097b20e28774d6c1ad35a20325630c3a02c610ee181611e3b565b73ffffffffffffffffffffffffffffffffffffffff8716610f55576040517f435db3480000000000000000000000000000000000000000000000000000000081527f6f776e657200000000000000000000000000000000000000000000000000000060048201526024015b60405180910390fd5b73ffffffffffffffffffffffffffffffffffffffff8616610fc4576040517f435db3480000000000000000000000000000000000000000000000000000000081527f76616c696461746f7200000000000000000000000000000000000000000000006004820152602401610f4c565b8461101d576040517f435db3480000000000000000000000000000000000000000000000000000000081527f73657276696365000000000000000000000000000000000000000000000000006004820152602401610f4c565b7f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e006110687f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0387612304565b156110a2576040517f5502583a00000000000000000000000000000000000000000000000000000000815260048101879052602401610f4c565b6112095f87835f015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff166324c12bf66040518163ffffffff1660e01b81526004015f60405180830381865afa158015611111573d5f5f3e3d5ffd5b505050506040513d5f823e601f3d9081017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe01682016040526111569190810190613736565b8b8b8a8a8d896001015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff168a6002015f9054906101000a900473ffffffffffffffffffffffffffffffffffffffff166040516020016111b9979695949392919061380c565b604080517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0818403018152908290526111f59291602001613a15565b60405160208183030381529060405261230f565b925073ffffffffffffffffffffffffffffffffffffffff831661127a576040517f435db3480000000000000000000000000000000000000000000000000000000081527f666f726765206465706c6f7900000000000000000000000000000000000000006004820152602401610f4c565b6112886003820187856123fb565b5073ffffffffffffffffffffffffffffffffffffffff83165f81815260068301602090815260408083208a90558983526007850190915280822080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff001660011790555188917f0453e3ffce9b0d4f994d54652037d3e15d87ec29aab0aafba90ac322edc87c2591a3505095945050505050565b5f80807f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0061136a7f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0386612425565b5f8281526007909301602052604090922054909691955060ff169350915050565b73ffffffffffffffffffffffffffffffffffffffff81165f9081527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e066020526040812054907f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e00821561140d575f83815260078201602052604090205460ff1691505b50915091565b7faf290d8680820aad922855f39b306097b20e28774d6c1ad35a20325630c3a02c61143d81611e3b565b7f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e005f8061148a7f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0386612442565b91509150816114c8576040517f2a188b7f00000000000000000000000000000000000000000000000000000000815260048101869052602401610f4c565b6114d56003840186612450565b5073ffffffffffffffffffffffffffffffffffffffff81165f90815260068401602090815260408083208390558783526007860190915280822080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff001690555186917f475a09e552c07ad6aa3d8b6f3fb547091aae08290004e78277eb2ffb854ea21e91a25050505050565b5f8281527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b626800602052604090206001015461159b81611e3b565b610a2d8383611f70565b6060807f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e005f6115f37f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e03611f66565b90505f8167ffffffffffffffff81111561160f5761160f613171565b604051908082528060200260200182016040528015611638578160200160208202803683370190505b5090505f8267ffffffffffffffff81111561165557611655613171565b60405190808252806020026020018201604052801561167e578160200160208202803683370190505b5090505f5b838110156116f4576116986003860182612425565b8483815181106116aa576116aa6136d5565b602002602001018484815181106116c3576116c36136d5565b73ffffffffffffffffffffffffffffffffffffffff9093166020938402919091019092019190915252600101611683565b50909590945092505050565b5f61172a7f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0061064a565b90505f86600281111561173f5761173f613520565b036117c7575f8080806117548688018861354d565b93509350935093508373ffffffffffffffffffffffffffffffffffffffff1689867f9612604afba70e4cf03261d7d86ca03d08911d9887aa41621dea929e34cfd7b18b876040516106ed92919073ffffffffffffffffffffffffffffffffffffffff929092168252602082015260400190565b60018660028111156117db576117db613520565b0361185d575f806117ee84860186613592565b915091508173ffffffffffffffffffffffffffffffffffffffff1687847f556d832108ef7e0123726b3e037bc1cd39023e8d397b242d8b36426550d8c123898560405161080392919073ffffffffffffffffffffffffffffffffffffffff929092168252602082015260400190565b600286600281111561187157611871613520565b036109b0575f80611884848601866135bc565b915091508115611967575f5f5f838060200190518101906118a5919061365e565b815192955090935091505f5b8181101561091c578473ffffffffffffffffffffffffffffffffffffffff168c897f3e4e312643f14a5cca74681c381ee1ed5862b2037f509b5c3d745522e8dc2f618e888681518110611906576119066136d5565b6020026020010151888781518110611920576119206136d5565b6020908102919091018101516040805173ffffffffffffffffffffffffffffffffffffffff90951685529184019290925282015260600160405180910390a46001016118b1565b5f5f5f8380602001905181019061197e9190613702565b6040805173ffffffffffffffffffffffffffffffffffffffff8e811682526020820185905291810183905293965091945092508416908b9088907f3e4e312643f14a5cca74681c381ee1ed5862b2037f509b5c3d745522e8dc2f619060600161099d565b5f807f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0081611a307f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0386612442565b945090508015611a50575f85815260078301602052604090205460ff1692505b5050915091565b7faf290d8680820aad922855f39b306097b20e28774d6c1ad35a20325630c3a02c611a8181611e3b565b7f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e00611acc7f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0385612304565b611b05576040517f2a188b7f00000000000000000000000000000000000000000000000000000000815260048101859052602401610f4c565b5f84815260078201602052604090205483151560ff909116151503610a2d578215611b64575f848152600782016020526040902080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00169055611b9d565b5f848152600782016020526040902080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff001660011790555b837eb31832845d6567ecb46caeeee58acfcfddfcbba821c68dcbae9055ea4d795584604051611bd0911515815260200190565b60405180910390a250505050565b5f611be761245b565b805490915060ff68010000000000000000820416159067ffffffffffffffff165f81158015611c135750825b90505f8267ffffffffffffffff166001148015611c2f5750303b155b905081158015611c3d575080155b15611c74576040517ff92ee8a900000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b84547fffffffffffffffffffffffffffffffffffffffffffffffff00000000000000001660011785558315611cd55784547fffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffff16680100000000000000001785555b611cdd612483565b611ce5612483565b611cf18989898961248b565b8315611d525784547fffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffff168555604051600181527fc7f505b2f371ae2175ee4913f4499e1f2633a7b5936321eed1cdaeb6115181d29060200160405180910390a15b505050505050505050565b73ffffffffffffffffffffffffffffffffffffffff81165f90815260068301602052604081205480611dd3576040517f4b73e4e600000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff84166004820152602401610f4c565b5f81815260078501602052604090205460ff16611e34576040517fae111e9200000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff84166004820152602401610f4c565b9392505050565b611e458133612a29565b50565b5f8281527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b6268006020818152604080842073ffffffffffffffffffffffffffffffffffffffff8616855290915282205460ff16611f5d575f8481526020828152604080832073ffffffffffffffffffffffffffffffffffffffff87168452909152902080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00166001179055611ef93390565b73ffffffffffffffffffffffffffffffffffffffff168373ffffffffffffffffffffffffffffffffffffffff16857f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d60405160405180910390a4600191505061061e565b5f91505061061e565b5f61061e82612acf565b5f8281527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b6268006020818152604080842073ffffffffffffffffffffffffffffffffffffffff8616855290915282205460ff1615611f5d575f8481526020828152604080832073ffffffffffffffffffffffffffffffffffffffff8716808552925280832080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0016905551339287917ff6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b9190a4600191505061061e565b3073ffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000000000000000000000000000000000000000000016148061211957507f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff166121007f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc5473ffffffffffffffffffffffffffffffffffffffff1690565b73ffffffffffffffffffffffffffffffffffffffff1614155b15612150576040517fe07c8dba00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b565b5f610e8481611e3b565b8173ffffffffffffffffffffffffffffffffffffffff166352d1902d6040518163ffffffff1660e01b8152600401602060405180830381865afa9250505080156121e1575060408051601f3d9081017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe01682019092526121de91810190613a29565b60015b61222f576040517f4c9c8ce300000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff83166004820152602401610f4c565b7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc811461228b576040517faa1d49a400000000000000000000000000000000000000000000000000000000815260048101829052602401610f4c565b610abb8383612ad9565b3073ffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000001614612150576040517fe07c8dba00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5f611e348383612b3b565b5f83471015612353576040517fcf47918100000000000000000000000000000000000000000000000000000000815247600482015260248101859052604401610f4c565b81515f0361238d576040517f4ca249dc00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b8282516020840186f590503d1519811516156123ae576040513d5f823e3d81fd5b73ffffffffffffffffffffffffffffffffffffffff8116611e34576040517fb06ebf3d00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5f61241d848473ffffffffffffffffffffffffffffffffffffffff8516612b46565b949350505050565b5f8080806124338686612b62565b909450925050505b9250929050565b5f8080806124338686612b8b565b5f611e348383612bc3565b5f807ff0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a0061061e565b612150612bdf565b612493612bdf565b73ffffffffffffffffffffffffffffffffffffffff8416612502576040517f435db3480000000000000000000000000000000000000000000000000000000081527f6f776e65720000000000000000000000000000000000000000000000000000006004820152602401610f4c565b73ffffffffffffffffffffffffffffffffffffffff8316612571576040517f435db3480000000000000000000000000000000000000000000000000000000081527f666f72676550726f7879436f64650000000000000000000000000000000000006004820152602401610f4c565b73ffffffffffffffffffffffffffffffffffffffff82166125e0576040517f435db3480000000000000000000000000000000000000000000000000000000081527f6469616d6f6e64496d706c0000000000000000000000000000000000000000006004820152602401610f4c565b73ffffffffffffffffffffffffffffffffffffffff811661264f576040517f435db3480000000000000000000000000000000000000000000000000000000081527f62617365496d706c0000000000000000000000000000000000000000000000006004820152602401610f4c565b8273ffffffffffffffffffffffffffffffffffffffff166324c12bf66040518163ffffffff1660e01b81526004015f60405180830381865afa158015612697573d5f5f3e3d5ffd5b505050506040513d5f823e601f3d9081017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe01682016040526126dc9190810190613736565b515f03612737576040517f435db3480000000000000000000000000000000000000000000000000000000081527f666f72676550726f7879436f646520636f6465000000000000000000000000006004820152602401610f4c565b8173ffffffffffffffffffffffffffffffffffffffff16631bd8f7f16040518163ffffffff1660e01b81526004015f60405180830381865afa15801561277f573d5f5f3e3d5ffd5b505050506040513d5f823e601f3d9081017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe01682016040526127c49190810190613a40565b5173ffffffffffffffffffffffffffffffffffffffff838116911614612838576040517f435db3480000000000000000000000000000000000000000000000000000000081527f6469616d6f6e64496d706c2066616365740000000000000000000000000000006004820152602401610f4c565b8073ffffffffffffffffffffffffffffffffffffffff16631bd8f7f16040518163ffffffff1660e01b81526004015f60405180830381865afa158015612880573d5f5f3e3d5ffd5b505050506040513d5f823e601f3d9081017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe01682016040526128c59190810190613a40565b5173ffffffffffffffffffffffffffffffffffffffff828116911614612939576040517f435db3480000000000000000000000000000000000000000000000000000000081527f62617365496d706c2066616365740000000000000000000000000000000000006004820152602401610f4c565b7f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e00805473ffffffffffffffffffffffffffffffffffffffff8581167fffffffffffffffffffffffff00000000000000000000000000000000000000009283161783557f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0180548683169084161790557f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e028054918516919092161790556129fe5f86611e48565b506109e27faf290d8680820aad922855f39b306097b20e28774d6c1ad35a20325630c3a02c86611e48565b5f8281527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b6268006020908152604080832073ffffffffffffffffffffffffffffffffffffffff8516845290915290205460ff16610e84576040517fe2517d3f00000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff8216600482015260248101839052604401610f4c565b5f61061e82612c1d565b612ae282612c26565b60405173ffffffffffffffffffffffffffffffffffffffff8316907fbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b905f90a2805115612b3357610abb8282612cf4565b610e84612d73565b5f611e348383612dab565b5f828152600284016020526040812082905561241d8484612dc2565b5f8080612b6f8585612dcd565b5f81815260029690960160205260409095205494959350505050565b5f818152600283016020526040812054819080612bb857612bac8585612b3b565b92505f915061243b9050565b60019250905061243b565b5f8181526002830160205260408120819055611e348383612dd8565b612be7612de3565b612150576040517fd7e6bcf800000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5f61061e825490565b8073ffffffffffffffffffffffffffffffffffffffff163b5f03612c8e576040517f4c9c8ce300000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff82166004820152602401610f4c565b7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc80547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff92909216919091179055565b60605f5f8473ffffffffffffffffffffffffffffffffffffffff1684604051612d1d9190613b36565b5f60405180830381855af49150503d805f8114612d55576040519150601f19603f3d011682016040523d82523d5f602084013e612d5a565b606091505b5091509150612d6a858383612e01565b95945050505050565b3415612150576040517fb398979f00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5f8181526001830160205260408120541515611e34565b5f611e348383612e90565b5f611e348383612edc565b5f611e348383612f02565b5f612dec61245b565b5468010000000000000000900460ff16919050565b606082612e1657612e1182612fdc565b611e34565b8151158015612e3a575073ffffffffffffffffffffffffffffffffffffffff84163b155b15612e89576040517f9996b31500000000000000000000000000000000000000000000000000000000815273ffffffffffffffffffffffffffffffffffffffff85166004820152602401610f4c565b5080611e34565b5f818152600183016020526040812054612ed557508154600181810184555f84815260208082209093018490558454848252828601909352604090209190915561061e565b505f61061e565b5f825f018281548110612ef157612ef16136d5565b905f5260205f200154905092915050565b5f8181526001830160205260408120548015611f5d575f612f24600183613b41565b85549091505f90612f3790600190613b41565b9050808214612f96575f865f018281548110612f5557612f556136d5565b905f5260205f200154905080875f018481548110612f7557612f756136d5565b5f918252602080832090910192909255918252600188019052604090208390555b8554869080612fa757612fa7613b79565b600190038181905f5260205f20015f90559055856001015f8681526020019081526020015f205f90556001935050505061061e565b805115612fec5780518082602001fd5b6040517fd6bda27500000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b7fffffffff0000000000000000000000000000000000000000000000000000000081168114611e45575f5ffd5b5f6020828403121561305b575f5ffd5b8135611e348161301e565b60038110611e45575f5ffd5b73ffffffffffffffffffffffffffffffffffffffff81168114611e45575f5ffd5b5f5f5f5f5f608086880312156130a7575f5ffd5b85356130b281613066565b94506020860135935060408601356130c981613072565b9250606086013567ffffffffffffffff8111156130e4575f5ffd5b8601601f810188136130f4575f5ffd5b803567ffffffffffffffff81111561310a575f5ffd5b88602082840101111561311b575f5ffd5b959894975092955050506020019190565b5f6020828403121561313c575f5ffd5b5035919050565b5f5f60408385031215613154575f5ffd5b82359150602083013561316681613072565b809150509250929050565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52604160045260245ffd5b6040516060810167ffffffffffffffff811182821017156131c1576131c1613171565b60405290565b604051601f82017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe016810167ffffffffffffffff8111828210171561320e5761320e613171565b604052919050565b5f67ffffffffffffffff82111561322f5761322f613171565b50601f017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe01660200190565b5f82601f83011261326a575f5ffd5b813561327d61327882613216565b6131c7565b818152846020838601011115613291575f5ffd5b816020850160208301375f918101602001919091529392505050565b5f5f604083850312156132be575f5ffd5b82356132c981613072565b9150602083013567ffffffffffffffff8111156132e4575f5ffd5b6132f08582860161325b565b9150509250929050565b5f5f5f5f5f6080868803121561330e575f5ffd5b853561331981613072565b9450602086013561332981613072565b935060408601359250606086013567ffffffffffffffff81111561334b575f5ffd5b8601601f8101881361335b575f5ffd5b803567ffffffffffffffff811115613371575f5ffd5b8860208260051b840101111561311b575f5ffd5b602081525f82518060208401528060208501604085015e5f6040828501015260407fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0601f83011684010191505092915050565b5f602082840312156133e8575f5ffd5b8135611e3481613072565b604080825283519082018190525f9060208501906060840190835b8181101561342c57835183526020938401939092019160010161340e565b5050838103602080860191909152855180835291810192508501905f5b8181101561347d57825173ffffffffffffffffffffffffffffffffffffffff16845260209384019390920191600101613449565b50919695505050505050565b80358015158114613498575f5ffd5b919050565b5f5f604083850312156134ae575f5ffd5b823591506134be60208401613489565b90509250929050565b5f5f5f5f608085870312156134da575f5ffd5b84356134e581613072565b935060208501356134f581613072565b9250604085013561350581613072565b9150606085013561351581613072565b939692955090935050565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52602160045260245ffd5b5f5f5f5f60808587031215613560575f5ffd5b843561356b81613072565b935060208501359250604085013561358281613072565b9396929550929360600135925050565b5f5f604083850312156135a3575f5ffd5b82356135ae81613072565b946020939093013593505050565b5f5f604083850312156135cd575f5ffd5b6132c983613489565b5f67ffffffffffffffff8211156135ef576135ef613171565b5060051b60200190565b5f82601f830112613608575f5ffd5b8151613616613278826135d6565b8082825260208201915060208360051b860101925085831115613637575f5ffd5b602085015b8381101561365457805183526020928301920161363c565b5095945050505050565b5f5f5f60608486031215613670575f5ffd5b835161367b81613072565b602085015190935067ffffffffffffffff811115613697575f5ffd5b6136a3868287016135f9565b925050604084015167ffffffffffffffff8111156136bf575f5ffd5b6136cb868287016135f9565b9150509250925092565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52603260045260245ffd5b5f5f5f60608486031215613714575f5ffd5b835161371f81613072565b602085015160409095015190969495509392505050565b5f60208284031215613746575f5ffd5b815167ffffffffffffffff81111561375c575f5ffd5b8201601f8101841361376c575f5ffd5b805161377a61327882613216565b81815285602083850101111561378e575f5ffd5b8160208401602083015e5f91810160200191909152949350505050565b8183526020830192505f815f5b848110156138025781356137cb8161301e565b7fffffffff0000000000000000000000000000000000000000000000000000000016865260209586019591909101906001016137b8565b5093949350505050565b5f60c0820173ffffffffffffffffffffffffffffffffffffffff8a16835273ffffffffffffffffffffffffffffffffffffffff8916602084015260c060408401528087825260e08401905060e08860051b8501019150885f7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa18b3603015b8a8210156139c4577fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff2087860301845282358181126138c6575f5ffd5b8c0180356138d381613072565b73ffffffffffffffffffffffffffffffffffffffff16865260208101356138f981613066565b6003811061392e577f4e487b71000000000000000000000000000000000000000000000000000000005f52602160045260245ffd5b60208701526040810135368290037fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe1018112613968575f5ffd5b0160208101903567ffffffffffffffff811115613983575f5ffd5b8060051b3603821315613994575f5ffd5b606060408801526139a96060880182846137ab565b9650505060208301925060208401935060018201915061388a565b5050505060608301959095525073ffffffffffffffffffffffffffffffffffffffff9283166080820152911660a090910152949350505050565b5f81518060208401855e5f93019283525090919050565b5f61241d613a2383866139fe565b846139fe565b5f60208284031215613a39575f5ffd5b5051919050565b5f60208284031215613a50575f5ffd5b815167ffffffffffffffff811115613a66575f5ffd5b820160608185031215613a77575f5ffd5b613a7f61319e565b8151613a8a81613072565b81526020820151613a9a81613066565b6020820152604082015167ffffffffffffffff811115613ab8575f5ffd5b80830192505084601f830112613acc575f5ffd5b8151613ada613278826135d6565b8082825260208201915060208360051b860101925087831115613afb575f5ffd5b6020850194505b82851015613b26578451613b158161301e565b825260209485019490910190613b02565b6040840152509095945050505050565b5f611e3482846139fe565b8181038181111561061e577f4e487b71000000000000000000000000000000000000000000000000000000005f52601160045260245ffd5b7f4e487b71000000000000000000000000000000000000000000000000000000005f52603160045260245ffdfea2646970667358221220b10c889d379d5bf93a0563ec1ac0bfe1e784b2a32288be61dae2a1c612dc0f5464736f6c634300081c0033",
+	Bin: "0x60a080604052346100c257306080525f5160206138b95f395f51905f525460ff8160401c166100b3576002600160401b03196001600160401b03821601610060575b6040516137f290816100c78239608051818181611b9e0152611c7f0152f35b6001600160401b0319166001600160401b039081175f5160206138b95f395f51905f525581527fc7f505b2f371ae2175ee4913f4499e1f2633a7b5936321eed1cdaeb6115181d290602090a15f80610041565b63f92ee8a960e01b5f5260045ffd5b5f80fdfe6080806040526004361015610012575f80fd5b5f3560e01c90816301ffc9a7146125d7575080630b7e40c614612415578063248a9ca3146123a55780632f2ff15d1461232a5780632f44ec09146122d057806336568abe146122485780633a15d0701461215c5780633ea113d014611f9a5780634f1ef28614611c1657806352d1902d14611b595780637f765bfe146114b457806391d14854146114205780639ca92df91461138a578063a217fddf14611352578063ad3cb1cc146112a0578063c7525cba146111db578063d3884c3f14611059578063d547741f14610fd9578063e57997d214610e0a578063e98a578414610af1578063ec0b6a4d14610a52578063ecf5bcc1146108915763f8c8765e14610119575f80fd5b3461088d5760807ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d576101506126b6565b610158612693565b906044359073ffffffffffffffffffffffffffffffffffffffff821680920361088d5760643573ffffffffffffffffffffffffffffffffffffffff811680910361088d577ff0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a005460ff8160401c16159467ffffffffffffffff821680159081610885575b600114908161087b575b159081610872575b5061084a57818660017fffffffffffffffffffffffffffffffffffffffffffffffff000000000000000073ffffffffffffffffffffffffffffffffffffffff9516177ff0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a00556107f5575b5061025f6132dc565b6102676132dc565b16926102716132dc565b73ffffffffffffffffffffffffffffffffffffffff8316156107a957831561075d5780156107115781156106c5576040517f24c12bf60000000000000000000000000000000000000000000000000000000081525f81600481885afa9081156105e6575f916106a3575b505115610657576040517f1bd8f7f10000000000000000000000000000000000000000000000000000000081525f81600481855afa80156105e65773ffffffffffffffffffffffffffffffffffffffff915f9161063d575b50511681036105f1576040517f1bd8f7f10000000000000000000000000000000000000000000000000000000081525f81600481865afa80156105e65773ffffffffffffffffffffffffffffffffffffffff915f916105c4575b5051168203610578576104de937fffffffffffffffffffffffff00000000000000000000000000000000000000007f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e005416177f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e00557fffffffffffffffffffffffff00000000000000000000000000000000000000007f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e015416177f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e01557fffffffffffffffffffffffff00000000000000000000000000000000000000007f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e025416177f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e02556104d881612cd5565b50612dbc565b506104e557005b7fffffffffffffffffffffffffffffffffffffffffffffff00ffffffffffffffff7ff0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a0054167ff0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a00557fc7f505b2f371ae2175ee4913f4499e1f2633a7b5936321eed1cdaeb6115181d2602060405160018152a1005b7f435db348000000000000000000000000000000000000000000000000000000005f527f62617365496d706c20666163657400000000000000000000000000000000000060045260245ffd5b6105e091503d805f833e6105d8818361279a565b810190613151565b5f61038d565b6040513d5f823e3d90fd5b7f435db348000000000000000000000000000000000000000000000000000000005f527f6469616d6f6e64496d706c20666163657400000000000000000000000000000060045260245ffd5b61065191503d805f833e6105d8818361279a565b5f610333565b7f435db348000000000000000000000000000000000000000000000000000000005f527f666f72676550726f7879436f646520636f64650000000000000000000000000060045260245ffd5b6106bf91503d805f833e6106b7818361279a565b810190612a8d565b5f6102db565b7f435db348000000000000000000000000000000000000000000000000000000005f527f62617365496d706c00000000000000000000000000000000000000000000000060045260245ffd5b7f435db348000000000000000000000000000000000000000000000000000000005f527f6469616d6f6e64496d706c00000000000000000000000000000000000000000060045260245ffd5b7f435db348000000000000000000000000000000000000000000000000000000005f527f666f72676550726f7879436f646500000000000000000000000000000000000060045260245ffd5b7f435db348000000000000000000000000000000000000000000000000000000005f527f6f776e657200000000000000000000000000000000000000000000000000000060045260245ffd5b7fffffffffffffffffffffffffffffffffffffffffffffff0000000000000000001668010000000000000001177ff0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a00555f610256565b7ff92ee8a9000000000000000000000000000000000000000000000000000000005f5260045ffd5b9050155f6101ed565b303b1591506101e5565b8791506101db565b5f80fd5b3461088d5760407ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d576004356024358015159081810361088d576108d9612bc7565b61090d835f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0460205260405f2054151590565b15610a2657825f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e076020528160ff60405f20541615151461094b57005b7eb31832845d6567ecb46caeeee58acfcfddfcbba821c68dcbae9055ea4d795591602091156109ce57835f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e07825260405f207fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0081541690555b604051908152a2005b835f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e07825260405f2060017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff008254161790556109c5565b827f2a188b7f000000000000000000000000000000000000000000000000000000005f5260045260245ffd5b3461088d5760207ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d5760406004355f610a908261326d565b9290610abc575b5073ffffffffffffffffffffffffffffffffffffffff83519216825215156020820152f35b90505f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0760205260ff825f20541683610a97565b3461088d57610aff366126fa565b93929190610b0c33612af0565b93610b1681612888565b80610beb575082610b60827f9612604afba70e4cf03261d7d86ca03d08911d9887aa41621dea929e34cfd7b19773ffffffffffffffffffffffffffffffffffffffff940190612a63565b6040805173ffffffffffffffffffffffffffffffffffffffff89168152602081019490945291999098939095169491a482610b9d575b505050505b005b602073ffffffffffffffffffffffffffffffffffffffff807fa2b448c8495be4baf0f3195bf0d82d5ec29d24aa3c5dd949969149bd797fb3159360405196875216951693a480808080610b96565b919492939291610bfa81612888565b60018103610c805750610c7b610c49827f556d832108ef7e0123726b3e037bc1cd39023e8d397b242d8b36426550d8c1239473ffffffffffffffffffffffffffffffffffffffff940190612a46565b6040805173ffffffffffffffffffffffffffffffffffffffff9099168952602089019190915292169591829190820190565b0390a4005b600290610c8c81612888565b03610de257610c9d918101906128bf565b9015610d5d5791610ccd8360208073ffffffffffffffffffffffffffffffffffffffff95965183010191016129b1565b81519592909416935f5b868110610ce057005b808686867f3e4e312643f14a5cca74681c381ee1ed5862b2037f509b5c3d745522e8dc2f61610d1160019689612a05565b518d610d54610d20888b612a05565b516040519384938460409194939273ffffffffffffffffffffffffffffffffffffffff606083019616825260208201520152565b0390a401610cd7565b73ffffffffffffffffffffffffffffffffffffffff610c7b610da9836020807f3e4e312643f14a5cca74681c381ee1ed5862b2037f509b5c3d745522e8dc2f619651830101910161291a565b9060409392935194859416988460409194939273ffffffffffffffffffffffffffffffffffffffff606083019616825260208201520152565b7f9570ddf5000000000000000000000000000000000000000000000000000000005f5260045ffd5b3461088d575f7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d577f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0354610e638161293c565b610e70604051918261279a565b818152610e7c8261293c565b917fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0602083019301368437610eb08161293c565b92610ebe604051948561279a565b818452610eca8261293c565b917fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe06020860193013684375f5b818110610f8f575050604051938493604085019060408652518091526060850192905f5b818110610f76575050506020908483038286015251918281520191905f5b818110610f47575050500390f35b825173ffffffffffffffffffffffffffffffffffffffff16845285945060209384019390920191600101610f39565b8251855287965060209485019490920191600101610f1b565b80610fa060019297949596976130da565b73ffffffffffffffffffffffffffffffffffffffff610fbf8488612a05565b91169052610fcd8289612a05565b52019493929194610ef7565b3461088d5760407ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d57610b9b600435611016612693565b9061105461104f825f527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b626800602052600160405f20015490565b612c4f565b612fd2565b3461088d5760207ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d57600435611093612bc7565b61109c8161326d565b90156111af5761113773ffffffffffffffffffffffffffffffffffffffff5f928484527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e056020528360408120556110f285613525565b501673ffffffffffffffffffffffffffffffffffffffff165f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0660205260405f2090565b55805f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0760205260405f207fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0081541690557f475a09e552c07ad6aa3d8b6f3fb547091aae08290004e78277eb2ffb854ea21e5f80a2005b507f2a188b7f000000000000000000000000000000000000000000000000000000005f5260045260245ffd5b3461088d5760207ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d5760406112146126b6565b73ffffffffffffffffffffffffffffffffffffffff165f9081527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e066020526040812054908161126c575b825191825215156020820152f35b50805f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0760205260ff825f20541661125e565b3461088d575f7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d5760408051906112dd818361279a565b6005825260208201917f352e302e3000000000000000000000000000000000000000000000000000000083527fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0601f8351948593602085525180918160208701528686015e5f85828601015201168101030190f35b3461088d575f7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d5760206040515f8152f35b3461088d5760207ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d5760606113c66004356130da565b815f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0760205273ffffffffffffffffffffffffffffffffffffffff60ff60405f2054169160405193845216602083015215156040820152f35b3461088d5760407ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d57611457612693565b6004355f527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b62680060205273ffffffffffffffffffffffffffffffffffffffff60405f2091165f52602052602060ff60405f2054166040519015158152f35b3461088d5760807ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d576114eb6126b6565b6114f3612693565b604435916064359167ffffffffffffffff831161088d573660238401121561088d5782600401359267ffffffffffffffff841161088d578360051b92366024858401011161088d5773ffffffffffffffffffffffffffffffffffffffff90611559612bc7565b169182156107a95773ffffffffffffffffffffffffffffffffffffffff16938415611b0d578515611ac1576115b8865f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0460205260405f2054151590565b611a95576004935f73ffffffffffffffffffffffffffffffffffffffff7f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e005416604051968780927f24c12bf60000000000000000000000000000000000000000000000000000000082525afa9485156105e6575f95611a79575b5073ffffffffffffffffffffffffffffffffffffffff7f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0193929354169073ffffffffffffffffffffffffffffffffffffffff7f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e025416928460405196602088019960e08901918b52604089015260c0606089015252610100808701928701019460248201925f927fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff7d813603015b83851061192a578c8c8c6117a48d61174f818f8f8f89608085015260a084015260c0830152037fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0810183528261279a565b60206040519485928280850196805191829101885e840190838201905f8252519283915e01015f8152037fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0810184528361279a565b81511561190257829151905ff5903d15198215166105e65773ffffffffffffffffffffffffffffffffffffffff821680156118da5781611859602094825f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0586528360405f2055611815836133e1565b5073ffffffffffffffffffffffffffffffffffffffff165f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0660205260405f2090565b55815f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e07835260405f2060017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0082541617905580604051927f0453e3ffce9b0d4f994d54652037d3e15d87ec29aab0aafba90ac322edc87c255f80a38152f35b7fb06ebf3d000000000000000000000000000000000000000000000000000000005f5260045ffd5b7f4ca249dc000000000000000000000000000000000000000000000000000000005f5260045ffd5b9091929394977fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff008a820301845288358281121561088d578301606082019073ffffffffffffffffffffffffffffffffffffffff611989602483016126d9565b1683526044810135600381101561088d576119a381612888565b60208401526064810135907fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffbd368290030182121561088d576024910101906020823592019267ffffffffffffffff831161088d578260051b3603841361088d578260809260606040840152520191905f905b808210611a35575050506020806001929a019401950193929491906116fe565b9091928335907fffffffff00000000000000000000000000000000000000000000000000000000821680920361088d57602081600193829352019401920190611a15565b611a8e9195503d805f833e6106b7818361279a565b9387611632565b857f5502583a000000000000000000000000000000000000000000000000000000005f5260045260245ffd5b7f435db348000000000000000000000000000000000000000000000000000000005f527f736572766963650000000000000000000000000000000000000000000000000060045260245ffd5b7f435db348000000000000000000000000000000000000000000000000000000005f527f76616c696461746f72000000000000000000000000000000000000000000000060045260245ffd5b3461088d575f7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d5773ffffffffffffffffffffffffffffffffffffffff7f0000000000000000000000000000000000000000000000000000000000000000163003611bee5760206040517f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc8152f35b7fe07c8dba000000000000000000000000000000000000000000000000000000005f5260045ffd5b60407ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d57611c486126b6565b60243567ffffffffffffffff811161088d57611c68903690600401612842565b73ffffffffffffffffffffffffffffffffffffffff7f000000000000000000000000000000000000000000000000000000000000000016803014908115611f58575b50611bee57335f9081527fb7db2dd08fcb62d0c9e08c51941cae53c267786a0b75803fb7960902fc8ef97d602052604090205460ff1615611f285773ffffffffffffffffffffffffffffffffffffffff8216916040517f52d1902d000000000000000000000000000000000000000000000000000000008152602081600481875afa5f9181611ef4575b50611d6557837f4c9c8ce3000000000000000000000000000000000000000000000000000000005f5260045260245ffd5b807f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc859203611ec95750813b15611e9e57807fffffffffffffffffffffffff00000000000000000000000000000000000000007f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc5416177f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc557fbc7cd75a20ee27fd9adebab32041f755214dbc6bffa90cc0225b39da2e5c2d3b5f80a2815115611e6d575f80836020610b9b95519101845af43d15611e65573d91611e4983612808565b92611e57604051948561279a565b83523d5f602085013e613333565b606091613333565b505034611e7657005b7fb398979f000000000000000000000000000000000000000000000000000000005f5260045ffd5b7f4c9c8ce3000000000000000000000000000000000000000000000000000000005f5260045260245ffd5b7faa1d49a4000000000000000000000000000000000000000000000000000000005f5260045260245ffd5b9091506020813d602011611f20575b81611f106020938361279a565b8101031261088d57519085611d34565b3d9150611f03565b7fe2517d3f000000000000000000000000000000000000000000000000000000005f52336004525f60245260445ffd5b905073ffffffffffffffffffffffffffffffffffffffff7f360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc5416141583611caa565b3461088d57611fa8366126fa565b93929190611fb533612af0565b93611fbf81612888565b80612009575082610b60827fe5e0650048e213b8a668474e72c774ec69d8a6830270b7cc1c339fcd6a3b2e419773ffffffffffffffffffffffffffffffffffffffff940190612a63565b91949293929161201881612888565b600181036120675750610c7b610c49827f28fcdc3e3355f548f5fe83373acf91a82e1e561ee22797f6e91f831d2b2b3e139473ffffffffffffffffffffffffffffffffffffffff940190612a46565b60029061207381612888565b03610de257612084918101906128bf565b901561211057916120b48360208073ffffffffffffffffffffffffffffffffffffffff95965183010191016129b1565b81519592909416935f5b8681106120c757005b808686867f147c7aeaea1a7b56f7269db0eaea2435d8f957090d1bee114b6a6df6e556c42b6120f860019689612a05565b518d612107610d20888b612a05565b0390a4016120be565b73ffffffffffffffffffffffffffffffffffffffff610c7b610da9836020807f147c7aeaea1a7b56f7269db0eaea2435d8f957090d1bee114b6a6df6e556c42b9651830101910161291a565b3461088d5761216a366126fa565b612178949392919433612af0565b9361218281612888565b610de257826121ca8673ffffffffffffffffffffffffffffffffffffffff937f14bed88907ac31fe1ba4cf8981f80fd25e29877a08d1568c7210adc31ee9bc95980190612a63565b6040805173ffffffffffffffffffffffffffffffffffffffff89168152602081019490945291999098939095169491a48261220157005b602073ffffffffffffffffffffffffffffffffffffffff807fa2b448c8495be4baf0f3195bf0d82d5ec29d24aa3c5dd949969149bd797fb3159360405196875216951693a4005b3461088d5760407ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d5761227f612693565b3373ffffffffffffffffffffffffffffffffffffffff8216036122a857610b9b90600435612fd2565b7f6697b232000000000000000000000000000000000000000000000000000000005f5260045ffd5b3461088d575f7ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d5760207f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0354604051908152f35b3461088d5760407ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d57610b9b600435612367612693565b906123a061104f825f527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b626800602052600160405f20015490565b612ec0565b3461088d5760207ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d57602061240d6004355f527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b626800602052600160405f20015490565b604051908152f35b3461088d57612423366126fa565b9392919061243033612af0565b9361243a81612888565b80612484575082610b60827f86d733c2654f9db1a830cfbbf2180ee3329101d853428a7ead4e85ddb3230d609773ffffffffffffffffffffffffffffffffffffffff940190612a63565b91949293929161249381612888565b600181036124e25750610c7b610c49827fa36201ae386aaacb89bc573b7c0ecc0913a93028f710f28ca29840454f4468869473ffffffffffffffffffffffffffffffffffffffff940190612a46565b6002906124ee81612888565b03610de2576124ff918101906128bf565b901561258b579161252f8360208073ffffffffffffffffffffffffffffffffffffffff95965183010191016129b1565b81519592909416935f5b86811061254257005b808686867fa34d0136fb3d65c2424efbe91bfe903716015137d5dd5e965f59e7f0820eb2c361257360019689612a05565b518d612582610d20888b612a05565b0390a401612539565b73ffffffffffffffffffffffffffffffffffffffff610c7b610da9836020807fa34d0136fb3d65c2424efbe91bfe903716015137d5dd5e965f59e7f0820eb2c39651830101910161291a565b3461088d5760207ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc36011261088d57600435907fffffffff00000000000000000000000000000000000000000000000000000000821680920361088d57817f7965db0b0000000000000000000000000000000000000000000000000000000060209314908115612669575b5015158152f35b7f01ffc9a70000000000000000000000000000000000000000000000000000000091501483612662565b6024359073ffffffffffffffffffffffffffffffffffffffff8216820361088d57565b6004359073ffffffffffffffffffffffffffffffffffffffff8216820361088d57565b359073ffffffffffffffffffffffffffffffffffffffff8216820361088d57565b60807ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc82011261088d57600435600381101561088d57916024359160443573ffffffffffffffffffffffffffffffffffffffff8116810361088d579160643567ffffffffffffffff811161088d578260238201121561088d5780600401359267ffffffffffffffff841161088d576024848301011161088d576024019190565b90601f7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0910116810190811067ffffffffffffffff8211176127db57604052565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52604160045260245ffd5b67ffffffffffffffff81116127db57601f017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe01660200190565b81601f8201121561088d5780359061285982612808565b92612867604051948561279a565b8284526020838301011161088d57815f926020809301838601378301015290565b6003111561289257565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52602160045260245ffd5b91909160408184031261088d578035801515810361088d5792602082013567ffffffffffffffff811161088d576128f69201612842565b90565b519073ffffffffffffffffffffffffffffffffffffffff8216820361088d57565b9081606091031261088d5761292e816128f9565b916040602083015192015190565b67ffffffffffffffff81116127db5760051b60200190565b9080601f8301121561088d57815161296b8161293c565b92612979604051948561279a565b81845260208085019260051b82010192831161088d57602001905b8282106129a15750505090565b8151815260209182019101612994565b9160608383031261088d576129c5836128f9565b92602081015167ffffffffffffffff811161088d57836129e6918301612954565b92604082015167ffffffffffffffff811161088d576128f69201612954565b8051821015612a195760209160051b010190565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52603260045260245ffd5b919082604091031261088d576020612a5d836126d9565b92013590565b919082608091031261088d57612a78826126d9565b916020810135916060612a5d604084016126d9565b60208183031261088d5780519067ffffffffffffffff821161088d570181601f8201121561088d57805190612ac182612808565b92612acf604051948561279a565b8284526020838301011161088d57815f9260208093018386015e8301015290565b73ffffffffffffffffffffffffffffffffffffffff16805f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0660205260405f2054908115612b9c57815f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0760205260ff60405f20541615612b71575090565b7fae111e92000000000000000000000000000000000000000000000000000000005f5260045260245ffd5b7f4b73e4e6000000000000000000000000000000000000000000000000000000005f5260045260245ffd5b335f9081527f511d0314ee32589a99ab73eccd900c257efd9224711c0e5aadda466017c07f6c602052604090205460ff1615612bff57565b7fe2517d3f000000000000000000000000000000000000000000000000000000005f52336004527faf290d8680820aad922855f39b306097b20e28774d6c1ad35a20325630c3a02c60245260445ffd5b805f527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b62680060205260405f2073ffffffffffffffffffffffffffffffffffffffff33165f5260205260ff60405f20541615612ca65750565b7fe2517d3f000000000000000000000000000000000000000000000000000000005f523360045260245260445ffd5b73ffffffffffffffffffffffffffffffffffffffff81165f9081527fb7db2dd08fcb62d0c9e08c51941cae53c267786a0b75803fb7960902fc8ef97d602052604090205460ff16612db75773ffffffffffffffffffffffffffffffffffffffff165f8181527fb7db2dd08fcb62d0c9e08c51941cae53c267786a0b75803fb7960902fc8ef97d6020526040812080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff001660011790553391907f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d8180a4600190565b505f90565b73ffffffffffffffffffffffffffffffffffffffff81165f9081527f511d0314ee32589a99ab73eccd900c257efd9224711c0e5aadda466017c07f6c602052604090205460ff16612db75773ffffffffffffffffffffffffffffffffffffffff165f8181527f511d0314ee32589a99ab73eccd900c257efd9224711c0e5aadda466017c07f6c6020526040812080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff001660011790553391907faf290d8680820aad922855f39b306097b20e28774d6c1ad35a20325630c3a02c907f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d9080a4600190565b805f527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b62680060205260405f2073ffffffffffffffffffffffffffffffffffffffff83165f5260205260ff60405f205416155f14612fcc57805f527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b62680060205260405f2073ffffffffffffffffffffffffffffffffffffffff83165f5260205260405f2060017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0082541617905573ffffffffffffffffffffffffffffffffffffffff339216907f2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d5f80a4600190565b50505f90565b805f527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b62680060205260405f2073ffffffffffffffffffffffffffffffffffffffff83165f5260205260ff60405f2054165f14612fcc57805f527f02dd7bc7dec4dceedda775e58dd541e08a116c6c53815c0bd028192f7b62680060205260405f2073ffffffffffffffffffffffffffffffffffffffff83165f5260205260405f207fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00815416905573ffffffffffffffffffffffffffffffffffffffff339216907ff6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b5f80a4600190565b613104907f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e036133cc565b90549060031b1c90815f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0560205273ffffffffffffffffffffffffffffffffffffffff60405f20541690565b60208183031261088d5780519067ffffffffffffffff821161088d57019060608282031261088d57604051916060830183811067ffffffffffffffff8211176127db57604052805173ffffffffffffffffffffffffffffffffffffffff8116810361088d5783526020810151600381101561088d57602084015260408101519067ffffffffffffffff821161088d57019080601f8301121561088d578151906131f98261293c565b92613207604051948561279a565b82845260208085019360051b82010191821161088d57602001915b81831061323457505050604082015290565b82517fffffffff000000000000000000000000000000000000000000000000000000008116810361088d57815260209283019201613222565b805f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0560205260405f205480155f146132d457505f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0460205260405f20541515905f90565b600192909150565b60ff7ff0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a005460401c161561330b57565b7fd7e6bcf8000000000000000000000000000000000000000000000000000000005f5260045ffd5b90613370575080511561334857805190602001fd5b7fd6bda275000000000000000000000000000000000000000000000000000000005f5260045ffd5b815115806133c3575b613381575090565b73ffffffffffffffffffffffffffffffffffffffff907f9996b315000000000000000000000000000000000000000000000000000000005f521660045260245ffd5b50803b15613379565b8054821015612a19575f5260205f2001905f90565b805f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0460205260405f2054155f14612db7577f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0354680100000000000000008110156127db576134d061349b8260018594017f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e03557f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e036133cc565b81939154907fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff9060031b92831b921b19161790565b90557f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0354905f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0460205260405f2055600190565b5f8181527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0460205260409020548015612fcc577fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff810181811161378f577f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0354907fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff820191821161378f578181036136fa575b5050507f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e035480156136cd577fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0161364e817f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e036133cc565b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff82549160031b1b191690557f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e03555f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e046020525f6040812055600190565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52603160045260245ffd5b61375a61372a61349b937f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e036133cc565b90549060031b1c9283927f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e036133cc565b90555f527f11d8116c90363a5c9c6e1d5a32c41784fb521cabceaeed518cf2f20332b24e0460205260405f20555f80806135d7565b7f4e487b71000000000000000000000000000000000000000000000000000000005f52601160045260245ffdfea26469706673582212200a5c8274b283697038a9cd64dbd268813cdae63f0184378a25718ff525ecc75664736f6c634300081e0033f0c57e16840df040f15088dc2f81fe391c3923bec73e23a9662efc9c229c6a00",
 }
 
 // ForgeFactory is an auto generated Go binding around an Ethereum contract.
@@ -52,7 +54,8 @@ func (c *ForgeFactory) Instance(backend bind.ContractBackend, addr common.Addres
 }
 
 // PackDEFAULTADMINROLE is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xa217fddf.
+// the contract method with ID 0xa217fddf.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function DEFAULT_ADMIN_ROLE() view returns(bytes32)
 func (forgeFactory *ForgeFactory) PackDEFAULTADMINROLE() []byte {
@@ -61,6 +64,15 @@ func (forgeFactory *ForgeFactory) PackDEFAULTADMINROLE() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackDEFAULTADMINROLE is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xa217fddf.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function DEFAULT_ADMIN_ROLE() view returns(bytes32)
+func (forgeFactory *ForgeFactory) TryPackDEFAULTADMINROLE() ([]byte, error) {
+	return forgeFactory.abi.Pack("DEFAULT_ADMIN_ROLE")
 }
 
 // UnpackDEFAULTADMINROLE is the Go binding that unpacks the parameters returned
@@ -73,11 +85,12 @@ func (forgeFactory *ForgeFactory) UnpackDEFAULTADMINROLE(data []byte) ([32]byte,
 		return *new([32]byte), err
 	}
 	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
-	return out0, err
+	return out0, nil
 }
 
 // PackUPGRADEINTERFACEVERSION is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xad3cb1cc.
+// the contract method with ID 0xad3cb1cc.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function UPGRADE_INTERFACE_VERSION() view returns(string)
 func (forgeFactory *ForgeFactory) PackUPGRADEINTERFACEVERSION() []byte {
@@ -86,6 +99,15 @@ func (forgeFactory *ForgeFactory) PackUPGRADEINTERFACEVERSION() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackUPGRADEINTERFACEVERSION is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xad3cb1cc.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function UPGRADE_INTERFACE_VERSION() view returns(string)
+func (forgeFactory *ForgeFactory) TryPackUPGRADEINTERFACEVERSION() ([]byte, error) {
+	return forgeFactory.abi.Pack("UPGRADE_INTERFACE_VERSION")
 }
 
 // UnpackUPGRADEINTERFACEVERSION is the Go binding that unpacks the parameters returned
@@ -98,11 +120,12 @@ func (forgeFactory *ForgeFactory) UnpackUPGRADEINTERFACEVERSION(data []byte) (st
 		return *new(string), err
 	}
 	out0 := *abi.ConvertType(out[0], new(string)).(*string)
-	return out0, err
+	return out0, nil
 }
 
 // PackAddService is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x7f765bfe.
+// the contract method with ID 0x7f765bfe.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function addService(address owner, address validator, bytes32 service, (address,uint8,bytes4[])[] addCuts) returns(address forge)
 func (forgeFactory *ForgeFactory) PackAddService(owner common.Address, validator common.Address, service [32]byte, addCuts []IDiamondCutFacetCut) []byte {
@@ -111,6 +134,15 @@ func (forgeFactory *ForgeFactory) PackAddService(owner common.Address, validator
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackAddService is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x7f765bfe.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function addService(address owner, address validator, bytes32 service, (address,uint8,bytes4[])[] addCuts) returns(address forge)
+func (forgeFactory *ForgeFactory) TryPackAddService(owner common.Address, validator common.Address, service [32]byte, addCuts []IDiamondCutFacetCut) ([]byte, error) {
+	return forgeFactory.abi.Pack("addService", owner, validator, service, addCuts)
 }
 
 // UnpackAddService is the Go binding that unpacks the parameters returned
@@ -123,11 +155,12 @@ func (forgeFactory *ForgeFactory) UnpackAddService(data []byte) (common.Address,
 		return *new(common.Address), err
 	}
 	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
-	return out0, err
+	return out0, nil
 }
 
 // PackAlertBurn is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x3ea113d0.
+// the contract method with ID 0x3ea113d0.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function alertBurn(uint8 tokenType, uint256 uuid, address token, bytes data) returns()
 func (forgeFactory *ForgeFactory) PackAlertBurn(tokenType uint8, uuid *big.Int, token common.Address, data []byte) []byte {
@@ -138,8 +171,18 @@ func (forgeFactory *ForgeFactory) PackAlertBurn(tokenType uint8, uuid *big.Int, 
 	return enc
 }
 
+// TryPackAlertBurn is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x3ea113d0.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function alertBurn(uint8 tokenType, uint256 uuid, address token, bytes data) returns()
+func (forgeFactory *ForgeFactory) TryPackAlertBurn(tokenType uint8, uuid *big.Int, token common.Address, data []byte) ([]byte, error) {
+	return forgeFactory.abi.Pack("alertBurn", tokenType, uuid, token, data)
+}
+
 // PackAlertMint is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xe98a5784.
+// the contract method with ID 0xe98a5784.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function alertMint(uint8 tokenType, uint256 uuid, address token, bytes data) returns()
 func (forgeFactory *ForgeFactory) PackAlertMint(tokenType uint8, uuid *big.Int, token common.Address, data []byte) []byte {
@@ -150,8 +193,18 @@ func (forgeFactory *ForgeFactory) PackAlertMint(tokenType uint8, uuid *big.Int, 
 	return enc
 }
 
+// TryPackAlertMint is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xe98a5784.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function alertMint(uint8 tokenType, uint256 uuid, address token, bytes data) returns()
+func (forgeFactory *ForgeFactory) TryPackAlertMint(tokenType uint8, uuid *big.Int, token common.Address, data []byte) ([]byte, error) {
+	return forgeFactory.abi.Pack("alertMint", tokenType, uuid, token, data)
+}
+
 // PackAlertTransfer is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x0b7e40c6.
+// the contract method with ID 0x0b7e40c6.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function alertTransfer(uint8 tokenType, uint256 uuid, address token, bytes data) returns()
 func (forgeFactory *ForgeFactory) PackAlertTransfer(tokenType uint8, uuid *big.Int, token common.Address, data []byte) []byte {
@@ -162,8 +215,18 @@ func (forgeFactory *ForgeFactory) PackAlertTransfer(tokenType uint8, uuid *big.I
 	return enc
 }
 
+// TryPackAlertTransfer is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x0b7e40c6.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function alertTransfer(uint8 tokenType, uint256 uuid, address token, bytes data) returns()
+func (forgeFactory *ForgeFactory) TryPackAlertTransfer(tokenType uint8, uuid *big.Int, token common.Address, data []byte) ([]byte, error) {
+	return forgeFactory.abi.Pack("alertTransfer", tokenType, uuid, token, data)
+}
+
 // PackAlertTransferFrom is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x3a15d070.
+// the contract method with ID 0x3a15d070.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function alertTransferFrom(uint8 tokenType, uint256 uuid, address token, bytes data) returns()
 func (forgeFactory *ForgeFactory) PackAlertTransferFrom(tokenType uint8, uuid *big.Int, token common.Address, data []byte) []byte {
@@ -174,8 +237,18 @@ func (forgeFactory *ForgeFactory) PackAlertTransferFrom(tokenType uint8, uuid *b
 	return enc
 }
 
+// TryPackAlertTransferFrom is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x3a15d070.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function alertTransferFrom(uint8 tokenType, uint256 uuid, address token, bytes data) returns()
+func (forgeFactory *ForgeFactory) TryPackAlertTransferFrom(tokenType uint8, uuid *big.Int, token common.Address, data []byte) ([]byte, error) {
+	return forgeFactory.abi.Pack("alertTransferFrom", tokenType, uuid, token, data)
+}
+
 // PackAllForges is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xe57997d2.
+// the contract method with ID 0xe57997d2.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function allForges() view returns(bytes32[], address[])
 func (forgeFactory *ForgeFactory) PackAllForges() []byte {
@@ -184,6 +257,15 @@ func (forgeFactory *ForgeFactory) PackAllForges() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackAllForges is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xe57997d2.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function allForges() view returns(bytes32[], address[])
+func (forgeFactory *ForgeFactory) TryPackAllForges() ([]byte, error) {
+	return forgeFactory.abi.Pack("allForges")
 }
 
 // AllForgesOutput serves as a container for the return parameters of contract
@@ -205,12 +287,12 @@ func (forgeFactory *ForgeFactory) UnpackAllForges(data []byte) (AllForgesOutput,
 	}
 	outstruct.Arg0 = *abi.ConvertType(out[0], new([][32]byte)).(*[][32]byte)
 	outstruct.Arg1 = *abi.ConvertType(out[1], new([]common.Address)).(*[]common.Address)
-	return *outstruct, err
-
+	return *outstruct, nil
 }
 
 // PackForgeByIndex is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x9ca92df9.
+// the contract method with ID 0x9ca92df9.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function forgeByIndex(uint256 index) view returns(bytes32 service, address forge, bool running)
 func (forgeFactory *ForgeFactory) PackForgeByIndex(index *big.Int) []byte {
@@ -219,6 +301,15 @@ func (forgeFactory *ForgeFactory) PackForgeByIndex(index *big.Int) []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackForgeByIndex is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x9ca92df9.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function forgeByIndex(uint256 index) view returns(bytes32 service, address forge, bool running)
+func (forgeFactory *ForgeFactory) TryPackForgeByIndex(index *big.Int) ([]byte, error) {
+	return forgeFactory.abi.Pack("forgeByIndex", index)
 }
 
 // ForgeByIndexOutput serves as a container for the return parameters of contract
@@ -242,12 +333,12 @@ func (forgeFactory *ForgeFactory) UnpackForgeByIndex(data []byte) (ForgeByIndexO
 	outstruct.Service = *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
 	outstruct.Forge = *abi.ConvertType(out[1], new(common.Address)).(*common.Address)
 	outstruct.Running = *abi.ConvertType(out[2], new(bool)).(*bool)
-	return *outstruct, err
-
+	return *outstruct, nil
 }
 
 // PackForgeByService is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xec0b6a4d.
+// the contract method with ID 0xec0b6a4d.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function forgeByService(bytes32 service) view returns(address forge, bool running)
 func (forgeFactory *ForgeFactory) PackForgeByService(service [32]byte) []byte {
@@ -256,6 +347,15 @@ func (forgeFactory *ForgeFactory) PackForgeByService(service [32]byte) []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackForgeByService is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xec0b6a4d.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function forgeByService(bytes32 service) view returns(address forge, bool running)
+func (forgeFactory *ForgeFactory) TryPackForgeByService(service [32]byte) ([]byte, error) {
+	return forgeFactory.abi.Pack("forgeByService", service)
 }
 
 // ForgeByServiceOutput serves as a container for the return parameters of contract
@@ -277,12 +377,12 @@ func (forgeFactory *ForgeFactory) UnpackForgeByService(data []byte) (ForgeByServ
 	}
 	outstruct.Forge = *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
 	outstruct.Running = *abi.ConvertType(out[1], new(bool)).(*bool)
-	return *outstruct, err
-
+	return *outstruct, nil
 }
 
 // PackGetRoleAdmin is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x248a9ca3.
+// the contract method with ID 0x248a9ca3.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function getRoleAdmin(bytes32 role) view returns(bytes32)
 func (forgeFactory *ForgeFactory) PackGetRoleAdmin(role [32]byte) []byte {
@@ -291,6 +391,15 @@ func (forgeFactory *ForgeFactory) PackGetRoleAdmin(role [32]byte) []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackGetRoleAdmin is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x248a9ca3.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function getRoleAdmin(bytes32 role) view returns(bytes32)
+func (forgeFactory *ForgeFactory) TryPackGetRoleAdmin(role [32]byte) ([]byte, error) {
+	return forgeFactory.abi.Pack("getRoleAdmin", role)
 }
 
 // UnpackGetRoleAdmin is the Go binding that unpacks the parameters returned
@@ -303,11 +412,12 @@ func (forgeFactory *ForgeFactory) UnpackGetRoleAdmin(data []byte) ([32]byte, err
 		return *new([32]byte), err
 	}
 	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
-	return out0, err
+	return out0, nil
 }
 
 // PackGrantRole is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x2f2ff15d.
+// the contract method with ID 0x2f2ff15d.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function grantRole(bytes32 role, address account) returns()
 func (forgeFactory *ForgeFactory) PackGrantRole(role [32]byte, account common.Address) []byte {
@@ -318,8 +428,18 @@ func (forgeFactory *ForgeFactory) PackGrantRole(role [32]byte, account common.Ad
 	return enc
 }
 
+// TryPackGrantRole is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x2f2ff15d.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function grantRole(bytes32 role, address account) returns()
+func (forgeFactory *ForgeFactory) TryPackGrantRole(role [32]byte, account common.Address) ([]byte, error) {
+	return forgeFactory.abi.Pack("grantRole", role, account)
+}
+
 // PackHasRole is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x91d14854.
+// the contract method with ID 0x91d14854.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function hasRole(bytes32 role, address account) view returns(bool)
 func (forgeFactory *ForgeFactory) PackHasRole(role [32]byte, account common.Address) []byte {
@@ -328,6 +448,15 @@ func (forgeFactory *ForgeFactory) PackHasRole(role [32]byte, account common.Addr
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackHasRole is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x91d14854.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function hasRole(bytes32 role, address account) view returns(bool)
+func (forgeFactory *ForgeFactory) TryPackHasRole(role [32]byte, account common.Address) ([]byte, error) {
+	return forgeFactory.abi.Pack("hasRole", role, account)
 }
 
 // UnpackHasRole is the Go binding that unpacks the parameters returned
@@ -340,11 +469,12 @@ func (forgeFactory *ForgeFactory) UnpackHasRole(data []byte) (bool, error) {
 		return *new(bool), err
 	}
 	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-	return out0, err
+	return out0, nil
 }
 
 // PackInitialize is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xf8c8765e.
+// the contract method with ID 0xf8c8765e.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function initialize(address _owner, address _forgeProxyCode, address _diamondImpl, address _baseImpl) returns()
 func (forgeFactory *ForgeFactory) PackInitialize(owner common.Address, forgeProxyCode common.Address, diamondImpl common.Address, baseImpl common.Address) []byte {
@@ -355,8 +485,18 @@ func (forgeFactory *ForgeFactory) PackInitialize(owner common.Address, forgeProx
 	return enc
 }
 
+// TryPackInitialize is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xf8c8765e.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function initialize(address _owner, address _forgeProxyCode, address _diamondImpl, address _baseImpl) returns()
+func (forgeFactory *ForgeFactory) TryPackInitialize(owner common.Address, forgeProxyCode common.Address, diamondImpl common.Address, baseImpl common.Address) ([]byte, error) {
+	return forgeFactory.abi.Pack("initialize", owner, forgeProxyCode, diamondImpl, baseImpl)
+}
+
 // PackIsRunningForge is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xc7525cba.
+// the contract method with ID 0xc7525cba.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function isRunningForge(address forge) view returns(bytes32 service, bool running)
 func (forgeFactory *ForgeFactory) PackIsRunningForge(forge common.Address) []byte {
@@ -365,6 +505,15 @@ func (forgeFactory *ForgeFactory) PackIsRunningForge(forge common.Address) []byt
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackIsRunningForge is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xc7525cba.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function isRunningForge(address forge) view returns(bytes32 service, bool running)
+func (forgeFactory *ForgeFactory) TryPackIsRunningForge(forge common.Address) ([]byte, error) {
+	return forgeFactory.abi.Pack("isRunningForge", forge)
 }
 
 // IsRunningForgeOutput serves as a container for the return parameters of contract
@@ -386,12 +535,12 @@ func (forgeFactory *ForgeFactory) UnpackIsRunningForge(data []byte) (IsRunningFo
 	}
 	outstruct.Service = *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
 	outstruct.Running = *abi.ConvertType(out[1], new(bool)).(*bool)
-	return *outstruct, err
-
+	return *outstruct, nil
 }
 
 // PackLengthAllForges is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x2f44ec09.
+// the contract method with ID 0x2f44ec09.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function lengthAllForges() view returns(uint256)
 func (forgeFactory *ForgeFactory) PackLengthAllForges() []byte {
@@ -400,6 +549,15 @@ func (forgeFactory *ForgeFactory) PackLengthAllForges() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackLengthAllForges is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x2f44ec09.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function lengthAllForges() view returns(uint256)
+func (forgeFactory *ForgeFactory) TryPackLengthAllForges() ([]byte, error) {
+	return forgeFactory.abi.Pack("lengthAllForges")
 }
 
 // UnpackLengthAllForges is the Go binding that unpacks the parameters returned
@@ -412,11 +570,12 @@ func (forgeFactory *ForgeFactory) UnpackLengthAllForges(data []byte) (*big.Int, 
 		return new(big.Int), err
 	}
 	out0 := abi.ConvertType(out[0], new(big.Int)).(*big.Int)
-	return out0, err
+	return out0, nil
 }
 
 // PackPauseService is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xecf5bcc1.
+// the contract method with ID 0xecf5bcc1.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function pauseService(bytes32 service, bool paused) returns()
 func (forgeFactory *ForgeFactory) PackPauseService(service [32]byte, paused bool) []byte {
@@ -427,8 +586,18 @@ func (forgeFactory *ForgeFactory) PackPauseService(service [32]byte, paused bool
 	return enc
 }
 
+// TryPackPauseService is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xecf5bcc1.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function pauseService(bytes32 service, bool paused) returns()
+func (forgeFactory *ForgeFactory) TryPackPauseService(service [32]byte, paused bool) ([]byte, error) {
+	return forgeFactory.abi.Pack("pauseService", service, paused)
+}
+
 // PackProxiableUUID is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x52d1902d.
+// the contract method with ID 0x52d1902d.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function proxiableUUID() view returns(bytes32)
 func (forgeFactory *ForgeFactory) PackProxiableUUID() []byte {
@@ -437,6 +606,15 @@ func (forgeFactory *ForgeFactory) PackProxiableUUID() []byte {
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackProxiableUUID is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x52d1902d.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function proxiableUUID() view returns(bytes32)
+func (forgeFactory *ForgeFactory) TryPackProxiableUUID() ([]byte, error) {
+	return forgeFactory.abi.Pack("proxiableUUID")
 }
 
 // UnpackProxiableUUID is the Go binding that unpacks the parameters returned
@@ -449,11 +627,12 @@ func (forgeFactory *ForgeFactory) UnpackProxiableUUID(data []byte) ([32]byte, er
 		return *new([32]byte), err
 	}
 	out0 := *abi.ConvertType(out[0], new([32]byte)).(*[32]byte)
-	return out0, err
+	return out0, nil
 }
 
 // PackRemoveService is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xd3884c3f.
+// the contract method with ID 0xd3884c3f.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function removeService(bytes32 service) returns()
 func (forgeFactory *ForgeFactory) PackRemoveService(service [32]byte) []byte {
@@ -464,8 +643,18 @@ func (forgeFactory *ForgeFactory) PackRemoveService(service [32]byte) []byte {
 	return enc
 }
 
+// TryPackRemoveService is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xd3884c3f.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function removeService(bytes32 service) returns()
+func (forgeFactory *ForgeFactory) TryPackRemoveService(service [32]byte) ([]byte, error) {
+	return forgeFactory.abi.Pack("removeService", service)
+}
+
 // PackRenounceRole is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x36568abe.
+// the contract method with ID 0x36568abe.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function renounceRole(bytes32 role, address callerConfirmation) returns()
 func (forgeFactory *ForgeFactory) PackRenounceRole(role [32]byte, callerConfirmation common.Address) []byte {
@@ -476,8 +665,18 @@ func (forgeFactory *ForgeFactory) PackRenounceRole(role [32]byte, callerConfirma
 	return enc
 }
 
+// TryPackRenounceRole is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x36568abe.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function renounceRole(bytes32 role, address callerConfirmation) returns()
+func (forgeFactory *ForgeFactory) TryPackRenounceRole(role [32]byte, callerConfirmation common.Address) ([]byte, error) {
+	return forgeFactory.abi.Pack("renounceRole", role, callerConfirmation)
+}
+
 // PackRevokeRole is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0xd547741f.
+// the contract method with ID 0xd547741f.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function revokeRole(bytes32 role, address account) returns()
 func (forgeFactory *ForgeFactory) PackRevokeRole(role [32]byte, account common.Address) []byte {
@@ -488,8 +687,18 @@ func (forgeFactory *ForgeFactory) PackRevokeRole(role [32]byte, account common.A
 	return enc
 }
 
+// TryPackRevokeRole is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0xd547741f.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function revokeRole(bytes32 role, address account) returns()
+func (forgeFactory *ForgeFactory) TryPackRevokeRole(role [32]byte, account common.Address) ([]byte, error) {
+	return forgeFactory.abi.Pack("revokeRole", role, account)
+}
+
 // PackSupportsInterface is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x01ffc9a7.
+// the contract method with ID 0x01ffc9a7.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function supportsInterface(bytes4 interfaceId) view returns(bool)
 func (forgeFactory *ForgeFactory) PackSupportsInterface(interfaceId [4]byte) []byte {
@@ -498,6 +707,15 @@ func (forgeFactory *ForgeFactory) PackSupportsInterface(interfaceId [4]byte) []b
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackSupportsInterface is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x01ffc9a7.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function supportsInterface(bytes4 interfaceId) view returns(bool)
+func (forgeFactory *ForgeFactory) TryPackSupportsInterface(interfaceId [4]byte) ([]byte, error) {
+	return forgeFactory.abi.Pack("supportsInterface", interfaceId)
 }
 
 // UnpackSupportsInterface is the Go binding that unpacks the parameters returned
@@ -510,11 +728,12 @@ func (forgeFactory *ForgeFactory) UnpackSupportsInterface(data []byte) (bool, er
 		return *new(bool), err
 	}
 	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
-	return out0, err
+	return out0, nil
 }
 
 // PackUpgradeToAndCall is the Go binding used to pack the parameters required for calling
-// the contract method with ID 0x4f1ef286.
+// the contract method with ID 0x4f1ef286.  This method will panic if any
+// invalid/nil inputs are passed.
 //
 // Solidity: function upgradeToAndCall(address newImplementation, bytes data) payable returns()
 func (forgeFactory *ForgeFactory) PackUpgradeToAndCall(newImplementation common.Address, data []byte) []byte {
@@ -523,6 +742,15 @@ func (forgeFactory *ForgeFactory) PackUpgradeToAndCall(newImplementation common.
 		panic(err)
 	}
 	return enc
+}
+
+// TryPackUpgradeToAndCall is the Go binding used to pack the parameters required for calling
+// the contract method with ID 0x4f1ef286.  This method will return an error
+// if any inputs are invalid/nil.
+//
+// Solidity: function upgradeToAndCall(address newImplementation, bytes data) payable returns()
+func (forgeFactory *ForgeFactory) TryPackUpgradeToAndCall(newImplementation common.Address, data []byte) ([]byte, error) {
+	return forgeFactory.abi.Pack("upgradeToAndCall", newImplementation, data)
 }
 
 // ForgeFactoryERC1155Burned represents a ERC1155Burned event raised by the ForgeFactory contract.
@@ -549,7 +777,7 @@ func (ForgeFactoryERC1155Burned) ContractEventName() string {
 // Solidity: event ERC1155Burned(bytes32 indexed service, uint256 indexed uuid, address indexed from, address token, uint256 tokenID, uint256 amount)
 func (forgeFactory *ForgeFactory) UnpackERC1155BurnedEvent(log *types.Log) (*ForgeFactoryERC1155Burned, error) {
 	event := "ERC1155Burned"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryERC1155Burned)
@@ -595,7 +823,7 @@ func (ForgeFactoryERC1155Minted) ContractEventName() string {
 // Solidity: event ERC1155Minted(bytes32 indexed service, uint256 indexed uuid, address indexed to, address token, uint256 tokenID, uint256 amount)
 func (forgeFactory *ForgeFactory) UnpackERC1155MintedEvent(log *types.Log) (*ForgeFactoryERC1155Minted, error) {
 	event := "ERC1155Minted"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryERC1155Minted)
@@ -641,7 +869,7 @@ func (ForgeFactoryERC1155Transferred) ContractEventName() string {
 // Solidity: event ERC1155Transferred(bytes32 indexed service, uint256 indexed uuid, address indexed to, address token, uint256 tokenID, uint256 amount)
 func (forgeFactory *ForgeFactory) UnpackERC1155TransferredEvent(log *types.Log) (*ForgeFactoryERC1155Transferred, error) {
 	event := "ERC1155Transferred"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryERC1155Transferred)
@@ -686,7 +914,7 @@ func (ForgeFactoryERC20Burned) ContractEventName() string {
 // Solidity: event ERC20Burned(bytes32 indexed service, uint256 indexed uuid, address indexed from, address token, uint256 amount)
 func (forgeFactory *ForgeFactory) UnpackERC20BurnedEvent(log *types.Log) (*ForgeFactoryERC20Burned, error) {
 	event := "ERC20Burned"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryERC20Burned)
@@ -730,7 +958,7 @@ func (ForgeFactoryERC20FeeCollected) ContractEventName() string {
 // Solidity: event ERC20FeeCollected(uint256 indexed uuid, address indexed feeRecipient, address indexed token, uint256 fee)
 func (forgeFactory *ForgeFactory) UnpackERC20FeeCollectedEvent(log *types.Log) (*ForgeFactoryERC20FeeCollected, error) {
 	event := "ERC20FeeCollected"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryERC20FeeCollected)
@@ -775,7 +1003,7 @@ func (ForgeFactoryERC20Minted) ContractEventName() string {
 // Solidity: event ERC20Minted(bytes32 indexed service, uint256 indexed uuid, address indexed to, address token, uint256 amount)
 func (forgeFactory *ForgeFactory) UnpackERC20MintedEvent(log *types.Log) (*ForgeFactoryERC20Minted, error) {
 	event := "ERC20Minted"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryERC20Minted)
@@ -820,7 +1048,7 @@ func (ForgeFactoryERC20Transferred) ContractEventName() string {
 // Solidity: event ERC20Transferred(bytes32 indexed service, uint256 indexed uuid, address indexed to, address token, uint256 amount)
 func (forgeFactory *ForgeFactory) UnpackERC20TransferredEvent(log *types.Log) (*ForgeFactoryERC20Transferred, error) {
 	event := "ERC20Transferred"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryERC20Transferred)
@@ -865,7 +1093,7 @@ func (ForgeFactoryERC20TransferredFrom) ContractEventName() string {
 // Solidity: event ERC20TransferredFrom(bytes32 indexed service, uint256 indexed uuid, address indexed from, address token, uint256 amount)
 func (forgeFactory *ForgeFactory) UnpackERC20TransferredFromEvent(log *types.Log) (*ForgeFactoryERC20TransferredFrom, error) {
 	event := "ERC20TransferredFrom"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryERC20TransferredFrom)
@@ -910,7 +1138,7 @@ func (ForgeFactoryERC721Burned) ContractEventName() string {
 // Solidity: event ERC721Burned(bytes32 indexed service, uint256 indexed uuid, address indexed from, address token, uint256 tokenID)
 func (forgeFactory *ForgeFactory) UnpackERC721BurnedEvent(log *types.Log) (*ForgeFactoryERC721Burned, error) {
 	event := "ERC721Burned"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryERC721Burned)
@@ -955,7 +1183,7 @@ func (ForgeFactoryERC721Minted) ContractEventName() string {
 // Solidity: event ERC721Minted(bytes32 indexed service, uint256 indexed uuid, address indexed to, address token, uint256 tokenID)
 func (forgeFactory *ForgeFactory) UnpackERC721MintedEvent(log *types.Log) (*ForgeFactoryERC721Minted, error) {
 	event := "ERC721Minted"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryERC721Minted)
@@ -1000,7 +1228,7 @@ func (ForgeFactoryERC721Transferred) ContractEventName() string {
 // Solidity: event ERC721Transferred(bytes32 indexed service, uint256 indexed uuid, address indexed to, address token, uint256 tokenID)
 func (forgeFactory *ForgeFactory) UnpackERC721TransferredEvent(log *types.Log) (*ForgeFactoryERC721Transferred, error) {
 	event := "ERC721Transferred"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryERC721Transferred)
@@ -1041,7 +1269,7 @@ func (ForgeFactoryInitialized) ContractEventName() string {
 // Solidity: event Initialized(uint64 version)
 func (forgeFactory *ForgeFactory) UnpackInitializedEvent(log *types.Log) (*ForgeFactoryInitialized, error) {
 	event := "Initialized"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryInitialized)
@@ -1084,7 +1312,7 @@ func (ForgeFactoryRoleAdminChanged) ContractEventName() string {
 // Solidity: event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole)
 func (forgeFactory *ForgeFactory) UnpackRoleAdminChangedEvent(log *types.Log) (*ForgeFactoryRoleAdminChanged, error) {
 	event := "RoleAdminChanged"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryRoleAdminChanged)
@@ -1127,7 +1355,7 @@ func (ForgeFactoryRoleGranted) ContractEventName() string {
 // Solidity: event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender)
 func (forgeFactory *ForgeFactory) UnpackRoleGrantedEvent(log *types.Log) (*ForgeFactoryRoleGranted, error) {
 	event := "RoleGranted"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryRoleGranted)
@@ -1170,7 +1398,7 @@ func (ForgeFactoryRoleRevoked) ContractEventName() string {
 // Solidity: event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender)
 func (forgeFactory *ForgeFactory) UnpackRoleRevokedEvent(log *types.Log) (*ForgeFactoryRoleRevoked, error) {
 	event := "RoleRevoked"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryRoleRevoked)
@@ -1212,7 +1440,7 @@ func (ForgeFactoryServicePaused) ContractEventName() string {
 // Solidity: event ServicePaused(bytes32 indexed service, bool paused)
 func (forgeFactory *ForgeFactory) UnpackServicePausedEvent(log *types.Log) (*ForgeFactoryServicePaused, error) {
 	event := "ServicePaused"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryServicePaused)
@@ -1254,7 +1482,7 @@ func (ForgeFactoryServiceRegistered) ContractEventName() string {
 // Solidity: event ServiceRegistered(bytes32 indexed service, address indexed forge)
 func (forgeFactory *ForgeFactory) UnpackServiceRegisteredEvent(log *types.Log) (*ForgeFactoryServiceRegistered, error) {
 	event := "ServiceRegistered"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryServiceRegistered)
@@ -1295,7 +1523,7 @@ func (ForgeFactoryServiceUnregistered) ContractEventName() string {
 // Solidity: event ServiceUnregistered(bytes32 indexed service)
 func (forgeFactory *ForgeFactory) UnpackServiceUnregisteredEvent(log *types.Log) (*ForgeFactoryServiceUnregistered, error) {
 	event := "ServiceUnregistered"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryServiceUnregistered)
@@ -1336,7 +1564,7 @@ func (ForgeFactoryUpgraded) ContractEventName() string {
 // Solidity: event Upgraded(address indexed implementation)
 func (forgeFactory *ForgeFactory) UnpackUpgradedEvent(log *types.Log) (*ForgeFactoryUpgraded, error) {
 	event := "Upgraded"
-	if log.Topics[0] != forgeFactory.abi.Events[event].ID {
+	if len(log.Topics) == 0 || log.Topics[0] != forgeFactory.abi.Events[event].ID {
 		return nil, errors.New("event signature mismatch")
 	}
 	out := new(ForgeFactoryUpgraded)
