@@ -686,6 +686,141 @@ contract TestBlacklist is Test {
         assertFalse(BaseForge(FORGE).isBlacklisted(BLACKLIST_MANAGER.addr));
     }
 
+    function test_getBlacklistManagers_empty() external view {
+        address[] memory managers = BaseForge(FORGE).getBlacklistManagers();
+        assertEq(managers.length, 0);
+    }
+
+    function test_getBlacklistManagers_single() external {
+        _setupBlacklistManager(BLACKLIST_MANAGER.addr);
+
+        address[] memory managers = BaseForge(FORGE).getBlacklistManagers();
+        assertEq(managers.length, 1);
+        assertEq(managers[0], BLACKLIST_MANAGER.addr);
+    }
+
+    function test_getBlacklistManagers_multiple() external {
+        address manager1 = address(0x1001);
+        address manager2 = address(0x1002);
+        address manager3 = address(0x1003);
+
+        address[] memory managersToAdd = new address[](3);
+        managersToAdd[0] = manager1;
+        managersToAdd[1] = manager2;
+        managersToAdd[2] = manager3;
+
+        vm.prank(SERVICE_OWNER);
+        IBaseForgeFacetV2(FORGE).setBlacklistManager(managersToAdd, true);
+
+        address[] memory managers = BaseForge(FORGE).getBlacklistManagers();
+        assertEq(managers.length, 3);
+
+        // Verify all managers are in the list (order may vary due to EnumerableSet)
+        bool found1 = false;
+        bool found2 = false;
+        bool found3 = false;
+        for (uint256 i = 0; i < managers.length; i++) {
+            if (managers[i] == manager1) found1 = true;
+            if (managers[i] == manager2) found2 = true;
+            if (managers[i] == manager3) found3 = true;
+        }
+        assertTrue(found1 && found2 && found3);
+    }
+
+    function test_getBlacklistManagers_afterRemove() external {
+        address manager1 = address(0x1001);
+        address manager2 = address(0x1002);
+
+        address[] memory managersToAdd = new address[](2);
+        managersToAdd[0] = manager1;
+        managersToAdd[1] = manager2;
+
+        vm.prank(SERVICE_OWNER);
+        IBaseForgeFacetV2(FORGE).setBlacklistManager(managersToAdd, true);
+
+        assertEq(BaseForge(FORGE).getBlacklistManagers().length, 2);
+
+        // Remove one manager
+        address[] memory managerToRemove = new address[](1);
+        managerToRemove[0] = manager1;
+        vm.prank(SERVICE_OWNER);
+        IBaseForgeFacetV2(FORGE).setBlacklistManager(managerToRemove, false);
+
+        address[] memory managers = BaseForge(FORGE).getBlacklistManagers();
+        assertEq(managers.length, 1);
+        assertEq(managers[0], manager2);
+    }
+
+    function test_getBlacklistedAccounts_empty() external view {
+        address[] memory blacklisted = BaseForge(FORGE).getBlacklistedAccounts();
+        assertEq(blacklisted.length, 0);
+    }
+
+    function test_getBlacklistedAccounts_single() external {
+        _setupBlacklistManager(BLACKLIST_MANAGER.addr);
+        _addToBlacklist(ACCOUNT.addr);
+
+        address[] memory blacklisted = BaseForge(FORGE).getBlacklistedAccounts();
+        assertEq(blacklisted.length, 1);
+        assertEq(blacklisted[0], ACCOUNT.addr);
+    }
+
+    function test_getBlacklistedAccounts_multiple() external {
+        _setupBlacklistManager(BLACKLIST_MANAGER.addr);
+
+        address account1 = address(0x2001);
+        address account2 = address(0x2002);
+        address account3 = address(0x2003);
+
+        address[] memory accountsToAdd = new address[](3);
+        accountsToAdd[0] = account1;
+        accountsToAdd[1] = account2;
+        accountsToAdd[2] = account3;
+
+        vm.prank(BLACKLIST_MANAGER.addr);
+        IBaseForgeFacetV2(FORGE).updateBlacklist(accountsToAdd, true);
+
+        address[] memory blacklisted = BaseForge(FORGE).getBlacklistedAccounts();
+        assertEq(blacklisted.length, 3);
+
+        // Verify all accounts are in the list (order may vary due to EnumerableSet)
+        bool found1 = false;
+        bool found2 = false;
+        bool found3 = false;
+        for (uint256 i = 0; i < blacklisted.length; i++) {
+            if (blacklisted[i] == account1) found1 = true;
+            if (blacklisted[i] == account2) found2 = true;
+            if (blacklisted[i] == account3) found3 = true;
+        }
+        assertTrue(found1 && found2 && found3);
+    }
+
+    function test_getBlacklistedAccounts_afterRemove() external {
+        _setupBlacklistManager(BLACKLIST_MANAGER.addr);
+
+        address account1 = address(0x2001);
+        address account2 = address(0x2002);
+
+        address[] memory accountsToAdd = new address[](2);
+        accountsToAdd[0] = account1;
+        accountsToAdd[1] = account2;
+
+        vm.prank(BLACKLIST_MANAGER.addr);
+        IBaseForgeFacetV2(FORGE).updateBlacklist(accountsToAdd, true);
+
+        assertEq(BaseForge(FORGE).getBlacklistedAccounts().length, 2);
+
+        // Remove one account
+        address[] memory accountToRemove = new address[](1);
+        accountToRemove[0] = account1;
+        vm.prank(BLACKLIST_MANAGER.addr);
+        IBaseForgeFacetV2(FORGE).updateBlacklist(accountToRemove, false);
+
+        address[] memory blacklisted = BaseForge(FORGE).getBlacklistedAccounts();
+        assertEq(blacklisted.length, 1);
+        assertEq(blacklisted[0], account2);
+    }
+
     // ==================== Additional ERC20 Tests ====================
 
     function test_blacklisted_transferERC20_v2() external {

@@ -198,6 +198,14 @@ abstract contract BaseForge is Initializable, ContextUpgradeable, EIP712Upgradea
         return _getBlacklistStorage()._blacklisted.contains(account);
     }
 
+    function getBlacklistManagers() external view returns (address[] memory) {
+        return _getBlacklistStorage()._managers.values();
+    }
+
+    function getBlacklistedAccounts() external view returns (address[] memory) {
+        return _getBlacklistStorage()._blacklisted.values();
+    }
+
     function _setBlacklistManager(address[] memory managers, bool isManager) internal {
         BlacklistStorage storage $ = _getBlacklistStorage();
         for (uint256 i = 0; i < managers.length; i++) {
@@ -244,6 +252,8 @@ contract BaseForgeFacet is IDefaultDiamondCut, IBaseForgeFacetV2, BaseForge {
             BaseForge.validator.selector,
             BaseForge.isBlacklistManager.selector,
             BaseForge.isBlacklisted.selector,
+            BaseForge.getBlacklistManagers.selector,
+            BaseForge.getBlacklistedAccounts.selector,
             IBaseForgeFacet.setValidator.selector,
             IBaseForgeFacetV2.setBlacklistManager.selector,
             IBaseForgeFacetV2.updateBlacklist.selector
